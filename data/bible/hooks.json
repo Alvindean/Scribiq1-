@@ -1,0 +1,282 @@
+[
+  {
+    "id": "curiosity-gap",
+    "name": "Curiosity Gap",
+    "type": "curiosity",
+    "template": "The [thing] that [unexpected outcome] (and you're probably [doing it wrong])",
+    "example": "The morning routine that ruins your productivity (and you're probably doing it every day)",
+    "notes": "Use when reader already has familiarity with the topic but not the surprising angle. Triggers dopamine anticipation via information-gap theory — the brain experiences mild distress from incomplete information and compulsively seeks closure.",
+    "anatomy": "Known subject + unexpected/negative outcome + implication that reader is affected",
+    "relatedHooks": ["open-loop", "what-if-hook", "secret-revelation"]
+  },
+  {
+    "id": "pattern-interrupt",
+    "name": "Pattern Interrupt",
+    "type": "curiosity",
+    "template": "Stop. [Unexpected statement that breaks expectation].",
+    "example": "Stop. Everything you know about building habits is backwards.",
+    "notes": "Use at the very top of a piece to snap a scrolling reader out of passive consumption mode. Triggers an amygdala hijack — the brain's threat-detection system flags the unexpected input and forces attention.",
+    "anatomy": "Jarring single-word command + bold contradiction of assumed context",
+    "relatedHooks": ["bold-claim", "contrarian-hook", "false-assumption-challenge"]
+  },
+  {
+    "id": "identity-hook",
+    "name": "Identity Hook",
+    "type": "identity",
+    "template": "If you're [identity descriptor], you need to know this.",
+    "example": "If you're a first-generation entrepreneur, you need to know this about funding.",
+    "notes": "Use when you have a clearly defined audience segment. Activates mirror neurons and tribal identity circuitry — the reader self-selects in and feels the content was made specifically for them.",
+    "anatomy": "Conditional identity qualifier + urgent implication that exclusive knowledge follows",
+    "relatedHooks": ["relatability-hook", "empathy-hook", "promise-hook"]
+  },
+  {
+    "id": "fear-hook",
+    "name": "Fear Hook",
+    "type": "fear-urgency",
+    "template": "[Scary thing] is happening to [reader's group] right now.",
+    "example": "A silent confidence killer is happening to high performers right now.",
+    "notes": "Use when the problem is real, under-recognized, and your content offers the solution. Elevates cortisol and activates the brain's threat-detection system, making the reader feel compelled to read on to resolve the threat.",
+    "anatomy": "Named threat + specific affected group + present-tense immediacy",
+    "relatedHooks": ["loss-aversion-hook", "urgency-scarcity", "villain-hook"]
+  },
+  {
+    "id": "contrarian-hook",
+    "name": "Contrarian Hook",
+    "type": "contrarian",
+    "template": "Everyone says [conventional wisdom]. They're wrong.",
+    "example": "Everyone says you need to wake up at 5am to be successful. They're wrong.",
+    "notes": "Use when you have genuine evidence or a reframe that challenges a widely held belief. Triggers novelty-driven dopamine release and opens a curiosity gap — the reader must know why the consensus is wrong.",
+    "anatomy": "Stated common belief + blunt falsification",
+    "relatedHooks": ["bold-claim", "false-assumption-challenge", "paradox-hook"]
+  },
+  {
+    "id": "social-proof-hook",
+    "name": "Social Proof Hook",
+    "type": "social-proof",
+    "template": "[Large number] people can't all be wrong about [thing].",
+    "example": "47,000 founders can't all be wrong about this fundraising framework.",
+    "notes": "Use when you have real, verifiable numbers to cite. Reduces ambiguity through social validation — the brain uses others' behavior as a cognitive shortcut for determining correct action.",
+    "anatomy": "Specific large number + implied communal validation + named subject",
+    "relatedHooks": ["authority-hook", "data-hook", "specificity-hook"]
+  },
+  {
+    "id": "story-hook",
+    "name": "Story Hook",
+    "type": "story",
+    "template": "The day [specific event] changed everything.",
+    "example": "The day I lost my biggest client changed everything about how I run my business.",
+    "notes": "Use to open long-form content, email sequences, or sales pages. Drops the reader in medias res, activating narrative transportation — story immersion suspends analytical judgment and lowers resistance to persuasion.",
+    "anatomy": "Specific pivotal moment + consequence that implies transformation",
+    "relatedHooks": ["confession-hook", "before-after-hook", "villain-hook"]
+  },
+  {
+    "id": "data-hook",
+    "name": "Data Hook",
+    "type": "data",
+    "template": "In [year], [specific statistic] that nobody talks about.",
+    "example": "In 2023, 78% of B2B deals stall at the proposal stage — a fact nobody in sales training talks about.",
+    "notes": "Use when you have a genuinely surprising or under-reported statistic. Authority bias and specificity combine to build immediate credibility — the more precise the number, the more believable the claim.",
+    "anatomy": "Temporal anchor + precise statistic + implied information gap",
+    "relatedHooks": ["specificity-hook", "authority-hook", "social-proof-hook"]
+  },
+  {
+    "id": "open-loop",
+    "name": "Open Loop",
+    "type": "curiosity",
+    "template": "There are [N] reasons [outcome]. We'll get to the [Nth] one — the [surprising descriptor] one — at the end.",
+    "example": "There are 5 reasons most diets fail. We'll get to the fifth one — the one no nutritionist will tell you — at the end.",
+    "notes": "Use in list content, newsletters, and video scripts to drive completion rates. Exploits the Zeigarnik effect — the brain gives unfinished tasks preferential memory storage and creates a pull to close the loop.",
+    "anatomy": "Numbered promise + withheld payoff + superlative qualifier on the withheld item",
+    "relatedHooks": ["curiosity-gap", "secret-revelation", "data-hook"]
+  },
+  {
+    "id": "embedded-command",
+    "name": "Embedded Command",
+    "type": "nlp",
+    "template": "As you read this, you begin to notice [desired state].",
+    "example": "As you read this, you begin to notice how natural it feels to imagine running your own business.",
+    "notes": "Use in sales copy, landing pages, and high-commitment CTAs. An NLP technique that embeds a direct command within a larger innocuous sentence structure, bypassing the critical faculty that would reject a blunt instruction.",
+    "anatomy": "Presupposition frame + embedded imperative + desired outcome state",
+    "relatedHooks": ["future-pacing", "promise-hook", "relatability-hook"]
+  },
+  {
+    "id": "false-assumption-challenge",
+    "name": "False Assumption Challenge",
+    "type": "contrarian",
+    "template": "You think [thing], but that's actually not how [it] works.",
+    "example": "You think posting more content builds an audience faster, but that's actually not how the algorithm works.",
+    "notes": "Use when your content corrects a widely held misconception your audience is likely to hold. Triggers cognitive dissonance — the reader's existing mental model is challenged, and they must read on to update it.",
+    "anatomy": "Attribution of false belief to reader + correction signal + subject domain",
+    "relatedHooks": ["contrarian-hook", "pattern-interrupt", "bold-claim"]
+  },
+  {
+    "id": "what-if-hook",
+    "name": "What If Hook",
+    "type": "curiosity",
+    "template": "What if [conventional limitation] wasn't actually a constraint?",
+    "example": "What if needing 8 hours of sleep wasn't actually a biological constraint?",
+    "notes": "Use to open possibility-space content and reframe limiting beliefs. Opens a possibility space that didn't exist in the reader's mind a moment ago, triggering exploratory dopamine and inviting them to follow you into the unknown.",
+    "anatomy": "Hypothetical inversion of accepted constraint + invitation to explore",
+    "relatedHooks": ["curiosity-gap", "contrarian-hook", "future-pacing"]
+  },
+  {
+    "id": "specificity-hook",
+    "name": "Specificity Hook",
+    "type": "data",
+    "template": "[Hyper-specific detail or timeframe] instead of [vague equivalent].",
+    "example": "In exactly 14 days — not 'in a few weeks' — here's the skin transformation protocol that actually worked.",
+    "notes": "Use whenever you're tempted to use vague language like 'quickly' or 'soon.' Specificity signals that real experience or research is behind the claim — the brain uses precision as a proxy for credibility and truth.",
+    "anatomy": "Precise number or qualifier + explicit contrast with vague alternative",
+    "relatedHooks": ["data-hook", "bold-claim", "promise-hook"]
+  },
+  {
+    "id": "urgency-scarcity",
+    "name": "Urgency & Scarcity Hook",
+    "type": "fear-urgency",
+    "template": "Only [X] [spots/copies/hours] left. After that, [specific loss].",
+    "example": "Only 12 spots left in the October cohort. After that, the next opening isn't until March.",
+    "notes": "Use at decision points — checkout pages, email sequences, and event registration. Activates loss aversion circuits: the brain weights potential loss more heavily than equivalent gain, accelerating commitment decisions.",
+    "anatomy": "Precise remaining quantity + named deadline or cutoff + specific consequence of missing out",
+    "relatedHooks": ["fear-hook", "loss-aversion-hook", "urgency-scarcity"]
+  },
+  {
+    "id": "authority-hook",
+    "name": "Authority Hook",
+    "type": "social-proof",
+    "template": "[Credentialed institution or person] found that [claim].",
+    "example": "Harvard Business Review found that leaders who write daily are 3x more likely to reach executive roles.",
+    "notes": "Use when you have a genuine citation from a respected source. Authority bias — a cognitive shortcut that assigns greater credibility to credentialed sources — reduces the reader's analytical resistance to your claim.",
+    "anatomy": "Named authority source + empirical finding + implied significance for reader",
+    "relatedHooks": ["data-hook", "social-proof-hook", "specificity-hook"]
+  },
+  {
+    "id": "confession-hook",
+    "name": "Confession Hook",
+    "type": "story",
+    "template": "I have to be honest with you about [vulnerable admission].",
+    "example": "I have to be honest with you: I built my first course while secretly terrified no one would buy it.",
+    "notes": "Use to open content where trust is the primary barrier to conversion. Vulnerability triggers oxytocin release in the reader, creating a biochemical bond of intimacy and trust that makes subsequent claims far more persuasive.",
+    "anatomy": "Honesty signal + specific personal admission that risks judgment",
+    "relatedHooks": ["story-hook", "empathy-hook", "relatability-hook"]
+  },
+  {
+    "id": "before-after-hook",
+    "name": "Before-After Hook",
+    "type": "identity",
+    "template": "[Time period] ago I [was state A]. Today I [am state B]. Here's what changed.",
+    "example": "6 months ago I was billing $3,000/month. Today I charge $30,000 per project. Here's the one reframe that changed everything.",
+    "notes": "Use on sales pages, testimonial sections, and transformation-oriented content. Activates identity resonance by showing a plausible transformation arc — the reader projects themselves into the 'before' and desires the 'after.'",
+    "anatomy": "Specific time anchor + contrasting state A and state B + promise of bridge explanation",
+    "relatedHooks": ["transformation-hook", "promise-hook", "story-hook"]
+  },
+  {
+    "id": "secret-revelation",
+    "name": "Secret Revelation Hook",
+    "type": "curiosity",
+    "template": "What [authority/industry] doesn't want you to know about [thing].",
+    "example": "What the fitness industry doesn't want you to know about why most gym memberships fail.",
+    "notes": "Use when your content genuinely exposes a hidden mechanism or suppressed insight. Combines conspiracy framing with exclusivity dopamine — the promise of forbidden knowledge creates an urgent, almost compulsive need to read.",
+    "anatomy": "Named withholding authority + forbidden knowledge signal + subject domain",
+    "relatedHooks": ["curiosity-gap", "contrarian-hook", "villain-hook"]
+  },
+  {
+    "id": "relatability-hook",
+    "name": "Relatability Hook",
+    "type": "identity",
+    "template": "You know that feeling when [specific relatable situation]?",
+    "example": "You know that feeling when you've rewritten the same email four times and it still doesn't sound right?",
+    "notes": "Use to instantly validate a shared frustration before introducing a solution. Activates mirror neurons — the brain simulates the described experience — and triggers the relief of recognition: 'I'm not the only one.'",
+    "anatomy": "Shared-experience prompt + hyper-specific situation that only the target reader recognizes",
+    "relatedHooks": ["empathy-hook", "identity-hook", "confession-hook"]
+  },
+  {
+    "id": "future-pacing",
+    "name": "Future Pacing",
+    "type": "nlp",
+    "template": "Imagine [specific time] from now, when you [desired outcome state]...",
+    "example": "Imagine 90 days from now, when you open your laptop and your pipeline is already full before you send a single cold email...",
+    "notes": "Use in sales copy, onboarding sequences, and lead nurture emails. Borrowed from NLP timeline therapy — it causes the reader to mentally rehearse the desired future, making it feel real and achievable, which lowers purchase resistance.",
+    "anatomy": "Future time anchor + sensory-rich description of the desired outcome state",
+    "relatedHooks": ["embedded-command", "promise-hook", "transformation-hook"]
+  },
+  {
+    "id": "loss-aversion-hook",
+    "name": "Loss Aversion Hook",
+    "type": "fear-urgency",
+    "template": "Every day you wait, you're losing [specific thing].",
+    "example": "Every day you wait to systematize your sales process, you're losing three to five deals you never even know about.",
+    "notes": "Use as a bridge between problem-awareness and offer introduction. Draws on Kahneman's prospect theory — losses are neurologically weighted approximately twice as heavily as equivalent gains, making inaction feel increasingly costly.",
+    "anatomy": "Time-based inaction frame + specific and tangible ongoing loss",
+    "relatedHooks": ["urgency-scarcity", "fear-hook", "bold-claim"]
+  },
+  {
+    "id": "promise-hook",
+    "name": "Promise Hook",
+    "type": "identity",
+    "template": "By the time you finish [this piece/video/course], you will [specific transformation].",
+    "example": "By the time you finish this essay, you will have a complete framework for pricing your services without apology.",
+    "notes": "Use at the start of any content that requires significant time investment. Establishes a clear upfront contract with the reader — the brain needs to know the value exchange before committing attention, and this hook provides it explicitly.",
+    "anatomy": "Time-bounded completion frame + specific, concrete outcome promise",
+    "relatedHooks": ["before-after-hook", "transformation-hook", "identity-hook"]
+  },
+  {
+    "id": "question-hook",
+    "name": "Question Hook",
+    "type": "curiosity",
+    "template": "When was the last time you [specific meaningful action or state]?",
+    "example": "When was the last time you closed your laptop feeling like you'd actually done your best work?",
+    "notes": "Use to trigger immediate internal engagement before the reader has consciously decided to read. The brain cannot encounter a direct question without generating an answer — this automatic internal response creates instant engagement and emotional investment.",
+    "anatomy": "Direct temporal question + specific action or state that implies a gap or longing",
+    "relatedHooks": ["relatability-hook", "empathy-hook", "curiosity-gap"]
+  },
+  {
+    "id": "bold-claim",
+    "name": "Bold Claim",
+    "type": "contrarian",
+    "template": "[Extraordinary, provocative claim that demands proof].",
+    "example": "Cold outreach is dead. And continuing to use it is actively damaging your brand.",
+    "notes": "Use when you can fully back up an extraordinary claim within the piece. Shock creates cognitive dissonance — the gap between the stated claim and the reader's existing model demands resolution, generating a compulsive urge to read the justification.",
+    "anatomy": "Short declarative sentence making an extraordinary claim + optional escalating implication",
+    "relatedHooks": ["contrarian-hook", "pattern-interrupt", "false-assumption-challenge"]
+  },
+  {
+    "id": "empathy-hook",
+    "name": "Empathy Hook",
+    "type": "identity",
+    "template": "[Deeply accurate description of reader's pain or frustration] — I've been there.",
+    "example": "You've built something real, but every time you try to explain it, people's eyes glaze over. I've been there.",
+    "notes": "Use when your audience is in an emotionally charged state of frustration or overwhelm before you offer a solution. Validation before persuasion — when readers feel deeply understood, their defensive posture drops and they become far more open to what follows.",
+    "anatomy": "Precise articulation of specific audience pain + solidarity signal from the writer",
+    "relatedHooks": ["relatability-hook", "confession-hook", "identity-hook"]
+  },
+  {
+    "id": "paradox-hook",
+    "name": "Paradox Hook",
+    "type": "contrarian",
+    "template": "The [more/less] you [do X], the [opposite/counterintuitive result].",
+    "example": "The more you try to convince people to buy, the less they trust you.",
+    "notes": "Use when your content introduces a genuinely counterintuitive mechanism. Paradox creates cognitive tension — the logical contradiction occupies working memory and cannot be released until resolved, driving the reader to continue.",
+    "anatomy": "Comparative intensifier + action + counterintuitive consequence",
+    "relatedHooks": ["contrarian-hook", "bold-claim", "what-if-hook"]
+  },
+  {
+    "id": "transformation-hook",
+    "name": "Transformation Hook",
+    "type": "identity",
+    "template": "This is for people who are done being [state A] and ready to become [state B].",
+    "example": "This is for people who are done being the best-kept secret in their industry and ready to become the obvious choice.",
+    "notes": "Use at the top of sales pages, course landing pages, and community invitations. Issues an identity shift invitation — it positions the offer as a threshold the reader can choose to cross, activating aspiration and self-selection simultaneously.",
+    "anatomy": "Audience qualifier + rejected identity state A + aspirational identity state B",
+    "relatedHooks": ["before-after-hook", "promise-hook", "identity-hook"]
+  },
+  {
+    "id": "villain-hook",
+    "name": "Villain Hook",
+    "type": "story",
+    "template": "There's a reason [problem] keeps happening to [group]. And it's not [obvious cause].",
+    "example": "There's a reason talented designers keep getting passed over for promotions. And it's not their portfolio.",
+    "notes": "Use to open content that reframes the cause of a persistent problem and introduces a non-obvious solution. Common enemy framing externalizes blame and provides narrative relief, while the denial of the obvious cause opens a curiosity gap that demands resolution.",
+    "anatomy": "Named persistent problem + affected group + subversion of obvious explanation",
+    "relatedHooks": ["story-hook", "false-assumption-challenge", "contrarian-hook"]
+  }
+]
