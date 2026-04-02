@@ -1,0 +1,146 @@
+[
+  {
+    "id": "penny-dreadful",
+    "name": "The Penny Dreadful Era",
+    "period": "1830s–1860s",
+    "dominantStyle": "Lurid, serialized, melodramatic — built for mass addiction.",
+    "characteristics": [
+      "Weekly cliffhangers engineered for compulsive return",
+      "Villain-hero archetypes with moral ambiguity",
+      "Sensationalist headlines that promised impossible revelations",
+      "Cheap, direct language designed for newly literate masses",
+      "Emotion always before logic — fear, lust, outrage led every chapter"
+    ],
+    "keyFigures": ["G.W.M. Reynolds", "James Malcolm Rymer"],
+    "legendaryWorks": ["Varney the Vampire", "The String of Pearls"],
+    "whatSurvived": "The scroll-stopping headline. The cliffhanger. The villain your audience loves to hate. Every open loop in modern content marketing traces back here.",
+    "influencedBy": ["Gothic fiction", "Chapbook tradition"],
+    "modernEquivalent": "Viral Twitter threads. Netflix episode endings. Any copy that ends mid-promise."
+  },
+  {
+    "id": "gilded-age-advertising",
+    "name": "Gilded Age Advertising",
+    "period": "1870s–1900s",
+    "dominantStyle": "Bold claims, testimonial-heavy, patent-medicine persuasion at scale.",
+    "characteristics": [
+      "Hyperbolic claims with zero legal accountability",
+      "Testimonials as the primary proof mechanism",
+      "Repetition as the primary persuasion strategy",
+      "Visual hierarchy emerged: headline > subhead > body",
+      "First use of before-and-after as persuasive structure"
+    ],
+    "keyFigures": ["P.T. Barnum", "Thomas J. Barratt"],
+    "legendaryWorks": ["Ivory Soap campaigns", "Pears' Soap ads"],
+    "whatSurvived": "The testimonial. The before-and-after. The benefit-first headline. The idea that advertising is entertainment first, commerce second.",
+    "influencedBy": ["Circus barker tradition", "Patent medicine broadsides"],
+    "modernEquivalent": "Amazon reviews. Before/after Instagram posts. Sales page testimonial sections."
+  },
+  {
+    "id": "reason-why-era",
+    "name": "The Reason-Why Era",
+    "period": "1900s–1920s",
+    "dominantStyle": "Logic-driven, educative, respect-the-reader persuasion.",
+    "characteristics": [
+      "Give people reasons to buy, not just commands to buy",
+      "Long copy justified by the stakes of the purchase",
+      "Education as the primary persuasion mechanism",
+      "Respect for reader intelligence as a differentiator",
+      "First systematic study of what copy elements work"
+    ],
+    "keyFigures": ["John E. Kennedy", "Claude Hopkins", "Albert Lasker"],
+    "legendaryWorks": ["Scientific Advertising", "My Life in Advertising"],
+    "whatSurvived": "The principle that great copy is salesmanship in print. The belief that given enough compelling reasons, any rational person can be persuaded. Long-form sales copy.",
+    "influencedBy": ["Mail-order catalog tradition", "Department store advertising"],
+    "modernEquivalent": "Long-form landing pages. Detailed product descriptions. Explainer emails that educate before they sell."
+  },
+  {
+    "id": "hard-sell-era",
+    "name": "The Hard-Sell Era",
+    "period": "1920s–1950s",
+    "dominantStyle": "Aggressive, repetitive, fear-and-desire driven direct response.",
+    "characteristics": [
+      "Repetition: say it once, say it loud, say it often",
+      "Fear of social rejection as the primary emotional lever",
+      "Product features as the hero of the copy",
+      "Radio and print aligned: the jingle was born",
+      "Unique Selling Proposition emerged as a strategic tool"
+    ],
+    "keyFigures": ["Rosser Reeves", "John Caples", "Harry Scherman"],
+    "legendaryWorks": ["USP formulations", "Caples' 'They Laughed When I Sat Down...'"],
+    "whatSurvived": "The USP. The single-minded headline. The power of one clear, differentiating promise. 'They laughed when I sat down' remains the most-analyzed headline in history.",
+    "influencedBy": ["Mail-order direct response", "Early radio advertising"],
+    "modernEquivalent": "Google Ads. Short-form product copy. Facebook ad headlines."
+  },
+  {
+    "id": "creative-revolution",
+    "name": "The Creative Revolution",
+    "period": "1960s–1970s",
+    "dominantStyle": "Wit, irony, self-awareness — advertising that respects the reader's intelligence.",
+    "characteristics": [
+      "Humor as a primary persuasion tool",
+      "Self-deprecation disarmed skepticism",
+      "Art director and copywriter as a single creative unit",
+      "Visual and verbal working in tension, not harmony",
+      "Brand personality replaced product feature claims"
+    ],
+    "keyFigures": ["Bill Bernbach", "David Ogilvy", "Leo Burnett", "George Lois"],
+    "legendaryWorks": ["VW Think Small", "Avis We Try Harder", "Marlboro Man"],
+    "whatSurvived": "Brand voice. The concept of a brand having a personality. The idea that the most powerful ad can be the most honest one. Self-aware copy that winks at the reader.",
+    "influencedBy": ["European poster tradition", "New York jazz culture"],
+    "modernEquivalent": "Wendy's Twitter. Apple's '1984'. Any brand that acts like a person, not a corporation."
+  },
+  {
+    "id": "direct-response-golden-age",
+    "name": "Direct Response Golden Age",
+    "period": "1970s–1990s",
+    "dominantStyle": "Long-form, formula-driven, ROI-obsessed direct mail and print.",
+    "characteristics": [
+      "The sales letter as an art form: tested to the decimal",
+      "Every element tested: envelope teaser, opening line, P.S.",
+      "The P.S. as the second most-read element after the headline",
+      "Fear, greed, and exclusivity as the three primary levers",
+      "Formulaic but effective: AIDA, PAS, and their variants"
+    ],
+    "keyFigures": ["Gary Halbert", "Dan Kennedy", "Jay Abraham", "Gene Schwartz"],
+    "legendaryWorks": ["The Coat of Arms Letter", "Breakthrough Advertising"],
+    "whatSurvived": "AIDA. The sales letter format. The P.S. The principle that every element of copy must earn its place. The 'stages of awareness' framework still governs digital marketing.",
+    "influencedBy": ["Insurance sales training", "Mail-order book clubs"],
+    "modernEquivalent": "Email sequences. Long-form sales pages. VSL scripts. Webinar funnels."
+  },
+  {
+    "id": "content-marketing-era",
+    "name": "The Content Marketing Era",
+    "period": "2000s–2015",
+    "dominantStyle": "Value-first, SEO-informed, education-led relationship building.",
+    "characteristics": [
+      "Give before you ask: the blog post as the free sample",
+      "SEO shaped structure: keywords, headings, length",
+      "Thought leadership as the new authority mechanism",
+      "The listicle emerged as a dominant format",
+      "Social sharing as distribution strategy"
+    ],
+    "keyFigures": ["Seth Godin", "Joe Pulizzi", "Ann Handley"],
+    "legendaryWorks": ["Permission Marketing", "Content Rules", "Copyblogger"],
+    "whatSurvived": "The value-first principle. The idea that you earn attention before you request action. Long-form content as a trust mechanism. The email list as an asset.",
+    "influencedBy": ["Inbound marketing methodology", "Open source software ethos"],
+    "modernEquivalent": "YouTube channels. Substack newsletters. Free courses as lead magnets."
+  },
+  {
+    "id": "social-native-era",
+    "name": "The Social-Native Era",
+    "period": "2015–Present",
+    "dominantStyle": "Conversational, pattern-interrupting, algorithm-aware micro-copy.",
+    "characteristics": [
+      "The first line is everything: feed algorithms reward click-through",
+      "Compression: say in 3 lines what once took 3 paragraphs",
+      "Authenticity as a brand strategy, not just a value",
+      "The creator economy made individual voice the differentiator",
+      "UGC and testimonials blurred with professional copy"
+    ],
+    "keyFigures": ["Nicolas Cole", "Dickie Bush", "Alex Hormozi"],
+    "legendaryWorks": ["$100M Offers", "The Art and Business of Online Writing"],
+    "whatSurvived": "Short, punchy, one-idea-per-line formatting. The open loop. Radical specificity over vague inspiration. The personal brand as distribution strategy.",
+    "influencedBy": ["Twitter character constraints", "Newsletter renaissance", "TikTok attention economics"],
+    "modernEquivalent": "LinkedIn posts. Twitter threads. Short-form newsletters. Email subject lines as copy experiments."
+  }
+]

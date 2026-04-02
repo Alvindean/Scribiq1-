@@ -1,0 +1,29 @@
+{
+  "layers": [
+    {
+      "principle": "Information Gap Theory",
+      "description": "The brain experiences mild psychological discomfort when it detects an information gap — the space between what it knows and what it wants to know. This discomfort creates a compulsive drive to close the gap.",
+      "application": "Curiosity hooks, open loops, and withheld revelations all exploit information gap theory. The hook creates the gap; the content closes it. Never close the gap before the reader has fully committed to reading."
+    },
+    {
+      "principle": "Loss Aversion",
+      "description": "From prospect theory (Kahneman & Tversky): losses are neurologically weighted approximately twice as heavily as equivalent gains. People work harder to avoid losing $100 than to gain $100.",
+      "application": "Frame inaction as loss, not missed opportunity. 'You're losing $300/month by not doing this' outperforms 'You could gain $300/month by doing this.' Use sparingly — chronic loss framing creates anxiety and disengagement."
+    },
+    {
+      "principle": "Social Proof & Authority Bias",
+      "description": "In conditions of uncertainty, the brain uses others' behavior (social proof) and credentialed sources (authority bias) as cognitive shortcuts for determining correct action.",
+      "application": "Specific numbers outperform vague claims. '47,000 founders' > 'thousands of founders.' Named institutions > unnamed experts. Real testimonials with full names > anonymous quotes."
+    },
+    {
+      "principle": "Identity Resonance",
+      "description": "People make decisions that are consistent with their self-concept. Copy that speaks to who someone is (or wants to become) bypasses feature-benefit evaluation and activates identity-protective cognition.",
+      "application": "Lead with identity, not solution. 'For people who believe writing is a competitive advantage' works because it activates belonging before it proposes a product."
+    },
+    {
+      "principle": "Cognitive Load Reduction",
+      "description": "The brain's working memory is limited. Every unnecessary word, complex sentence, or unclear structure consumes cognitive resources that could be spent on persuasion. Simplicity isn't dumbing down — it's freeing up bandwidth for conversion.",
+      "application": "Short sentences. Active voice. One idea per paragraph. The most important idea first. Every edit should increase clarity or increase persuasive force — preferably both."
+    }
+  ]
+}

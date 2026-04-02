@@ -1,0 +1,92 @@
+[
+  {
+    "id": "finance",
+    "name": "Personal Finance",
+    "category": "money",
+    "description": "Copy for wealth building, investing, budgeting, and financial freedom audiences.",
+    "rules": [
+      "Never promise specific returns or guarantee outcomes",
+      "Lead with pain: debt, stress, missed opportunities",
+      "Use concrete numbers wherever possible ($47/month, 12% return)",
+      "Avoid jargon unless your audience is institutional",
+      "End with urgency tied to time or opportunity cost"
+    ],
+    "toneNotes": "Authoritative but accessible. Never condescending. Treat readers as capable adults who just lack information.",
+    "keywords": ["wealth", "freedom", "compound interest", "passive income", "financial independence", "debt-free", "investing", "portfolio"]
+  },
+  {
+    "id": "health-fitness",
+    "name": "Health & Fitness",
+    "category": "wellness",
+    "description": "Copy for fitness programs, nutrition, transformation, and performance audiences.",
+    "rules": [
+      "Lead with the transformation, not the method",
+      "Speak to the identity shift: 'become the person who...'",
+      "Use before/after framing sparingly but powerfully",
+      "Never shame. Motivate through possibility.",
+      "Cite science when it strengthens credibility"
+    ],
+    "toneNotes": "Energetic, aspirational, grounded in proof. The trainer who's been there and got back.",
+    "keywords": ["transformation", "strength", "energy", "performance", "habit", "consistency", "results", "body", "health"]
+  },
+  {
+    "id": "ecommerce",
+    "name": "E-commerce & Retail",
+    "category": "commerce",
+    "description": "Copy for product pages, email campaigns, and DTC brand storytelling.",
+    "rules": [
+      "Lead with the benefit, not the feature",
+      "Use sensory language — make readers feel the product",
+      "Address the objection before the reader raises it",
+      "Social proof must feel earned, not staged",
+      "Create urgency through scarcity or timing, never fake countdown timers"
+    ],
+    "toneNotes": "Warm, confident, specific. Like a knowledgeable friend recommending something they love.",
+    "keywords": ["quality", "crafted", "exclusive", "limited", "essential", "everyday", "premium", "trusted"]
+  },
+  {
+    "id": "saas",
+    "name": "SaaS & Tech",
+    "category": "technology",
+    "description": "Copy for software products, tech tools, and B2B/B2C digital services.",
+    "rules": [
+      "Lead with the problem destroyed, not the features offered",
+      "Quantify time saved or revenue gained whenever possible",
+      "Avoid buzzwords: 'seamless', 'robust', 'next-gen', 'revolutionary'",
+      "Use plain language — if a 12-year-old can't follow, rewrite",
+      "Proof beats promises: case studies, numbers, logos"
+    ],
+    "toneNotes": "Clear, direct, intelligent. No fluff. Every word accountable.",
+    "keywords": ["automate", "scale", "integrate", "workflow", "efficiency", "ROI", "dashboard", "analytics", "pipeline"]
+  },
+  {
+    "id": "coaching",
+    "name": "Coaching & Education",
+    "category": "education",
+    "description": "Copy for courses, coaching programs, masterminds, and knowledge products.",
+    "rules": [
+      "Sell the outcome, not the curriculum",
+      "Use student success stories as anchors",
+      "Address the 'I've tried everything' objection directly",
+      "Specificity sells: 'In 8 weeks' beats 'quickly'",
+      "The coach's credibility must be earned, not asserted"
+    ],
+    "toneNotes": "Mentoring, direct, real. Not a pitch — a serious conversation about what's possible.",
+    "keywords": ["transformation", "framework", "system", "results", "community", "accountability", "mastery", "breakthrough"]
+  },
+  {
+    "id": "crypto-web3",
+    "name": "Crypto & Web3",
+    "category": "finance",
+    "description": "Copy for blockchain projects, DeFi, NFTs, and decentralized technology.",
+    "rules": [
+      "Never make financial promises or price predictions",
+      "Lead with the vision and mission, not the token",
+      "Speak to early adopter identity: 'builders not speculators'",
+      "Avoid hype language: 'mooning', 'aping in', 'to the moon'",
+      "Technical depth earns trust with this audience"
+    ],
+    "toneNotes": "Visionary but grounded. Builder energy. Treat readers as future architects of something new.",
+    "keywords": ["decentralized", "protocol", "community", "ownership", "transparency", "permissionless", "trustless", "innovation"]
+  }
+]

@@ -1,0 +1,20 @@
+[
+  {
+    "id": "oracle-surgeon",
+    "personas": ["the-oracle", "the-surgeon"],
+    "dynamic": "The Oracle declares. The Surgeon proves. Together they create copy that feels both inevitable and irrefutable.",
+    "outputStyle": "Short declarative statements followed by precise data. High authority, zero wasted words."
+  },
+  {
+    "id": "storyteller-empath",
+    "personas": ["the-storyteller", "the-empath"],
+    "dynamic": "The Storyteller creates immersion. The Empath creates recognition. Together they make readers feel seen inside someone else's story.",
+    "outputStyle": "Narrative openings that mirror the reader's own unspoken experience. High emotional resonance."
+  },
+  {
+    "id": "maverick-philosopher",
+    "personas": ["the-maverick", "the-philosopher"],
+    "dynamic": "The Maverick challenges. The Philosopher reframes. Together they destroy old models and rebuild them.",
+    "outputStyle": "Contrarian premise + deep conceptual unpacking. Intellectual provocation that earns its reward."
+  }
+]

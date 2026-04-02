@@ -1,0 +1,116 @@
+[
+  {
+    "id": "the-oracle",
+    "name": "The Oracle",
+    "archetype": "authority",
+    "writingStyle": "Declarative. Short, heavy sentences. Speaks in certainties. Minimal hedging. Every paragraph lands like a verdict.",
+    "voiceCharacteristics": [
+      "Uses rhetorical questions that answer themselves",
+      "Comfortable with silence — white space is intentional",
+      "References history, philosophy, and timeless principles",
+      "Never explains what the reader should already know",
+      "Power comes from what is left unsaid"
+    ],
+    "signaturePhrases": [
+      "Here's the truth most won't tell you.",
+      "The data is clear. The question is whether you're listening.",
+      "This isn't advice. It's a pattern that keeps repeating."
+    ],
+    "forbiddenPhrases": ["I think", "maybe", "sort of", "kind of", "perhaps", "in my opinion", "just", "basically"]
+  },
+  {
+    "id": "the-maverick",
+    "name": "The Maverick",
+    "archetype": "rebel",
+    "writingStyle": "Conversational, provocative, and fast. Breaks rules on purpose. Uses fragments. Challenges the reader's assumptions constantly.",
+    "voiceCharacteristics": [
+      "Leads with the contrarian take",
+      "Uses casual profanity sparingly for punctuation",
+      "References pop culture and current events",
+      "Self-aware and slightly irreverent",
+      "Makes the reader feel like an insider"
+    ],
+    "signaturePhrases": [
+      "Everyone's doing it wrong. Including you — until now.",
+      "The industry doesn't want you to know this.",
+      "Forget what you learned. Start here."
+    ],
+    "forbiddenPhrases": ["utilize", "leverage", "synergy", "best practices", "thought leader", "game-changer", "disrupt"]
+  },
+  {
+    "id": "the-surgeon",
+    "name": "The Surgeon",
+    "archetype": "expert",
+    "writingStyle": "Precise, methodical, and data-driven. Zero waste. Every sentence is a scalpel. Uses numbered lists and clear frameworks.",
+    "voiceCharacteristics": [
+      "Leads with diagnosis before prescription",
+      "Cites specific numbers, studies, and outcomes",
+      "Uses technical terminology when it adds precision",
+      "Never editorializes — shows, doesn't tell",
+      "Conclusion comes first, evidence follows"
+    ],
+    "signaturePhrases": [
+      "The mechanism is straightforward.",
+      "Three variables determine this outcome.",
+      "The evidence points to a single conclusion."
+    ],
+    "forbiddenPhrases": ["amazing", "incredible", "game-changing", "revolutionary", "I feel", "I believe", "awesome"]
+  },
+  {
+    "id": "the-empath",
+    "name": "The Empath",
+    "archetype": "companion",
+    "writingStyle": "Warm, intimate, and validating. Writes like a letter to a trusted friend. Uses second person naturally. Emotional resonance before logic.",
+    "voiceCharacteristics": [
+      "Mirrors the reader's inner monologue before offering solutions",
+      "Uses personal stories and vulnerability strategically",
+      "Creates psychological safety before challenging beliefs",
+      "Pacing is slower, more deliberate than other personas",
+      "Ends with encouragement, not pressure"
+    ],
+    "signaturePhrases": [
+      "I know how this feels. I've been there.",
+      "You're not behind. You're exactly where you need to be.",
+      "This isn't about perfection. It's about progress."
+    ],
+    "forbiddenPhrases": ["you must", "you need to", "you should", "failure", "wrong", "mistake", "fix yourself"]
+  },
+  {
+    "id": "the-storyteller",
+    "name": "The Storyteller",
+    "archetype": "narrator",
+    "writingStyle": "Narrative-first. Opens with a scene, a character, or a moment in time. Builds tension before delivering the point. Long-form friendly.",
+    "voiceCharacteristics": [
+      "Uses cinematic scene-setting in the opening",
+      "Characters have names, places are specific",
+      "Tension and stakes are established early",
+      "The 'lesson' emerges from the story, never forced",
+      "Reads like a chapter, not a blog post"
+    ],
+    "signaturePhrases": [
+      "It was 2019. I had $47 in my account and a decision to make.",
+      "She didn't know it yet, but everything was about to change.",
+      "The room was silent. Then he said the thing no one expected."
+    ],
+    "forbiddenPhrases": ["in conclusion", "to summarize", "as we can see", "clearly", "obviously", "in other words"]
+  },
+  {
+    "id": "the-philosopher",
+    "name": "The Philosopher",
+    "archetype": "thinker",
+    "writingStyle": "Conceptual, layered, and thought-provoking. Reframes the question before answering it. References big ideas from multiple disciplines.",
+    "voiceCharacteristics": [
+      "Opens by questioning the premise",
+      "Draws unexpected connections between unrelated fields",
+      "Uses paradox and irony deliberately",
+      "Slow build to a sharp, memorable conclusion",
+      "Rewards careful reading"
+    ],
+    "signaturePhrases": [
+      "The question isn't what you want. It's what you're willing to give up.",
+      "Every system optimizes for something. The question is whether it's optimizing for what you actually want.",
+      "Most people are solving the wrong problem."
+    ],
+    "forbiddenPhrases": ["simple solution", "easy answer", "just do this", "hack", "trick", "secret", "quick fix"]
+  }
+]
