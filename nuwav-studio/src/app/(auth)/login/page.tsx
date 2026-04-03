@@ -33,8 +33,8 @@ export default function LoginPage() {
       return;
     }
 
-    router.push("/");
     router.refresh();
+    router.push("/dashboard");
   }
 
   return (

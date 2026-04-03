@@ -19,9 +19,10 @@ export async function POST(request: NextRequest): Promise<Response> {
     password = body.password;
     name = body.name?.trim();
 
-    if (!email || !password || !name) {
-      throw new Error("Missing required fields");
+    if (!email || !password) {
+      throw new Error("Email and password are required");
     }
+    if (!name) name = email.split("@")[0];
     if (password.length < 8) {
       throw new Error("Password must be at least 8 characters");
     }
