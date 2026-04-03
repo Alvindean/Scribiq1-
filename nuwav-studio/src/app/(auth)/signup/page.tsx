@@ -3,72 +3,59 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/shared/Logo";
-import { createClient } from "@/lib/supabase/client";
 
 export default function SignupPage() {
   const router = useRouter();
-  const supabase = createClient();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-        emailRedirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
+    try {
+      const res = await fetch("/api/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, name }),
+      });
 
-    if (error) {
-      setError(error.message);
+      const data = (await res.json()) as { error?: string; userId?: string };
+
+      if (!res.ok) {
+        setError(data.error ?? "Failed to create account");
+        setLoading(false);
+        return;
+      }
+
+      // Sign in immediately after signup
+      const result = await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setError("Account created but sign in failed. Please try logging in.");
+        setLoading(false);
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      setError("Something went wrong. Please try again.");
       setLoading(false);
-      return;
     }
-
-    if (data.user && !data.session) {
-      // Email confirmation required
-      setSuccess(true);
-      setLoading(false);
-      return;
-    }
-
-    router.push("/dashboard");
-    router.refresh();
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
-        <div className="w-full max-w-sm text-center space-y-4">
-          <Logo size="lg" className="justify-center" />
-          <div className="rounded-xl border bg-card p-6 shadow-sm space-y-3">
-            <div className="text-2xl">📧</div>
-            <h2 className="font-bold text-lg">Check your email</h2>
-            <p className="text-sm text-muted-foreground">
-              We sent a confirmation link to <strong>{email}</strong>. Click it
-              to activate your account.
-            </p>
-          </div>
-          <Link href="/login" className="text-sm text-violet-600 hover:underline">
-            Back to sign in
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (

@@ -1,9 +1,10 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { publishedPages, projects, modules, lessons } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Lesson } from "@/types/project";
 
 interface Props {
   params: Promise<{ slug: string; lessonSlug: string }>;
@@ -11,28 +12,45 @@ interface Props {
 
 export default async function LessonPage({ params }: Props) {
   const { slug, lessonSlug } = await params;
-  const supabase = await createClient();
 
-  const { data: page } = await supabase
-    .from("published_pages")
-    .select("*, projects(*, modules(*, lessons(*)))")
-    .eq("slug", slug)
-    .eq("page_type", "course_portal")
-    .eq("is_live", true)
-    .single();
+  const [page] = await db
+    .select()
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.slug, slug),
+        eq(publishedPages.pageType, "course_portal"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
 
   if (!page) notFound();
 
-  const pageData = page as unknown as { projects: unknown };
-  const project = pageData.projects as {
-    title: string;
-    modules: Array<{ id: string; title: string; order: number; lessons: Lesson[] }>;
-  };
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, page.projectId))
+    .limit(1);
 
-  const allLessons = project.modules
-    .sort((a, b) => a.order - b.order)
-    .flatMap((m) => m.lessons)
-    .sort((a, b) => a.order - b.order);
+  if (!project) notFound();
+
+  const projectModules = await db
+    .select()
+    .from(modules)
+    .where(eq(modules.projectId, project.id))
+    .orderBy(modules.order);
+
+  const projectLessons = await db
+    .select()
+    .from(lessons)
+    .where(eq(lessons.projectId, project.id))
+    .orderBy(lessons.order);
+
+  const allLessons = projectLessons.sort((a, b) => a.order - b.order);
+
+  // Suppress unused variable warning
+  void projectModules;
 
   const lesson = allLessons.find((l) => l.id === lessonSlug);
   if (!lesson) notFound();
@@ -59,9 +77,9 @@ export default async function LessonPage({ params }: Props) {
         <h1 className="text-2xl font-bold mb-6">{lesson.title}</h1>
 
         {/* Video player */}
-        {lesson.video_url ? (
+        {lesson.videoUrl ? (
           <video
-            src={lesson.video_url}
+            src={lesson.videoUrl}
             controls
             className="w-full rounded-xl aspect-video bg-black mb-6"
           />

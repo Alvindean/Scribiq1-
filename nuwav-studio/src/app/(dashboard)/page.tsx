@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Plus, BookOpen } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { profiles, projects } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { UsageStats } from "@/components/dashboard/UsageStats";
@@ -8,29 +11,31 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import type { Project } from "@/types/project";
 
 export default async function DashboardPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const session = await auth();
+  const userId = session?.user?.id;
 
-  const { data: profileData } = await supabase
-    .from("profiles")
-    .select("name")
-    .eq("id", user!.id)
-    .single();
+  const [profile] = userId
+    ? await db.select({ name: profiles.name }).from(profiles).where(eq(profiles.id, userId)).limit(1)
+    : [null];
 
-  const { data: projects } = await supabase
-    .from("projects")
-    .select("*")
-    .order("updated_at", { ascending: false })
-    .limit(20);
-
-  const profile = profileData as { name: string | null } | null;
   const firstName = profile?.name?.split(" ")[0] ?? "there";
 
-  // Mock usage for MVP (would normally come from a usage tracking table)
+  // Get org_id from profile for filtering
+  const [profileFull] = userId
+    ? await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, userId)).limit(1)
+    : [null];
+
+  const projectList = profileFull?.orgId
+    ? await db
+        .select()
+        .from(projects)
+        .where(eq(projects.orgId, profileFull.orgId))
+        .limit(20)
+    : [];
+
+  // Mock usage for MVP
   const usageStats = {
-    projects: { used: projects?.length ?? 0, limit: 3 },
+    projects: { used: projectList.length, limit: 3 },
     renders: { used: 0, limit: 10 },
     generations: { used: 0, limit: 50 },
     storage: { used: 0, limit: 5 },
@@ -59,14 +64,14 @@ export default async function DashboardPage() {
         <div className="lg:col-span-3">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold">Recent Projects</h2>
-            {(projects?.length ?? 0) > 0 && (
+            {projectList.length > 0 && (
               <Link href="/projects" className="text-sm text-violet-600 hover:underline">
                 View all
               </Link>
             )}
           </div>
 
-          {!projects || projects.length === 0 ? (
+          {projectList.length === 0 ? (
             <EmptyState
               icon={BookOpen}
               title="No projects yet"
@@ -78,7 +83,7 @@ export default async function DashboardPage() {
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-              {(projects as Project[]).map((project) => (
+              {(projectList as Project[]).map((project) => (
                 <ProjectCard key={project.id} project={project} />
               ))}
             </div>

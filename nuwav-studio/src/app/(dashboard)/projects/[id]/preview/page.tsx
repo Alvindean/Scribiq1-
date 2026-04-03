@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { projects, modules, lessons } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -32,28 +34,38 @@ export default async function PreviewPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
 
-  const { data: project } = await supabase
-    .from("projects")
-    .select(
-      `
-      *,
-      modules (
-        *,
-        lessons ( * )
-      )
-    `
-    )
-    .eq("id", id)
-    .order("order", { referencedTable: "modules", ascending: true })
-    .single();
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, id))
+    .limit(1);
 
   if (!project) notFound();
 
-  const typedProject = project as unknown as ProjectWithModules;
+  const projectModules = await db
+    .select()
+    .from(modules)
+    .where(eq(modules.projectId, id))
+    .orderBy(modules.order);
 
-  const firstLesson = typedProject.modules
+  const projectLessons = await db
+    .select()
+    .from(lessons)
+    .where(eq(lessons.projectId, id))
+    .orderBy(lessons.order);
+
+  const modulesWithLessons = projectModules.map((mod) => ({
+    ...mod,
+    lessons: projectLessons.filter((l) => l.moduleId === mod.id),
+  }));
+
+  const typedProject = {
+    ...project,
+    modules: modulesWithLessons,
+  } as unknown as ProjectWithModules;
+
+  const firstLesson = modulesWithLessons
     .flatMap((m) => m.lessons)
     .sort((a, b) => a.order - b.order)[0];
 
@@ -76,9 +88,9 @@ export default async function PreviewPage({
       <Card>
         <CardContent className="p-0">
           <div className="relative flex aspect-video w-full items-center justify-center rounded-lg bg-muted">
-            {firstLesson?.video_url ? (
+            {firstLesson?.videoUrl ? (
               <video
-                src={firstLesson.video_url}
+                src={firstLesson.videoUrl}
                 controls
                 className="h-full w-full rounded-lg object-contain"
               />
@@ -116,7 +128,7 @@ export default async function PreviewPage({
       {/* Module & Lesson list */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Content</h2>
-        {typedProject.modules.length === 0 ? (
+        {modulesWithLessons.length === 0 ? (
           <p className="text-muted-foreground text-sm">
             No modules yet.{" "}
             <Link
@@ -129,7 +141,7 @@ export default async function PreviewPage({
           </p>
         ) : (
           <div className="space-y-4">
-            {typedProject.modules.map((mod) => (
+            {modulesWithLessons.map((mod) => (
               <Card key={mod.id}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base font-medium">
@@ -151,9 +163,9 @@ export default async function PreviewPage({
                             className="flex items-center justify-between py-2.5"
                           >
                             <div className="flex items-center gap-3 min-w-0">
-                              {lesson.thumbnail_url ? (
+                              {lesson.thumbnailUrl ? (
                                 <img
-                                  src={lesson.thumbnail_url}
+                                  src={lesson.thumbnailUrl}
                                   alt={lesson.title}
                                   className="h-10 w-16 shrink-0 rounded object-cover"
                                 />
@@ -164,10 +176,10 @@ export default async function PreviewPage({
                                 <p className="truncate text-sm font-medium">
                                   {lesson.order + 1}. {lesson.title}
                                 </p>
-                                {lesson.duration_seconds && (
+                                {lesson.durationSeconds && (
                                   <p className="text-xs text-muted-foreground">
-                                    {Math.floor(lesson.duration_seconds / 60)}m{" "}
-                                    {lesson.duration_seconds % 60}s
+                                    {Math.floor(lesson.durationSeconds / 60)}m{" "}
+                                    {lesson.durationSeconds % 60}s
                                   </p>
                                 )}
                               </div>

@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { projects, modules, lessons } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { generateOutline, generateScript } from "@/lib/ai/pipeline";
 
 interface ProgressEvent {
@@ -13,15 +16,9 @@ function encodeSSE(data: ProgressEvent): string {
 }
 
 export async function POST(request: NextRequest): Promise<Response> {
-  const supabase = await createClient();
+  const session = await auth();
 
-  // Auth check
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!session?.user?.id) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -40,14 +37,13 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
   }
 
-  // Fetch the project, verifying org membership (RLS handles authorization)
-  const { data: project, error: projectError } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", projectId)
-    .single();
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, projectId))
+    .limit(1);
 
-  if (projectError || !project) {
+  if (!project) {
     return new Response(JSON.stringify({ error: "Project not found" }), {
       status: 404,
       headers: { "Content-Type": "application/json" },
@@ -67,9 +63,9 @@ export async function POST(request: NextRequest): Promise<Response> {
         const outline = await generateOutline({
           niche: project.niche ?? "",
           product_name: project.title,
-          target_audience: project.target_audience ?? "general audience",
+          target_audience: project.targetAudience ?? "general audience",
           tone: project.tone,
-          duration_target: project.duration_target ?? undefined,
+          duration_target: project.durationTarget ?? undefined,
           type: project.type,
           template_structure: null,
         });
@@ -81,21 +77,17 @@ export async function POST(request: NextRequest): Promise<Response> {
         });
 
         // Step 2 — Create modules
-        const moduleInserts = outline.modules.map((mod, idx) => ({
-          project_id: projectId,
-          title: mod.title,
-          order: idx,
-          type: mod.type,
-        }));
-
-        const { data: createdModules, error: moduleError } = await supabase
-          .from("modules")
-          .insert(moduleInserts)
-          .select("id, title");
-
-        if (moduleError || !createdModules) {
-          throw new Error("Failed to create modules");
-        }
+        const createdModules = await db
+          .insert(modules)
+          .values(
+            outline.modules.map((mod, idx) => ({
+              projectId,
+              title: mod.title,
+              order: idx,
+              type: mod.type,
+            }))
+          )
+          .returning({ id: modules.id, title: modules.title });
 
         send({
           step: "modules_created",
@@ -117,21 +109,19 @@ export async function POST(request: NextRequest): Promise<Response> {
           for (let lIdx = 0; lIdx < mod.lessons.length; lIdx++) {
             const lesson = mod.lessons[lIdx];
 
-            // Insert lesson row
-            const { data: createdLesson, error: lessonError } = await supabase
-              .from("lessons")
-              .insert({
-                module_id: dbModule.id,
-                project_id: projectId,
+            const [createdLesson] = await db
+              .insert(lessons)
+              .values({
+                moduleId: dbModule.id,
+                projectId,
                 title: lesson.title,
                 order: lIdx,
-                duration_seconds: lesson.duration_seconds,
+                durationSeconds: lesson.duration_seconds,
                 status: "draft",
               })
-              .select("id")
-              .single();
+              .returning({ id: lessons.id });
 
-            if (lessonError || !createdLesson) {
+            if (!createdLesson) {
               throw new Error(`Failed to create lesson: ${lesson.title}`);
             }
 
@@ -140,17 +130,16 @@ export async function POST(request: NextRequest): Promise<Response> {
               lesson_title: lesson.title,
               key_points: lesson.key_points,
               tone: project.tone,
-              target_audience: project.target_audience ?? "general audience",
+              target_audience: project.targetAudience ?? "general audience",
               duration_seconds: lesson.duration_seconds,
               product_name: project.title,
               niche: project.niche ?? undefined,
             });
 
-            // Save script to lesson
-            await supabase
-              .from("lessons")
-              .update({ script, status: "scripted" })
-              .eq("id", createdLesson.id);
+            await db
+              .update(lessons)
+              .set({ script, status: "scripted" })
+              .where(eq(lessons.id, createdLesson.id));
 
             completedLessons++;
             const progress = 30 + Math.round((completedLessons / totalLessons) * 60);
@@ -164,10 +153,10 @@ export async function POST(request: NextRequest): Promise<Response> {
         }
 
         // Step 4 — Mark project as ready for review
-        await supabase
-          .from("projects")
-          .update({ status: "review" })
-          .eq("id", projectId);
+        await db
+          .update(projects)
+          .set({ status: "review" })
+          .where(eq(projects.id, projectId));
 
         send({
           step: "complete",

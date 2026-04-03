@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -436,16 +436,15 @@ export default function NewProjectPage() {
   async function fetchTemplates() {
     if (templates.length > 0) return;
     setTemplatesLoading(true);
-    const supabase = createClient();
-    const { data } = await supabase
-      .from("templates")
-      .select(
-        "id, name, type, description, thumbnail_url, niche_category"
-      )
-      .eq("is_public", true)
-      .order("name");
-    setTemplates((data as Template[]) ?? []);
-    setTemplatesLoading(false);
+    try {
+      const res = await fetch("/api/templates");
+      if (res.ok) {
+        const data = (await res.json()) as Template[];
+        setTemplates(data);
+      }
+    } finally {
+      setTemplatesLoading(false);
+    }
   }
 
   function canAdvance(): boolean {
@@ -472,55 +471,33 @@ export default function NewProjectPage() {
     if (!formData.type) return;
     setSubmitting(true);
     setError(null);
-    const supabase = createClient();
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) {
-      setError("You must be logged in to create a project.");
+    try {
+      const res = await fetch("/api/projects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: formData.type,
+          title: formData.product_name.trim(),
+          niche: formData.niche.trim() || null,
+          targetAudience: formData.target_audience.trim() || null,
+          tone: formData.tone,
+          durationTarget: formData.duration_target,
+          templateId: formData.template_id,
+        }),
+      });
+
+      const data = (await res.json()) as { id?: string; error?: string };
+
+      if (!res.ok || !data.id) {
+        throw new Error(data.error ?? "Failed to create project.");
+      }
+
+      router.push(`/projects/${data.id}/generate`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to create project.");
       setSubmitting(false);
-      return;
     }
-
-    // Resolve org_id from the user profile
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("org_id")
-      .eq("id", user.id)
-      .single();
-
-    if (!profile?.org_id) {
-      setError("No organisation found for your account.");
-      setSubmitting(false);
-      return;
-    }
-
-    const { data: project, error: insertError } = await supabase
-      .from("projects")
-      .insert({
-        org_id: profile.org_id,
-        created_by: user.id,
-        type: formData.type,
-        title: formData.product_name.trim(),
-        niche: formData.niche.trim() || null,
-        target_audience: formData.target_audience.trim() || null,
-        tone: formData.tone,
-        duration_target: formData.duration_target,
-        template_id: formData.template_id,
-        status: "draft",
-        brand_settings: {},
-      })
-      .select("id")
-      .single();
-
-    if (insertError || !project) {
-      setError(insertError?.message ?? "Failed to create project.");
-      setSubmitting(false);
-      return;
-    }
-
-    router.push(`/projects/${project.id}/generate`);
   }
 
   return (

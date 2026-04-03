@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { templates } from "@/lib/db/schema";
+import { eq, asc } from "drizzle-orm";
 import {
   Card,
   CardContent,
@@ -34,20 +36,19 @@ export default async function TemplatesPage({
   const { type } = await searchParams;
   const filterType = (type ?? "all") as FilterType;
 
-  const supabase = await createClient();
+  const query = db
+    .select()
+    .from(templates)
+    .where(eq(templates.isPublic, true))
+    .orderBy(asc(templates.name));
 
-  let query = supabase
-    .from("templates")
-    .select("*")
-    .eq("is_public", true)
-    .order("name", { ascending: true });
+  const allTemplates = await query;
 
-  if (filterType !== "all") {
-    query = query.eq("type", filterType);
-  }
-
-  const { data: templates } = await query;
-  const typedTemplates = (templates ?? []) as Template[];
+  const typedTemplates = (
+    filterType === "all"
+      ? allTemplates
+      : allTemplates.filter((t) => t.type === filterType)
+  ) as unknown as Template[];
 
   const filterOptions: { value: FilterType; label: string }[] = [
     { value: "all", label: "All" },

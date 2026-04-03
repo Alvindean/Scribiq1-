@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,10 +11,16 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import type { Database } from "@/types/database";
 
 type ExportFormat = "mp4" | "pdf" | "pptx" | "zip";
-type ExportRow = Database["public"]["Tables"]["exports"]["Row"];
+
+interface ExportRow {
+  id: string;
+  format: string;
+  status: "pending" | "processing" | "complete" | "failed";
+  url: string | null;
+  created_at: string;
+}
 
 type ExportStatus = ExportRow["status"];
 
@@ -76,18 +81,22 @@ export default function ExportPage() {
   const [exporting, setExporting] = useState<ExportFormat | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const load = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("exports")
-        .select("*")
-        .eq("project_id", id)
-        .order("created_at", { ascending: false });
-      setExports(data ?? []);
+  const fetchExports = async () => {
+    try {
+      const res = await fetch(`/api/export?projectId=${id}`);
+      if (res.ok) {
+        const data = (await res.json()) as { exports?: ExportRow[] };
+        setExports(data.exports ?? []);
+      }
+    } catch {
+      // ignore
+    } finally {
       setLoadingHistory(false);
-    };
-    load();
+    }
+  };
+
+  useEffect(() => {
+    fetchExports();
   }, [id]);
 
   async function handleExport(format: ExportFormat) {
@@ -108,13 +117,7 @@ export default function ExportPage() {
       const result = (await res.json()) as { exportId?: string; url?: string };
 
       // Refresh export history
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("exports")
-        .select("*")
-        .eq("project_id", id)
-        .order("created_at", { ascending: false });
-      setExports(data ?? []);
+      await fetchExports();
 
       // If a download URL was returned immediately, trigger download
       if (result.url) {

@@ -106,14 +106,14 @@ export function LessonPreview() {
   }
 
   const primaryColor =
-    (project?.brand_settings as { colors?: { primary?: string } } | null)
+    (project?.brandSettings as { colors?: { primary?: string } } | null)
       ?.colors?.primary ?? "#6366f1";
   const companyName = project?.title ?? "NuWav Studio";
 
   const previewProps = buildPreviewProps(
     selectedLesson.title,
     selectedLesson.script,
-    selectedLesson.duration_seconds,
+    selectedLesson.durationSeconds,
     primaryColor,
     companyName
   );
@@ -135,12 +135,12 @@ export function LessonPreview() {
     <div className="flex flex-col gap-6 p-6 max-w-3xl mx-auto w-full">
       {/* Remotion Player / Video Player */}
       <div className="relative w-full rounded-xl overflow-hidden bg-zinc-800 aspect-video">
-        {selectedLesson.video_url ? (
+        {selectedLesson.videoUrl ? (
           <video
-            src={selectedLesson.video_url}
+            src={selectedLesson.videoUrl}
             controls
             className="w-full h-full object-contain"
-            poster={selectedLesson.thumbnail_url ?? undefined}
+            poster={selectedLesson.thumbnailUrl ?? undefined}
           />
         ) : (
           <Player
@@ -167,7 +167,7 @@ export function LessonPreview() {
         <div className="flex items-center gap-4 text-zinc-500 text-sm">
           <span className="flex items-center gap-1.5">
             <Clock className="w-3.5 h-3.5" />
-            {formatDuration(selectedLesson.duration_seconds)}
+            {formatDuration(selectedLesson.durationSeconds)}
           </span>
           <span
             className={`capitalize text-xs px-2 py-0.5 rounded-full font-medium ${

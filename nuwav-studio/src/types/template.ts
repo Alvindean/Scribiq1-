@@ -1,7 +1,7 @@
-import type { Database } from "./database";
+import type { Template as DbTemplate } from "./database";
 
-export type Template = Database["public"]["Tables"]["templates"]["Row"];
-export type TemplateInsert = Database["public"]["Tables"]["templates"]["Insert"];
+export type Template = DbTemplate;
+export type TemplateInsert = Partial<DbTemplate>;
 
 export interface TemplateStructureModule {
   type: "intro" | "lesson" | "cta" | "testimonial" | "bonus" | "outro";

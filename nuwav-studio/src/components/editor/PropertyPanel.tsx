@@ -38,8 +38,8 @@ export function PropertyPanel() {
     if (selectedLesson) {
       setScriptDraft(selectedLesson.script ?? "");
       setDurationInput(
-        selectedLesson.duration_seconds != null
-          ? String(selectedLesson.duration_seconds)
+        selectedLesson.durationSeconds != null
+          ? String(selectedLesson.durationSeconds)
           : ""
       );
       setScriptDirty(false);
@@ -89,7 +89,7 @@ export function PropertyPanel() {
       }
 
       updateLesson(selectedLesson.id, {
-        voiceover_url: data.url,
+        voiceoverUrl: data.url,
         status: "voiced",
       });
     } catch (err) {
@@ -114,7 +114,7 @@ export function PropertyPanel() {
   const handleSaveDuration = () => {
     const parsed = parseInt(durationInput, 10);
     if (!Number.isNaN(parsed) && parsed >= 0) {
-      updateLesson(selectedLesson.id, { duration_seconds: parsed });
+      updateLesson(selectedLesson.id, { durationSeconds: parsed });
     }
   };
 
@@ -213,12 +213,12 @@ export function PropertyPanel() {
             <p className="text-xs text-red-400 text-center">{voiceoverError}</p>
           )}
 
-          {selectedLesson.voiceover_url && (
+          {selectedLesson.voiceoverUrl && (
             <div className="rounded-lg bg-zinc-800 border border-zinc-700 p-4 flex flex-col gap-3">
               <p className="text-xs text-zinc-400 font-medium">Voiceover</p>
               <audio
                 ref={audioRef}
-                src={selectedLesson.voiceover_url}
+                src={selectedLesson.voiceoverUrl}
                 onPlay={() => setIsPlayingVoiceover(true)}
                 onPause={() => setIsPlayingVoiceover(false)}
                 onEnded={() => setIsPlayingVoiceover(false)}
@@ -242,7 +242,7 @@ export function PropertyPanel() {
             </div>
           )}
 
-          {!selectedLesson.voiceover_url && !voiceoverError && (
+          {!selectedLesson.voiceoverUrl && !voiceoverError && (
             <p className="text-xs text-zinc-600 text-center py-4">
               No voiceover generated yet.
             </p>

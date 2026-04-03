@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { projects, modules, lessons } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -52,32 +54,42 @@ export default async function ProjectPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
 
-  const { data: project } = await supabase
-    .from("projects")
-    .select(
-      `
-      *,
-      modules (
-        *,
-        lessons ( * )
-      )
-    `
-    )
-    .eq("id", id)
-    .order("order", { referencedTable: "modules", ascending: true })
-    .single();
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, id))
+    .limit(1);
 
   if (!project) notFound();
 
-  const typedProject = project as unknown as ProjectWithModules;
+  const projectModules = await db
+    .select()
+    .from(modules)
+    .where(eq(modules.projectId, id))
+    .orderBy(modules.order);
 
-  const totalLessons = typedProject.modules.reduce(
+  const projectLessons = await db
+    .select()
+    .from(lessons)
+    .where(eq(lessons.projectId, id))
+    .orderBy(lessons.order);
+
+  const modulesWithLessons = projectModules.map((mod) => ({
+    ...mod,
+    lessons: projectLessons.filter((l) => l.moduleId === mod.id),
+  }));
+
+  const typedProject = {
+    ...project,
+    modules: modulesWithLessons,
+  } as unknown as ProjectWithModules;
+
+  const totalLessons = modulesWithLessons.reduce(
     (sum, m) => sum + m.lessons.length,
     0
   );
-  const publishedLessons = typedProject.modules.reduce(
+  const publishedLessons = modulesWithLessons.reduce(
     (sum, m) => sum + m.lessons.filter((l) => l.status === "published").length,
     0
   );
@@ -123,13 +135,13 @@ export default async function ProjectPage({
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
         {[
-          { label: "Modules", value: typedProject.modules.length },
+          { label: "Modules", value: modulesWithLessons.length },
           { label: "Lessons", value: totalLessons },
           { label: "Published", value: publishedLessons },
           {
             label: "Duration",
-            value: typedProject.duration_target
-              ? `${typedProject.duration_target} min`
+            value: typedProject.durationTarget
+              ? `${typedProject.durationTarget} min`
               : "—",
           },
         ].map(({ label, value }) => (
@@ -145,7 +157,7 @@ export default async function ProjectPage({
       {/* Modules & Lessons */}
       <div className="space-y-4">
         <h2 className="text-xl font-semibold">Modules</h2>
-        {typedProject.modules.length === 0 ? (
+        {modulesWithLessons.length === 0 ? (
           <Card>
             <CardContent className="py-12 text-center text-muted-foreground">
               No modules yet.{" "}
@@ -160,7 +172,7 @@ export default async function ProjectPage({
           </Card>
         ) : (
           <div className="space-y-4">
-            {typedProject.modules.map((mod) => (
+            {modulesWithLessons.map((mod) => (
               <Card key={mod.id}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">

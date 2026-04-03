@@ -1,9 +1,32 @@
-import { type NextRequest } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import { auth } from "@/lib/auth/config";
+import { NextResponse } from "next/server";
 
-export async function middleware(request: NextRequest) {
-  return await updateSession(request);
-}
+export default auth((req) => {
+  const { pathname } = req.nextUrl;
+  const isLoggedIn = !!req.auth;
+
+  const isDashboardRoute =
+    pathname === "/" ||
+    pathname.startsWith("/projects") ||
+    pathname.startsWith("/templates") ||
+    pathname.startsWith("/settings");
+
+  const isAuthRoute = pathname === "/login" || pathname === "/signup";
+
+  if (!isLoggedIn && isDashboardRoute) {
+    const loginUrl = req.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (isLoggedIn && isAuthRoute) {
+    const homeUrl = req.nextUrl.clone();
+    homeUrl.pathname = "/";
+    return NextResponse.redirect(homeUrl);
+  }
+
+  return NextResponse.next();
+});
 
 export const config = {
   matcher: [

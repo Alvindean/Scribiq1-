@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,10 +11,17 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import type { Profile } from "@/types/project";
+
+interface ProfileData {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  avatar_url: string | null;
+}
 
 export default function SettingsPage() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<ProfileData | null>(null);
   const [name, setName] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [loading, setLoading] = useState(true);
@@ -25,25 +31,21 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (!user) {
+      try {
+        const res = await fetch("/api/settings/profile");
+        if (res.ok) {
+          const data = (await res.json()) as { profile?: ProfileData };
+          if (data.profile) {
+            setProfile(data.profile);
+            setName(data.profile.name ?? "");
+            setAvatarUrl(data.profile.avatar_url ?? "");
+          }
+        }
+      } catch {
+        // ignore
+      } finally {
         setLoading(false);
-        return;
       }
-      const { data } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
-      if (data) {
-        setProfile(data as Profile);
-        setName(data.name ?? "");
-        setAvatarUrl(data.avatar_url ?? "");
-      }
-      setLoading(false);
     };
     load();
   }, []);
@@ -55,16 +57,20 @@ export default function SettingsPage() {
     setSuccess(null);
 
     try {
-      const supabase = createClient();
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({
+      const res = await fetch("/api/settings/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           name: name.trim() || null,
           avatar_url: avatarUrl.trim() || null,
-        })
-        .eq("id", profile.id);
+        }),
+      });
 
-      if (updateError) throw updateError;
+      if (!res.ok) {
+        const data = (await res.json()) as { error?: string };
+        throw new Error(data.error ?? "Failed to save");
+      }
+
       setSuccess("Profile updated successfully.");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save profile");

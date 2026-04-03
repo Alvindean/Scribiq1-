@@ -12,7 +12,7 @@ import {
   Waves,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { signOut } from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 const navItems = [
@@ -26,10 +26,8 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
-  const supabase = createClient();
-
   async function handleSignOut() {
-    await supabase.auth.signOut();
+    await signOut({ redirect: false });
     router.push("/login");
   }
 

@@ -1,18 +1,51 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { projects, exports } from "@/lib/db/schema";
+import { eq, desc } from "drizzle-orm";
 
 type ExportFormat = "mp4" | "pdf" | "pptx" | "scorm" | "zip";
 
+export async function GET(request: NextRequest): Promise<Response> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return new Response(JSON.stringify({ error: "Unauthorized" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const { searchParams } = new URL(request.url);
+  const projectId = searchParams.get("projectId");
+
+  if (!projectId) {
+    return new Response(JSON.stringify({ error: "Missing projectId" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const exportList = await db
+    .select()
+    .from(exports)
+    .where(eq(exports.projectId, projectId))
+    .orderBy(desc(exports.createdAt));
+
+  const mapped = exportList.map((e) => ({
+    id: e.id,
+    format: e.format,
+    status: e.status,
+    url: e.url,
+    created_at: e.createdAt?.toISOString() ?? new Date().toISOString(),
+  }));
+
+  return Response.json({ exports: mapped });
+}
+
 export async function POST(request: NextRequest): Promise<Response> {
-  const supabase = await createClient();
+  const session = await auth();
 
-  // Auth check
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!session?.user?.id) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -45,32 +78,29 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   try {
-    // Verify project access (RLS handles authorization)
-    const { data: project, error: projectError } = await supabase
-      .from("projects")
-      .select("id")
-      .eq("id", projectId)
-      .single();
+    const [project] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.id, projectId))
+      .limit(1);
 
-    if (projectError || !project) {
+    if (!project) {
       return new Response(JSON.stringify({ error: "Project not found" }), {
         status: 404,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Create exports record
-    const { data: exportRecord, error: exportError } = await supabase
-      .from("exports")
-      .insert({
-        project_id: projectId,
+    const [exportRecord] = await db
+      .insert(exports)
+      .values({
+        projectId,
         format,
         status: "processing",
       })
-      .select("id")
-      .single();
+      .returning({ id: exports.id });
 
-    if (exportError || !exportRecord) {
+    if (!exportRecord) {
       throw new Error("Failed to create export record");
     }
 

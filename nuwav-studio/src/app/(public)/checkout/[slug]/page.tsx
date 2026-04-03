@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { publishedPages, projects } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,21 +12,30 @@ interface Props {
 
 export default async function CheckoutPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
 
-  const { data: page } = await supabase
-    .from("published_pages")
-    .select("*, projects(title)")
-    .eq("slug", slug)
-    .eq("page_type", "checkout")
-    .eq("is_live", true)
-    .single();
+  const [page] = await db
+    .select()
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.slug, slug),
+        eq(publishedPages.pageType, "checkout"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
 
   if (!page) notFound();
 
-  const pageData = page as unknown as { projects: { title: string }; content: { price?: string; product_name?: string } };
-  const project = pageData.projects;
-  const content = pageData.content;
+  const [project] = await db
+    .select({ title: projects.title })
+    .from(projects)
+    .where(eq(projects.id, page.projectId))
+    .limit(1);
+
+  if (!project) notFound();
+
+  const content = page.content as { price?: string; product_name?: string };
 
   return (
     <div className="min-h-screen bg-muted/30 flex items-center justify-center py-12 px-4">

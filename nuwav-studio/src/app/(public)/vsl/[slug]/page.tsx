@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { publishedPages, projects } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 
@@ -31,21 +33,30 @@ interface SalesPageContent {
 
 export default async function VSLPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
 
-  const { data: page } = await supabase
-    .from("published_pages")
-    .select("*, projects(title, niche)")
-    .eq("slug", slug)
-    .eq("page_type", "sales")
-    .eq("is_live", true)
-    .single();
+  const [page] = await db
+    .select()
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.slug, slug),
+        eq(publishedPages.pageType, "sales"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
 
   if (!page) notFound();
 
-  const pageData = page as unknown as { content: SalesPageContent; projects: { title: string; niche: string } };
-  const content = pageData.content;
-  const project = pageData.projects;
+  const [project] = await db
+    .select({ title: projects.title, niche: projects.niche })
+    .from(projects)
+    .where(eq(projects.id, page.projectId))
+    .limit(1);
+
+  if (!project) notFound();
+
+  const content = page.content as SalesPageContent;
 
   return (
     <div className="min-h-screen bg-background">

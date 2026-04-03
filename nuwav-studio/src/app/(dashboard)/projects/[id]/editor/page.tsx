@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { projects, modules, lessons } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { EditorLayout } from "@/components/editor/EditorLayout";
 import type { ProjectWithModules } from "@/types/project";
 
@@ -9,26 +11,36 @@ export default async function EditorPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
 
-  const { data: project } = await supabase
-    .from("projects")
-    .select(
-      `
-      *,
-      modules (
-        *,
-        lessons ( * )
-      )
-    `
-    )
-    .eq("id", id)
-    .order("order", { referencedTable: "modules", ascending: true })
-    .single();
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, id))
+    .limit(1);
 
   if (!project) notFound();
 
-  const typedProject = project as unknown as ProjectWithModules;
+  const projectModules = await db
+    .select()
+    .from(modules)
+    .where(eq(modules.projectId, id))
+    .orderBy(modules.order);
 
-  return <EditorLayout project={typedProject} modules={typedProject.modules ?? []} />;
+  const projectLessons = await db
+    .select()
+    .from(lessons)
+    .where(eq(lessons.projectId, id))
+    .orderBy(lessons.order);
+
+  const modulesWithLessons = projectModules.map((mod) => ({
+    ...mod,
+    lessons: projectLessons.filter((l) => l.moduleId === mod.id),
+  }));
+
+  const typedProject = {
+    ...project,
+    modules: modulesWithLessons,
+  } as unknown as ProjectWithModules;
+
+  return <EditorLayout project={typedProject} modules={modulesWithLessons} />;
 }

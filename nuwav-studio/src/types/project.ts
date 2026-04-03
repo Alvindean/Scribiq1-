@@ -1,18 +1,25 @@
-import type { Database } from "./database";
+import type { InferSelectModel } from "drizzle-orm";
+import type {
+  projects,
+  modules,
+  lessons,
+  profiles,
+  organizations,
+  templates,
+} from "@/lib/db/schema";
 
-export type Project = Database["public"]["Tables"]["projects"]["Row"];
-export type ProjectInsert = Database["public"]["Tables"]["projects"]["Insert"];
-export type ProjectUpdate = Database["public"]["Tables"]["projects"]["Update"];
+export type Project = InferSelectModel<typeof projects>;
+export type Module = InferSelectModel<typeof modules>;
+export type Lesson = InferSelectModel<typeof lessons>;
+export type Profile = InferSelectModel<typeof profiles>;
+export type Organization = InferSelectModel<typeof organizations>;
+export type Template = InferSelectModel<typeof templates>;
 
-export type Module = Database["public"]["Tables"]["modules"]["Row"];
-export type ModuleInsert = Database["public"]["Tables"]["modules"]["Insert"];
-
-export type Lesson = Database["public"]["Tables"]["lessons"]["Row"];
-export type LessonInsert = Database["public"]["Tables"]["lessons"]["Insert"];
-export type LessonUpdate = Database["public"]["Tables"]["lessons"]["Update"];
-
-export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
-export type Organization = Database["public"]["Tables"]["organizations"]["Row"];
+export type ProjectInsert = Partial<Project>;
+export type ProjectUpdate = Partial<Project>;
+export type ModuleInsert = Partial<Module>;
+export type LessonInsert = Partial<Lesson>;
+export type LessonUpdate = Partial<Lesson>;
 
 export type ProjectWithModules = Project & {
   modules: (Module & { lessons: Lesson[] })[];

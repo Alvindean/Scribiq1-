@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -14,15 +13,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import type { Database } from "@/types/database";
 
-type PublishedPage =
-  Database["public"]["Tables"]["published_pages"]["Row"];
+interface PublishedPageData {
+  id: string;
+  slug: string;
+  is_live: boolean;
+  updated_at: string;
+}
 
 export default function PublishPage() {
   const { id } = useParams<{ id: string }>();
 
-  const [page, setPage] = useState<PublishedPage | null>(null);
+  const [page, setPage] = useState<PublishedPageData | null>(null);
   const [slug, setSlug] = useState("");
   const [isLive, setIsLive] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -34,20 +36,21 @@ export default function PublishPage() {
 
   useEffect(() => {
     const load = async () => {
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("published_pages")
-        .select("*")
-        .eq("project_id", id)
-        .eq("page_type", "course_portal")
-        .maybeSingle();
-
-      if (data) {
-        setPage(data);
-        setSlug(data.slug);
-        setIsLive(data.is_live);
+      try {
+        const res = await fetch(`/api/publish?projectId=${id}`);
+        if (res.ok) {
+          const data = (await res.json()) as { page?: PublishedPageData };
+          if (data.page) {
+            setPage(data.page);
+            setSlug(data.page.slug);
+            setIsLive(data.page.is_live);
+          }
+        }
+      } catch {
+        // ignore
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     load();
   }, [id]);

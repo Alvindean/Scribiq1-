@@ -1,7 +1,9 @@
 import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { db } from "@/lib/db";
+import { organizations } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 
 type SubscriptionStatus =
   | "active"
@@ -16,7 +18,6 @@ type SubscriptionStatus =
 type DbPlan = "starter" | "pro" | "agency" | "enterprise";
 
 function mapStatusToPlan(status: SubscriptionStatus, priceId: string | null): DbPlan {
-  // Active subscriptions map by price ID; fallback to starter
   if (status !== "active" && status !== "trialing") return "starter";
   if (priceId === process.env.STRIPE_AGENCY_PRICE_ID) return "agency";
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) return "pro";
@@ -46,8 +47,6 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   try {
-    const supabase = createAdminClient();
-
     switch (event.type) {
       case "customer.subscription.created":
       case "customer.subscription.updated": {
@@ -63,13 +62,10 @@ export async function POST(request: NextRequest): Promise<Response> {
           priceId
         );
 
-        await supabase
-          .from("organizations")
-          .update({
-            plan,
-            stripe_customer_id: customerId,
-          })
-          .eq("stripe_customer_id", customerId);
+        await db
+          .update(organizations)
+          .set({ plan, stripeCustomerId: customerId })
+          .where(eq(organizations.stripeCustomerId, customerId));
 
         break;
       }
@@ -81,16 +77,15 @@ export async function POST(request: NextRequest): Promise<Response> {
             ? subscription.customer
             : subscription.customer.id;
 
-        await supabase
-          .from("organizations")
-          .update({ plan: "starter" })
-          .eq("stripe_customer_id", customerId);
+        await db
+          .update(organizations)
+          .set({ plan: "starter" })
+          .where(eq(organizations.stripeCustomerId, customerId));
 
         break;
       }
 
       default:
-        // Unhandled event — return 200 so Stripe doesn't retry
         break;
     }
 

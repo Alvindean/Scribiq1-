@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { db } from "@/lib/db";
+import { publishedPages, projects, modules, lessons } from "@/lib/db/schema";
+import { eq, and } from "drizzle-orm";
 import { PlayCircle, ChevronRight, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { formatDuration } from "@/lib/utils/duration";
@@ -12,36 +14,49 @@ interface Props {
 
 export default async function CoursePortalPage({ params }: Props) {
   const { slug } = await params;
-  const supabase = await createClient();
 
-  const { data: page } = await supabase
-    .from("published_pages")
-    .select("*, projects(*, modules(*, lessons(*)))")
-    .eq("slug", slug)
-    .eq("page_type", "course_portal")
-    .eq("is_live", true)
-    .single();
+  const [page] = await db
+    .select()
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.slug, slug),
+        eq(publishedPages.pageType, "course_portal"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
 
   if (!page) notFound();
 
-  const pageData = page as unknown as { projects: unknown };
-  const project = pageData.projects as {
-    title: string;
-    niche: string;
-    modules: Array<{
-      id: string;
-      title: string;
-      order: number;
-      lessons: Lesson[];
-    }>;
-  };
+  const [project] = await db
+    .select()
+    .from(projects)
+    .where(eq(projects.id, page.projectId))
+    .limit(1);
 
-  const allLessons = project.modules
-    .sort((a, b) => a.order - b.order)
-    .flatMap((m) => m.lessons);
+  if (!project) notFound();
 
+  const projectModules = await db
+    .select()
+    .from(modules)
+    .where(eq(modules.projectId, project.id))
+    .orderBy(modules.order);
+
+  const projectLessons = await db
+    .select()
+    .from(lessons)
+    .where(eq(lessons.projectId, project.id))
+    .orderBy(lessons.order);
+
+  const modulesWithLessons = projectModules.map((mod) => ({
+    ...mod,
+    lessons: projectLessons.filter((l) => l.moduleId === mod.id),
+  }));
+
+  const allLessons = modulesWithLessons.flatMap((m) => m.lessons) as unknown as Lesson[];
   const totalDuration = allLessons.reduce(
-    (acc, l) => acc + (l.duration_seconds ?? 0),
+    (acc, l) => acc + (l.durationSeconds ?? 0),
     0
   );
 
@@ -67,43 +82,41 @@ export default async function CoursePortalPage({ params }: Props) {
               {formatDuration(totalDuration)}
             </span>
             <span>{allLessons.length} lessons</span>
-            <span>{project.modules.length} modules</span>
+            <span>{modulesWithLessons.length} modules</span>
           </div>
         </div>
 
         {/* Modules and lessons */}
         <div className="space-y-4">
-          {project.modules
-            .sort((a, b) => a.order - b.order)
-            .map((module) => (
-              <div key={module.id} className="rounded-xl border overflow-hidden">
-                <div className="bg-muted/50 px-4 py-3 font-semibold text-sm">
-                  {module.title}
-                </div>
-                <div className="divide-y">
-                  {module.lessons
-                    .sort((a, b) => a.order - b.order)
-                    .map((lesson) => (
-                      <Link
-                        key={lesson.id}
-                        href={`/course/${slug}/${lesson.id}`}
-                        className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group"
-                      >
-                        <PlayCircle className="h-5 w-5 text-violet-500 shrink-0" />
-                        <span className="flex-1 text-sm font-medium group-hover:text-violet-700">
-                          {lesson.title}
-                        </span>
-                        {lesson.duration_seconds && (
-                          <span className="text-xs text-muted-foreground">
-                            {formatDuration(lesson.duration_seconds)}
-                          </span>
-                        )}
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                    ))}
-                </div>
+          {modulesWithLessons.map((module) => (
+            <div key={module.id} className="rounded-xl border overflow-hidden">
+              <div className="bg-muted/50 px-4 py-3 font-semibold text-sm">
+                {module.title}
               </div>
-            ))}
+              <div className="divide-y">
+                {module.lessons
+                  .sort((a, b) => a.order - b.order)
+                  .map((lesson) => (
+                    <Link
+                      key={lesson.id}
+                      href={`/course/${slug}/${lesson.id}`}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group"
+                    >
+                      <PlayCircle className="h-5 w-5 text-violet-500 shrink-0" />
+                      <span className="flex-1 text-sm font-medium group-hover:text-violet-700">
+                        {lesson.title}
+                      </span>
+                      {lesson.durationSeconds && (
+                        <span className="text-xs text-muted-foreground">
+                          {formatDuration(lesson.durationSeconds)}
+                        </span>
+                      )}
+                      <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                    </Link>
+                  ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

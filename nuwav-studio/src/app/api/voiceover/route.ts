@@ -1,18 +1,15 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { lessons } from "@/lib/db/schema";
+import { eq } from "drizzle-orm";
 import { generateVoiceover } from "@/lib/elevenlabs/tts";
 import { uploadToR2, buildR2Key } from "@/lib/media/r2";
 
 export async function POST(request: NextRequest): Promise<Response> {
-  const supabase = await createClient();
+  const session = await auth();
 
-  // Auth check
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!session?.user?.id) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },
@@ -42,30 +39,27 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   try {
-    // Verify lesson access (RLS handles authorization)
-    const { data: lesson, error: lessonError } = await supabase
-      .from("lessons")
-      .select("id, project_id")
-      .eq("id", lessonId)
-      .single();
+    const [lesson] = await db
+      .select({ id: lessons.id, projectId: lessons.projectId })
+      .from(lessons)
+      .where(eq(lessons.id, lessonId))
+      .limit(1);
 
-    if (lessonError || !lesson) {
+    if (!lesson) {
       return new Response(JSON.stringify({ error: "Lesson not found" }), {
         status: 404,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // Generate voiceover audio
     const { audioBuffer, contentType } = await generateVoiceover({
       text,
       voiceId,
     });
 
-    // Upload to R2
     const key = buildR2Key(
       "shared",
-      lesson.project_id,
+      lesson.projectId,
       "audio",
       `${lessonId}-voiceover.mp3`
     );
@@ -74,14 +68,13 @@ export async function POST(request: NextRequest): Promise<Response> {
       key,
       body: audioBuffer,
       contentType,
-      metadata: { lessonId, userId: user.id },
+      metadata: { lessonId, userId: session.user.id },
     });
 
-    // Update lesson record
-    await supabase
-      .from("lessons")
-      .update({ voiceover_url: url, status: "voiced" })
-      .eq("id", lessonId);
+    await db
+      .update(lessons)
+      .set({ voiceoverUrl: url, status: "voiced" })
+      .where(eq(lessons.id, lessonId));
 
     return new Response(JSON.stringify({ url }), {
       status: 200,

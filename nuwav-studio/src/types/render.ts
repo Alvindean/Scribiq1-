@@ -1,9 +1,6 @@
-import type { Database } from "./database";
+import type { RenderJob, Export, PublishedPage, MediaAsset } from "./database";
 
-export type RenderJob = Database["public"]["Tables"]["render_jobs"]["Row"];
-export type Export = Database["public"]["Tables"]["exports"]["Row"];
-export type PublishedPage = Database["public"]["Tables"]["published_pages"]["Row"];
-export type MediaAsset = Database["public"]["Tables"]["media_assets"]["Row"];
+export type { RenderJob, Export, PublishedPage, MediaAsset };
 
 export interface RenderCompositionProps {
   lessonId: string;

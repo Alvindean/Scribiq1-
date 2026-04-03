@@ -1,20 +1,14 @@
 import { NextRequest } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
 import { generateSlideBackground } from "@/lib/media/images";
 
 type ImageStyle = "photorealistic" | "illustration" | "abstract" | "minimal";
 type AspectRatio = "16:9" | "1:1" | "9:16";
 
 export async function POST(request: NextRequest): Promise<Response> {
-  const supabase = await createClient();
+  const session = await auth();
 
-  // Auth check
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
+  if (!session?.user?.id) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { "Content-Type": "application/json" },

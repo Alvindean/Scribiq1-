@@ -1,4 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
+import { auth } from "@/lib/auth";
+import { db } from "@/lib/db";
+import { profiles, organizations, projects } from "@/lib/db/schema";
+import { eq, count } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,7 +13,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PLANS } from "@/lib/stripe/plans";
 import type { Plan } from "@/lib/stripe/plans";
-import type { Organization } from "@/types/project";
 
 // ─── Plan card ────────────────────────────────────────────────────────────────
 
@@ -77,47 +79,48 @@ function PlanCard({
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default async function BillingPage() {
-  const supabase = await createClient();
+  const session = await auth();
+  const userId = session?.user?.id;
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  let org: { id: string; plan: string } | null = null;
+  let projectCount = 0;
 
-  let org: Organization | null = null;
+  if (userId) {
+    const [profile] = await db
+      .select({ orgId: profiles.orgId })
+      .from(profiles)
+      .where(eq(profiles.id, userId))
+      .limit(1);
 
-  if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("org_id")
-      .eq("id", user.id)
-      .single();
+    if (profile?.orgId) {
+      const [orgData] = await db
+        .select({ id: organizations.id, plan: organizations.plan })
+        .from(organizations)
+        .where(eq(organizations.id, profile.orgId))
+        .limit(1);
 
-    if (profile?.org_id) {
-      const { data: orgData } = await supabase
-        .from("organizations")
-        .select("*")
-        .eq("id", profile.org_id)
-        .single();
-      org = (orgData as Organization) ?? null;
+      if (orgData) {
+        org = orgData;
+
+        const [countResult] = await db
+          .select({ value: count() })
+          .from(projects)
+          .where(eq(projects.orgId, orgData.id));
+
+        projectCount = countResult?.value ?? 0;
+      }
     }
   }
 
   const currentPlanId = org?.plan ?? "starter";
   const currentPlan = PLANS.find((p) => p.id === currentPlanId) ?? PLANS[0];
 
-  const { count: projectCount } = org
-    ? await supabase
-        .from("projects")
-        .select("id", { count: "exact", head: true })
-        .eq("org_id", org.id)
-    : { count: 0 };
-
   const usagePercent =
     currentPlan.limits.projects === -1
       ? 0
       : Math.min(
           100,
-          Math.round(((projectCount ?? 0) / currentPlan.limits.projects) * 100)
+          Math.round((projectCount / currentPlan.limits.projects) * 100)
         );
 
   return (
@@ -144,7 +147,7 @@ export default async function BillingPage() {
               [
                 {
                   label: "Projects",
-                  used: projectCount ?? 0,
+                  used: projectCount,
                   limit:
                     currentPlan.limits.projects === -1
                       ? "∞"

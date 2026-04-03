@@ -69,9 +69,9 @@ export function ProjectCard({ project }: ProjectCardProps) {
           <Badge variant="outline" className="capitalize">
             {project.type}
           </Badge>
-          {project.duration_target && (
+          {project.durationTarget && (
             <span className="text-xs text-muted-foreground ml-auto">
-              {formatDuration(project.duration_target)}
+              {formatDuration(project.durationTarget)}
             </span>
           )}
         </div>
