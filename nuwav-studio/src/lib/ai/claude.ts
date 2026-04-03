@@ -1,8 +1,26 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY!,
-});
+let _client: OpenAI | null = null;
+
+function getClient(): OpenAI {
+  if (!_client) {
+    if (!process.env.OPENROUTER_API_KEY) {
+      throw new Error("OPENROUTER_API_KEY is not set");
+    }
+    _client = new OpenAI({
+      apiKey: process.env.OPENROUTER_API_KEY,
+      baseURL: "https://openrouter.ai/api/v1",
+      defaultHeaders: {
+        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "https://nuwav-studio.vercel.app",
+        "X-Title": "NuWav Studio",
+      },
+    });
+  }
+  return _client;
+}
+
+const DEFAULT_MODEL =
+  process.env.OPENROUTER_MODEL ?? "anthropic/claude-sonnet-4-5";
 
 export interface GenerateOptions {
   prompt: string;
@@ -14,20 +32,24 @@ export interface GenerateOptions {
 export async function generateText(options: GenerateOptions): Promise<string> {
   const { prompt, systemPrompt, maxTokens = 4096, temperature = 0.7 } = options;
 
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
+  if (systemPrompt) {
+    messages.push({ role: "system", content: systemPrompt });
+  }
+  messages.push({ role: "user", content: prompt });
+
+  const response = await getClient().chat.completions.create({
+    model: DEFAULT_MODEL,
     max_tokens: maxTokens,
     temperature,
-    ...(systemPrompt ? { system: systemPrompt } : {}),
-    messages: [{ role: "user", content: prompt }],
+    messages,
   });
 
-  const textBlock = message.content.find((block) => block.type === "text");
-  if (!textBlock || textBlock.type !== "text") {
-    throw new Error("No text content in Claude response");
+  const text = response.choices[0]?.message?.content;
+  if (!text) {
+    throw new Error("No text content in AI response");
   }
-
-  return textBlock.text;
+  return text;
 }
 
 export async function generateJSON<T>(options: GenerateOptions): Promise<T> {
@@ -38,14 +60,11 @@ export async function generateJSON<T>(options: GenerateOptions): Promise<T> {
       "\n\nIMPORTANT: Respond ONLY with valid JSON. No markdown code blocks, no explanation — just the raw JSON object.",
   });
 
-  // Strip any accidental markdown
   const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
 
   try {
     return JSON.parse(cleaned) as T;
   } catch {
-    throw new Error(`Claude returned invalid JSON: ${cleaned.slice(0, 200)}`);
+    throw new Error(`AI returned invalid JSON: ${cleaned.slice(0, 200)}`);
   }
 }
-
-export { anthropic };
