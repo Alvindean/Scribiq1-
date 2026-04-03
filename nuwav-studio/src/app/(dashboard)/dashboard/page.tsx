@@ -33,12 +33,11 @@ export default async function DashboardPage() {
         .limit(20)
     : [];
 
-  // Mock usage for MVP
   const usageStats = {
-    projects: { used: projectList.length, limit: 3 },
-    renders: { used: 0, limit: 10 },
-    generations: { used: 0, limit: 50 },
-    storage: { used: 0, limit: 5 },
+    projects: { used: projectList.length, limit: -1 },
+    renders: { used: 0, limit: -1 },
+    generations: { used: 0, limit: -1 },
+    storage: { used: 0, limit: -1 },
   };
 
   return (
