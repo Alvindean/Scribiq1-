@@ -17,6 +17,12 @@ interface StageInfo {
   description: string;
 }
 
+interface SSEEvent {
+  step: string;
+  message: string;
+  progress: number;
+}
+
 const STAGES: StageInfo[] = [
   {
     key: "outline",
@@ -46,9 +52,22 @@ function stageIndex(stage: GenerationStage): number {
   return STAGE_ORDER.indexOf(stage);
 }
 
-function stageProgress(stage: GenerationStage): number {
+function stageProgress(stage: GenerationStage, apiProgress: number): number {
+  if (stage === "complete") return 100;
+  if (apiProgress > 0) return apiProgress;
   const idx = stageIndex(stage);
   return Math.round(((idx + 1) / STAGES.length) * 100);
+}
+
+/** Map API `step` strings to display stages */
+function stepToStage(step: string): GenerationStage {
+  if (step === "outline" || step === "outline_done" || step === "modules_created") {
+    return "outline";
+  }
+  if (step === "lesson_scripted") return "scripts";
+  if (step === "voiceover_generated") return "voiceover";
+  if (step === "complete") return "complete";
+  return "outline";
 }
 
 // ─── Stage indicator ──────────────────────────────────────────────────────────
@@ -114,24 +133,28 @@ export default function GeneratePage() {
   const router = useRouter();
 
   const [stage, setStage] = useState<GenerationStage>("outline");
+  const [apiProgress, setApiProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState<string>(
     "Starting generation…"
   );
   const [error, setError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     if (started) return;
     setStarted(true);
 
-    // Start generation and connect to SSE stream
-    const start = async () => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const run = async () => {
       try {
         const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ projectId: id }),
+          signal: controller.signal,
         });
 
         if (!res.ok) {
@@ -139,49 +162,72 @@ export default function GeneratePage() {
           throw new Error(body.error ?? `HTTP ${res.status}`);
         }
 
-        // Connect to SSE stream
-        const es = new EventSource(`/api/generate/stream?projectId=${id}`);
-        eventSourceRef.current = es;
+        if (!res.body) throw new Error("No response body");
 
-        es.addEventListener("stage", (e: MessageEvent<string>) => {
-          const data = JSON.parse(e.data) as {
-            stage: GenerationStage;
-            message: string;
-          };
-          setStage(data.stage);
-          setStatusMessage(data.message);
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
 
-          if (data.stage === "complete") {
-            es.close();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+
+          // SSE messages are delimited by double newline
+          const chunks = buffer.split("\n\n");
+          buffer = chunks.pop() ?? "";
+
+          for (const chunk of chunks) {
+            const line = chunk.trim();
+            if (!line.startsWith("data: ")) continue;
+            try {
+              const event = JSON.parse(line.slice(6)) as SSEEvent;
+
+              if (event.step === "error") {
+                setError(event.message);
+                return;
+              }
+
+              const newStage = stepToStage(event.step);
+              setStage(newStage);
+              setApiProgress(event.progress);
+              setStatusMessage(event.message);
+            } catch {
+              // Ignore malformed SSE lines
+            }
           }
-        });
+        }
 
-        es.addEventListener("error_event", (e: MessageEvent<string>) => {
-          const data = JSON.parse(e.data) as { message: string };
-          setError(data.message);
-          es.close();
-        });
-
-        es.onerror = () => {
-          // SSE connection closed after complete — this is normal
-          es.close();
-        };
+        // Stream ended — mark complete if not already
+        setStage("complete");
+        setApiProgress(100);
+        setStatusMessage("Generation complete!");
       } catch (err) {
+        if (err instanceof Error && err.name === "AbortError") return;
         setError(
           err instanceof Error ? err.message : "Failed to start generation"
         );
       }
     };
 
-    start();
+    run();
 
     return () => {
-      eventSourceRef.current?.close();
+      abortRef.current?.abort();
     };
   }, [id, started]);
 
-  const progress = stageProgress(stage);
+  const progress = stageProgress(stage, apiProgress);
   const isComplete = stage === "complete";
+
+  const handleRetry = () => {
+    setError(null);
+    setStarted(false);
+    setStage("outline");
+    setApiProgress(0);
+    setStatusMessage("Starting generation…");
+  };
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-12 space-y-8">
@@ -225,15 +271,7 @@ export default function GeneratePage() {
             </p>
             <p className="text-sm text-muted-foreground mt-1">{error}</p>
             <div className="mt-4 flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setError(null);
-                  setStarted(false);
-                  setStage("outline");
-                }}
-              >
+              <Button variant="outline" size="sm" onClick={handleRetry}>
                 Retry
               </Button>
               <Button asChild variant="outline" size="sm">

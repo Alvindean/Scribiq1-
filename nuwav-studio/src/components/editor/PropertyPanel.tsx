@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useEditorStore } from "@/stores/editor-store";
 import { useProjectStore } from "@/stores/project-store";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -13,6 +13,7 @@ import {
   LayoutGrid,
   Clock,
   FileText,
+  Loader2,
 } from "lucide-react";
 
 export function PropertyPanel() {
@@ -30,6 +31,8 @@ export function PropertyPanel() {
   const [scriptDraft, setScriptDraft] = useState<string>("");
   const [durationInput, setDurationInput] = useState<string>("");
   const [scriptDirty, setScriptDirty] = useState(false);
+  const [voiceoverError, setVoiceoverError] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (selectedLesson) {
@@ -40,6 +43,7 @@ export function PropertyPanel() {
           : ""
       );
       setScriptDirty(false);
+      setVoiceoverError(null);
     }
   }, [selectedLesson]);
 
@@ -61,13 +65,49 @@ export function PropertyPanel() {
     setScriptDirty(false);
   };
 
-  const handleGenerateVoiceover = () => {
+  const handleGenerateVoiceover = async () => {
+    const text = selectedLesson.script;
+    if (!text) {
+      setVoiceoverError("Write a script first before generating voiceover.");
+      return;
+    }
+
     setIsGenerating(true);
-    // Trigger voiceover generation externally
-    setTimeout(() => setIsGenerating(false), 2000);
+    setVoiceoverError(null);
+
+    try {
+      const res = await fetch("/api/voiceover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lessonId: selectedLesson.id, text }),
+      });
+
+      const data = (await res.json()) as { url?: string; error?: string };
+
+      if (!res.ok || !data.url) {
+        throw new Error(data.error ?? `HTTP ${res.status}`);
+      }
+
+      updateLesson(selectedLesson.id, {
+        voiceover_url: data.url,
+        status: "voiced",
+      });
+    } catch (err) {
+      setVoiceoverError(
+        err instanceof Error ? err.message : "Failed to generate voiceover"
+      );
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleTogglePlay = () => {
+    if (!audioRef.current) return;
+    if (isPlayingVoiceover) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
     setIsPlayingVoiceover(!isPlayingVoiceover);
   };
 
@@ -156,17 +196,29 @@ export function PropertyPanel() {
             disabled={isGenerating}
             className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white"
           >
-            <Mic className="w-4 h-4" />
-            {isGenerating ? "Generating…" : "Generate Voiceover"}
+            {isGenerating ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Generating…
+              </>
+            ) : (
+              <>
+                <Mic className="w-4 h-4" />
+                Generate Voiceover
+              </>
+            )}
           </Button>
+
+          {voiceoverError && (
+            <p className="text-xs text-red-400 text-center">{voiceoverError}</p>
+          )}
 
           {selectedLesson.voiceover_url && (
             <div className="rounded-lg bg-zinc-800 border border-zinc-700 p-4 flex flex-col gap-3">
               <p className="text-xs text-zinc-400 font-medium">Voiceover</p>
               <audio
+                ref={audioRef}
                 src={selectedLesson.voiceover_url}
-                controls
-                className="w-full h-8"
                 onPlay={() => setIsPlayingVoiceover(true)}
                 onPause={() => setIsPlayingVoiceover(false)}
                 onEnded={() => setIsPlayingVoiceover(false)}
@@ -190,7 +242,7 @@ export function PropertyPanel() {
             </div>
           )}
 
-          {!selectedLesson.voiceover_url && (
+          {!selectedLesson.voiceover_url && !voiceoverError && (
             <p className="text-xs text-zinc-600 text-center py-4">
               No voiceover generated yet.
             </p>

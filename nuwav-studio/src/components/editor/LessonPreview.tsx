@@ -1,7 +1,25 @@
 "use client";
+import dynamic from "next/dynamic";
 import { useEditorStore } from "@/stores/editor-store";
+import { useProjectStore } from "@/stores/project-store";
 import { Button } from "@/components/ui/button";
 import { Play, Video, Clock, FileText } from "lucide-react";
+import type { LessonVideoProps } from "@/remotion/compositions/LessonVideo";
+
+// Player must be loaded client-side only — it uses browser APIs
+const Player = dynamic(
+  () => import("@remotion/player").then((m) => m.Player),
+  { ssr: false }
+);
+
+// LessonVideo is also loaded dynamically to keep the SSR bundle clean
+const LessonVideo = dynamic(
+  () =>
+    import("@/remotion/compositions/LessonVideo").then((m) => m.LessonVideo),
+  { ssr: false }
+);
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatDuration(seconds: number | null): string {
   if (seconds == null) return "—";
@@ -10,8 +28,73 @@ function formatDuration(seconds: number | null): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
+/** Build minimal Remotion slide data from a lesson for in-editor preview. */
+function buildPreviewProps(
+  title: string,
+  script: string | null,
+  durationSeconds: number | null,
+  primaryColor: string,
+  companyName: string
+): LessonVideoProps {
+  const fps = 30;
+  const scriptSeconds = Math.max(30, durationSeconds ?? 120);
+
+  const slides: LessonVideoProps["slides"] = [
+    {
+      type: "title",
+      title,
+      durationInFrames: 90,
+    },
+  ];
+
+  if (script) {
+    // Show up to 300 chars as body; the rest as a second content slide
+    const first = script.slice(0, 300);
+    const rest = script.length > 300 ? script.slice(300, 600) : null;
+
+    slides.push({
+      type: "content",
+      heading: title,
+      body: first,
+      durationInFrames: Math.round((scriptSeconds * fps) / (rest ? 2 : 1)),
+    });
+
+    if (rest) {
+      slides.push({
+        type: "content",
+        heading: "Continued",
+        body: rest,
+        durationInFrames: Math.round((scriptSeconds * fps) / 2),
+      });
+    }
+  } else {
+    slides.push({
+      type: "content",
+      heading: title,
+      body: "No script yet — write one in the Script panel.",
+      durationInFrames: 120,
+    });
+  }
+
+  const totalFrames = slides.reduce((s, sl) => s + sl.durationInFrames, 0);
+
+  return {
+    title,
+    slides,
+    brandSettings: {
+      primaryColor,
+      backgroundColor: "#0d0d1a",
+      companyName,
+    },
+    totalFrames,
+  } as LessonVideoProps & { totalFrames: number };
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
+
 export function LessonPreview() {
   const { selectedLesson, isGenerating, setIsGenerating } = useEditorStore();
+  const { project } = useProjectStore();
 
   if (!selectedLesson) {
     return (
@@ -22,6 +105,22 @@ export function LessonPreview() {
     );
   }
 
+  const primaryColor =
+    (project?.brand_settings as { colors?: { primary?: string } } | null)
+      ?.colors?.primary ?? "#6366f1";
+  const companyName = project?.title ?? "NuWav Studio";
+
+  const previewProps = buildPreviewProps(
+    selectedLesson.title,
+    selectedLesson.script,
+    selectedLesson.duration_seconds,
+    primaryColor,
+    companyName
+  );
+
+  const totalFrames =
+    (previewProps as LessonVideoProps & { totalFrames: number }).totalFrames;
+
   const scriptPreview = selectedLesson.script
     ? selectedLesson.script.slice(0, 200) +
       (selectedLesson.script.length > 200 ? "…" : "")
@@ -29,14 +128,13 @@ export function LessonPreview() {
 
   const handleRender = () => {
     setIsGenerating(true);
-    // Render action wired up externally via API route
     setTimeout(() => setIsGenerating(false), 3000);
   };
 
   return (
     <div className="flex flex-col gap-6 p-6 max-w-3xl mx-auto w-full">
-      {/* Video Player */}
-      <div className="relative w-full rounded-xl overflow-hidden bg-zinc-800 aspect-video flex items-center justify-center">
+      {/* Remotion Player / Video Player */}
+      <div className="relative w-full rounded-xl overflow-hidden bg-zinc-800 aspect-video">
         {selectedLesson.video_url ? (
           <video
             src={selectedLesson.video_url}
@@ -45,21 +143,18 @@ export function LessonPreview() {
             poster={selectedLesson.thumbnail_url ?? undefined}
           />
         ) : (
-          <div className="flex flex-col items-center gap-3 text-zinc-600">
-            {selectedLesson.thumbnail_url && (
-              <img
-                src={selectedLesson.thumbnail_url}
-                alt="Thumbnail"
-                className="absolute inset-0 w-full h-full object-cover opacity-20"
-              />
-            )}
-            <div className="relative z-10 flex flex-col items-center gap-2">
-              <div className="w-16 h-16 rounded-full bg-zinc-700/80 flex items-center justify-center">
-                <Play className="w-7 h-7 text-zinc-400 ml-1" />
-              </div>
-              <p className="text-xs text-zinc-500">No video rendered yet</p>
-            </div>
-          </div>
+          <Player
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            component={LessonVideo as any}
+            inputProps={previewProps}
+            durationInFrames={totalFrames}
+            fps={30}
+            compositionWidth={1920}
+            compositionHeight={1080}
+            style={{ width: "100%", height: "100%" }}
+            controls
+            loop
+          />
         )}
       </div>
 
