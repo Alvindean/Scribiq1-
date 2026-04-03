@@ -1,0 +1,271 @@
+"use client";
+import { useState, useEffect } from "react";
+import { useEditorStore } from "@/stores/editor-store";
+import { useProjectStore } from "@/stores/project-store";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Mic,
+  Save,
+  Play,
+  Pause,
+  LayoutGrid,
+  Clock,
+  FileText,
+} from "lucide-react";
+
+export function PropertyPanel() {
+  const {
+    selectedLesson,
+    activeTab,
+    setActiveTab,
+    isGenerating,
+    setIsGenerating,
+    isPlayingVoiceover,
+    setIsPlayingVoiceover,
+  } = useEditorStore();
+  const { updateLesson } = useProjectStore();
+
+  const [scriptDraft, setScriptDraft] = useState<string>("");
+  const [durationInput, setDurationInput] = useState<string>("");
+  const [scriptDirty, setScriptDirty] = useState(false);
+
+  useEffect(() => {
+    if (selectedLesson) {
+      setScriptDraft(selectedLesson.script ?? "");
+      setDurationInput(
+        selectedLesson.duration_seconds != null
+          ? String(selectedLesson.duration_seconds)
+          : ""
+      );
+      setScriptDirty(false);
+    }
+  }, [selectedLesson]);
+
+  if (!selectedLesson) {
+    return (
+      <div className="flex items-center justify-center h-full text-zinc-600 text-sm px-4 text-center">
+        Select a lesson to edit its properties.
+      </div>
+    );
+  }
+
+  const handleSaveScript = () => {
+    updateLesson(selectedLesson.id, { script: scriptDraft });
+    setScriptDirty(false);
+  };
+
+  const handleDiscardScript = () => {
+    setScriptDraft(selectedLesson.script ?? "");
+    setScriptDirty(false);
+  };
+
+  const handleGenerateVoiceover = () => {
+    setIsGenerating(true);
+    // Trigger voiceover generation externally
+    setTimeout(() => setIsGenerating(false), 2000);
+  };
+
+  const handleTogglePlay = () => {
+    setIsPlayingVoiceover(!isPlayingVoiceover);
+  };
+
+  const handleSaveDuration = () => {
+    const parsed = parseInt(durationInput, 10);
+    if (!Number.isNaN(parsed) && parsed >= 0) {
+      updateLesson(selectedLesson.id, { duration_seconds: parsed });
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="px-4 py-3 border-b border-zinc-800 shrink-0">
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider truncate">
+          {selectedLesson.title}
+        </p>
+      </div>
+
+      <Tabs
+        value={activeTab}
+        onValueChange={(v) => setActiveTab(v as typeof activeTab)}
+        className="flex flex-col flex-1 min-h-0"
+      >
+        <TabsList className="grid grid-cols-4 mx-3 mt-3 shrink-0 bg-zinc-800">
+          <TabsTrigger value="script" className="text-xs gap-1">
+            <FileText className="w-3 h-3" />
+            Script
+          </TabsTrigger>
+          <TabsTrigger value="voice" className="text-xs gap-1">
+            <Mic className="w-3 h-3" />
+            Voice
+          </TabsTrigger>
+          <TabsTrigger value="visuals" className="text-xs gap-1">
+            <LayoutGrid className="w-3 h-3" />
+            Visuals
+          </TabsTrigger>
+          <TabsTrigger value="timing" className="text-xs gap-1">
+            <Clock className="w-3 h-3" />
+            Timing
+          </TabsTrigger>
+        </TabsList>
+
+        {/* Script Tab */}
+        <TabsContent
+          value="script"
+          className="flex-1 flex flex-col min-h-0 px-3 pb-3 mt-3 gap-3"
+        >
+          <Textarea
+            value={scriptDraft}
+            onChange={(e) => {
+              setScriptDraft(e.target.value);
+              setScriptDirty(true);
+            }}
+            placeholder="Write the lesson script here…"
+            className="flex-1 min-h-0 resize-none text-sm bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 leading-relaxed"
+          />
+          {scriptDirty && (
+            <div className="flex gap-2 shrink-0">
+              <Button
+                onClick={handleSaveScript}
+                size="sm"
+                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
+              >
+                <Save className="w-3.5 h-3.5" />
+                Save
+              </Button>
+              <Button
+                onClick={handleDiscardScript}
+                size="sm"
+                variant="outline"
+                className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5"
+              >
+                Discard
+              </Button>
+            </div>
+          )}
+        </TabsContent>
+
+        {/* Voice Tab */}
+        <TabsContent
+          value="voice"
+          className="flex-1 flex flex-col px-3 pb-3 mt-3 gap-4"
+        >
+          <Button
+            onClick={handleGenerateVoiceover}
+            disabled={isGenerating}
+            className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white"
+          >
+            <Mic className="w-4 h-4" />
+            {isGenerating ? "Generating…" : "Generate Voiceover"}
+          </Button>
+
+          {selectedLesson.voiceover_url && (
+            <div className="rounded-lg bg-zinc-800 border border-zinc-700 p-4 flex flex-col gap-3">
+              <p className="text-xs text-zinc-400 font-medium">Voiceover</p>
+              <audio
+                src={selectedLesson.voiceover_url}
+                controls
+                className="w-full h-8"
+                onPlay={() => setIsPlayingVoiceover(true)}
+                onPause={() => setIsPlayingVoiceover(false)}
+                onEnded={() => setIsPlayingVoiceover(false)}
+              />
+              <Button
+                onClick={handleTogglePlay}
+                size="sm"
+                variant="outline"
+                className="gap-2 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
+              >
+                {isPlayingVoiceover ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5" /> Pause
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5" /> Play
+                  </>
+                )}
+              </Button>
+            </div>
+          )}
+
+          {!selectedLesson.voiceover_url && (
+            <p className="text-xs text-zinc-600 text-center py-4">
+              No voiceover generated yet.
+            </p>
+          )}
+        </TabsContent>
+
+        {/* Visuals Tab */}
+        <TabsContent
+          value="visuals"
+          className="flex-1 flex flex-col px-3 pb-3 mt-3 gap-3"
+        >
+          <p className="text-xs font-medium text-zinc-400">Slide Previews</p>
+          <div className="grid grid-cols-2 gap-2">
+            {[1, 2, 3, 4].map((n) => (
+              <div
+                key={n}
+                className="aspect-video rounded bg-zinc-800 border border-zinc-700 flex items-center justify-center"
+              >
+                <span className="text-xs text-zinc-600">Slide {n}</span>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-zinc-600 text-center py-2">
+            Slide editing coming soon.
+          </p>
+        </TabsContent>
+
+        {/* Timing Tab */}
+        <TabsContent
+          value="timing"
+          className="flex-1 flex flex-col px-3 pb-3 mt-3 gap-4"
+        >
+          <div className="flex flex-col gap-2">
+            <label
+              className="text-xs font-medium text-zinc-400"
+              htmlFor="duration-input"
+            >
+              Duration (seconds)
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="duration-input"
+                type="number"
+                min={0}
+                value={durationInput}
+                onChange={(e) => setDurationInput(e.target.value)}
+                placeholder="e.g. 120"
+                className="flex-1 bg-zinc-800 border border-zinc-700 rounded-md px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500"
+              />
+              <Button
+                onClick={handleSaveDuration}
+                size="sm"
+                className="bg-violet-600 hover:bg-violet-700 text-white"
+              >
+                Save
+              </Button>
+            </div>
+          </div>
+
+          <div className="rounded-lg bg-zinc-800/60 border border-zinc-700/50 p-4 flex flex-col gap-2 text-sm">
+            <div className="flex justify-between">
+              <span className="text-zinc-500">Frame Rate</span>
+              <span className="text-zinc-300 font-mono">30 fps</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">Resolution</span>
+              <span className="text-zinc-300 font-mono">1920 × 1080</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-zinc-500">Format</span>
+              <span className="text-zinc-300 font-mono">MP4 / H.264</span>
+            </div>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
