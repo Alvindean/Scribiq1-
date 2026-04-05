@@ -6,7 +6,7 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
 
   const isDashboardRoute =
-    pathname === "/" ||
+    pathname.startsWith("/dashboard") ||
     pathname.startsWith("/projects") ||
     pathname.startsWith("/templates") ||
     pathname.startsWith("/settings");
@@ -21,7 +21,7 @@ export default auth((req) => {
 
   if (isLoggedIn && isAuthRoute) {
     const homeUrl = req.nextUrl.clone();
-    homeUrl.pathname = "/";
+    homeUrl.pathname = "/dashboard";
     return NextResponse.redirect(homeUrl);
   }
 

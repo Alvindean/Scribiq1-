@@ -1,5 +1,8 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
+
+// Allow up to 300s on Vercel (Pro) or 60s (Hobby) for long AI generation runs
+export const maxDuration = 300;
 import { db } from "@/lib/db";
 import { projects, modules, lessons } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";

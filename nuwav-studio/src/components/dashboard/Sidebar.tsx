@@ -12,11 +12,11 @@ import {
   Waves,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "@/lib/auth";
+import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const navItems = [
-  { href: "/", icon: LayoutDashboard, label: "Dashboard" },
+  { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/projects", icon: FolderOpen, label: "Projects" },
   { href: "/templates", icon: Layers, label: "Templates" },
   { href: "/settings", icon: Settings, label: "Settings" },
@@ -48,8 +48,8 @@ export function Sidebar() {
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive =
-            item.href === "/"
-              ? pathname === "/"
+            item.href === "/dashboard"
+              ? pathname === "/dashboard"
               : pathname.startsWith(item.href);
           return (
             <Link
