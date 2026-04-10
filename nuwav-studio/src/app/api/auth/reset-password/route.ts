@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { users, passwordResetTokens } from "@/lib/db/schema";
-import { eq, isNull } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest): Promise<Response> {
   let token: string;
