@@ -2,8 +2,8 @@ import Link from "next/link";
 import { Plus, BookOpen } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { profiles, projects } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { profiles, projects, lessons, renderJobs } from "@/lib/db/schema";
+import { eq, count, and, gte } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { UsageStats } from "@/components/dashboard/UsageStats";
@@ -14,30 +14,64 @@ export default async function DashboardPage() {
   const session = await auth();
   const userId = session?.user?.id;
 
-  const [profile] = userId
-    ? await db.select({ name: profiles.name }).from(profiles).where(eq(profiles.id, userId)).limit(1)
-    : [null];
-
-  const firstName = profile?.name?.split(" ")[0] ?? "there";
-
-  // Get org_id from profile for filtering
   const [profileFull] = userId
-    ? await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, userId)).limit(1)
+    ? await db
+        .select({ name: profiles.name, orgId: profiles.orgId })
+        .from(profiles)
+        .where(eq(profiles.id, userId))
+        .limit(1)
     : [null];
 
-  const projectList = profileFull?.orgId
-    ? await db
-        .select()
-        .from(projects)
-        .where(eq(projects.orgId, profileFull.orgId))
-        .limit(20)
+  const firstName = profileFull?.name?.split(" ")[0] ?? "there";
+  const orgId = profileFull?.orgId;
+
+  // Recent projects for display (limited to 20)
+  const projectList = orgId
+    ? await db.select().from(projects).where(eq(projects.orgId, orgId)).limit(20)
     : [];
 
+  // Start of current month for monthly stats
+  const monthStart = new Date();
+  monthStart.setDate(1);
+  monthStart.setHours(0, 0, 0, 0);
+
+  // Accurate counts via COUNT queries
+  const [projectCount, lessonCount, renderCount] = await Promise.all([
+    orgId
+      ? db.select({ value: count() }).from(projects).where(eq(projects.orgId, orgId))
+          .then((r) => r[0]?.value ?? 0)
+      : Promise.resolve(0),
+
+    orgId
+      ? db
+          .select({ value: count() })
+          .from(lessons)
+          .innerJoin(projects, eq(lessons.projectId, projects.id))
+          .where(eq(projects.orgId, orgId))
+          .then((r) => r[0]?.value ?? 0)
+      : Promise.resolve(0),
+
+    orgId
+      ? db
+          .select({ value: count() })
+          .from(renderJobs)
+          .innerJoin(projects, eq(renderJobs.projectId, projects.id))
+          .where(
+            and(
+              eq(projects.orgId, orgId),
+              gte(renderJobs.createdAt, monthStart)
+            )
+          )
+          .then((r) => r[0]?.value ?? 0)
+      : Promise.resolve(0),
+  ]);
+
   const usageStats = {
-    projects: { used: projectList.length, limit: -1 },
-    renders: { used: 0, limit: -1 },
-    generations: { used: 0, limit: -1 },
-    storage: { used: 0, limit: -1 },
+    projects:    { used: projectCount,  limit: -1 },
+    lessons:     { used: lessonCount,   limit: -1 },
+    renders:     { used: renderCount,   limit: -1 },
+    generations: { used: lessonCount,   limit: -1 },
+    storage:     { used: 0,             limit: -1 },
   };
 
   return (

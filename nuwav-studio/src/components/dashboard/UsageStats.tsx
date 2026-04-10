@@ -1,4 +1,4 @@
-import { Video, Cpu, HardDrive, FolderOpen } from "lucide-react";
+import { Video, Cpu, HardDrive, FolderOpen, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 
@@ -13,6 +13,7 @@ interface UsageStat {
 interface UsageStatsProps {
   stats: {
     projects: { used: number; limit: number };
+    lessons: { used: number; limit: number };
     renders: { used: number; limit: number };
     generations: { used: number; limit: number };
     storage: { used: number; limit: number };
@@ -26,6 +27,12 @@ export function UsageStats({ stats }: UsageStatsProps) {
       used: stats.projects.used,
       limit: stats.projects.limit,
       icon: FolderOpen,
+    },
+    {
+      label: "Lessons Created",
+      used: stats.lessons.used,
+      limit: stats.lessons.limit,
+      icon: BookOpen,
     },
     {
       label: "Video Renders",
