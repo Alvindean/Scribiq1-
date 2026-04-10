@@ -5,6 +5,11 @@ import { db } from "@/lib/db";
 import { users } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
+// Pre-computed dummy hash used to run bcrypt.compare even when no user is found,
+// preventing timing-based user enumeration attacks.
+const DUMMY_HASH =
+  "$2a$12$OxLAA.9UPpjyJsX3RMnmZOQ8yWd7u1e1tVpZEXIr7mLiU4qU9LHSG";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     Credentials({
@@ -16,7 +21,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) return null;
 
-        const email = credentials.email as string;
+        // Normalize email to match how it is stored at signup.
+        const email = (credentials.email as string).trim().toLowerCase();
         const password = credentials.password as string;
 
         const [user] = await db
@@ -25,10 +31,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           .where(eq(users.email, email))
           .limit(1);
 
-        if (!user || !user.passwordHash) return null;
+        // Always run bcrypt.compare to prevent timing-based user enumeration.
+        const hashToCompare = user?.passwordHash ?? DUMMY_HASH;
+        const isValid = await bcrypt.compare(password, hashToCompare);
 
-        const isValid = await bcrypt.compare(password, user.passwordHash);
-        if (!isValid) return null;
+        if (!user || !user.passwordHash || !isValid) return null;
 
         return {
           id: user.id,

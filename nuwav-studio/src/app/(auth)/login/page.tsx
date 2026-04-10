@@ -62,6 +62,10 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                inputMode="email"
               />
             </div>
             <div className="space-y-2">
