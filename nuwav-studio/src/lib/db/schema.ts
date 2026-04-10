@@ -14,6 +14,7 @@ export const users = pgTable("users", {
   name: text("name"),
   avatarUrl: text("avatar_url"),
   passwordHash: text("password_hash"),
+  isAdmin: boolean("is_admin").default(false).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
