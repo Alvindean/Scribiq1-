@@ -1,8 +1,11 @@
+// Rate limiting for this route is handled at the middleware layer (src/middleware.ts)
+import crypto from "crypto";
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
-import { users, organizations, profiles } from "@/lib/db/schema";
+import { users, organizations, profiles, emailVerificationTokens } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { sendVerificationEmail } from "@/lib/email";
 
 export async function POST(request: NextRequest): Promise<Response> {
   let email: string;
@@ -92,6 +95,23 @@ export async function POST(request: NextRequest): Promise<Response> {
       name,
       role: "owner",
     });
+
+    // Send email verification
+    try {
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+      await db.insert(emailVerificationTokens).values({
+        userId: newUser.id,
+        token: verificationToken,
+        email,
+        expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // 24h
+      });
+      await sendVerificationEmail(
+        email,
+        `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/verify-email?token=${verificationToken}`
+      );
+    } catch {
+      // Non-fatal: account is created, verification email failed
+    }
 
     return new Response(JSON.stringify({ userId: newUser.id }), {
       status: 201,

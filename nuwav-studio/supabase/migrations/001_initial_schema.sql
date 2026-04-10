@@ -1,3 +1,5 @@
+-- NOTE: This project uses Neon (not Supabase). Apply these migrations via the Neon console or drizzle-kit.
+
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
@@ -28,7 +30,7 @@ create table organizations (
   updated_at timestamptz default now()
 );
 
--- Users profile (extends Supabase Auth)
+-- Users profile (extends Auth.js / Neon Auth)
 create table profiles (
   id uuid primary key references auth.users(id) on delete cascade,
   org_id uuid references organizations(id),

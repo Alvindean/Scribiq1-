@@ -80,6 +80,11 @@ export default function LoginPage() {
                 autoComplete="current-password"
                 maxLength={128}
               />
+              <div className="text-right">
+                <Link href="/forgot-password" className="text-xs text-muted-foreground hover:text-violet-600">
+                  Forgot password?
+                </Link>
+              </div>
             </div>
 
             {error && (

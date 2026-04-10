@@ -1,3 +1,5 @@
+-- NOTE: This project uses Neon (not Supabase). Apply these migrations via the Neon console or drizzle-kit.
+
 -- Seed starter templates
 insert into templates (name, type, niche_category, description, structure, is_public) values
 (

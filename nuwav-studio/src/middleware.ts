@@ -1,7 +1,11 @@
 import { auth } from "@/lib/auth/config";
 import { NextResponse } from "next/server";
+import { applyRateLimit } from "@/lib/ratelimit/apply";
 
-export default auth((req) => {
+export default auth(async (req) => {
+  const rl = await applyRateLimit(req);
+  if (rl.limited && rl.response) return rl.response;
+
   const { pathname } = req.nextUrl;
   const isLoggedIn = !!req.auth;
 
