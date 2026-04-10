@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useEditorStore } from "@/stores/editor-store";
 import { useProjectStore } from "@/stores/project-store";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -14,7 +14,96 @@ import {
   Clock,
   FileText,
   Loader2,
+  Wand2,
+  X,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
+
+// ── Chip input ───────────────────────────────────────────────────────────────
+
+interface ChipInputProps {
+  chips: string[];
+  onChange: (chips: string[]) => void;
+  placeholder?: string;
+  disabled?: boolean;
+}
+
+function ChipInput({ chips, onChange, placeholder, disabled }: ChipInputProps) {
+  const [inputVal, setInputVal] = useState("");
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function commit(raw: string) {
+    const trimmed = raw.replace(/,+$/, "").trim();
+    if (trimmed && !chips.includes(trimmed)) {
+      onChange([...chips, trimmed]);
+    }
+    setInputVal("");
+  }
+
+  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const val = e.target.value;
+    // Pasting comma-separated values splits them all at once
+    if (val.includes(",")) {
+      const parts = val.split(",").map((s) => s.trim()).filter(Boolean);
+      const newChips = parts.slice(0, -1).filter((p) => !chips.includes(p));
+      onChange([...chips, ...newChips]);
+      setInputVal(parts[parts.length - 1]);
+      return;
+    }
+    setInputVal(val);
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if ((e.key === "Enter" || e.key === "Tab") && inputVal.trim()) {
+      e.preventDefault();
+      commit(inputVal);
+    } else if (e.key === "Backspace" && !inputVal && chips.length > 0) {
+      onChange(chips.slice(0, -1));
+    }
+  }
+
+  function removeChip(idx: number) {
+    onChange(chips.filter((_, i) => i !== idx));
+  }
+
+  return (
+    <div
+      className="flex flex-wrap gap-1.5 rounded-md border border-zinc-700 bg-zinc-800 px-2 py-2 min-h-[44px] cursor-text"
+      onClick={() => inputRef.current?.focus()}
+    >
+      {chips.map((chip, idx) => (
+        <span
+          key={idx}
+          className="flex items-center gap-1 rounded bg-violet-700/60 border border-violet-500/40 px-2 py-0.5 text-xs text-violet-200 max-w-[180px]"
+        >
+          <span className="truncate">{chip}</span>
+          {!disabled && (
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); removeChip(idx); }}
+              className="shrink-0 text-violet-300 hover:text-white transition-colors"
+              aria-label={`Remove "${chip}"`}
+            >
+              <X className="w-3 h-3" />
+            </button>
+          )}
+        </span>
+      ))}
+      <input
+        ref={inputRef}
+        value={inputVal}
+        onChange={handleChange}
+        onKeyDown={handleKeyDown}
+        disabled={disabled}
+        placeholder={chips.length === 0 ? placeholder : "Add another…"}
+        className="flex-1 min-w-[100px] bg-transparent text-xs text-zinc-100 placeholder:text-zinc-600 outline-none"
+      />
+    </div>
+  );
+}
+
+// ── PropertyPanel ─────────────────────────────────────────────────────────────
 
 export function PropertyPanel() {
   const {
@@ -34,6 +123,12 @@ export function PropertyPanel() {
   const [voiceoverError, setVoiceoverError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  // Quick Edit state
+  const [quickEditOpen, setQuickEditOpen] = useState(false);
+  const [editPrompts, setEditPrompts] = useState<string[]>([]);
+  const [isRewriting, setIsRewriting] = useState(false);
+  const [rewriteError, setRewriteError] = useState<string | null>(null);
+
   useEffect(() => {
     if (selectedLesson) {
       setScriptDraft(selectedLesson.script ?? "");
@@ -44,6 +139,8 @@ export function PropertyPanel() {
       );
       setScriptDirty(false);
       setVoiceoverError(null);
+      setRewriteError(null);
+      setEditPrompts([]);
     }
   }, [selectedLesson]);
 
@@ -65,37 +162,52 @@ export function PropertyPanel() {
     setScriptDirty(false);
   };
 
+  const handleApplyQuickEdit = async () => {
+    if (!scriptDraft.trim() || editPrompts.length === 0) return;
+    setIsRewriting(true);
+    setRewriteError(null);
+    try {
+      const res = await fetch("/api/lessons/rewrite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          lessonId: selectedLesson.id,
+          script: scriptDraft,
+          prompts: editPrompts,
+        }),
+      });
+      const data = (await res.json()) as { script?: string; error?: string };
+      if (!res.ok || !data.script) throw new Error(data.error ?? "Rewrite failed");
+      setScriptDraft(data.script);
+      setScriptDirty(data.script !== (selectedLesson.script ?? ""));
+      setEditPrompts([]);
+      setQuickEditOpen(false);
+    } catch (err) {
+      setRewriteError(err instanceof Error ? err.message : "Rewrite failed");
+    } finally {
+      setIsRewriting(false);
+    }
+  };
+
   const handleGenerateVoiceover = async () => {
     const text = selectedLesson.script;
     if (!text) {
       setVoiceoverError("Write a script first before generating voiceover.");
       return;
     }
-
     setIsGenerating(true);
     setVoiceoverError(null);
-
     try {
       const res = await fetch("/api/voiceover", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ lessonId: selectedLesson.id, text }),
       });
-
       const data = (await res.json()) as { url?: string; error?: string };
-
-      if (!res.ok || !data.url) {
-        throw new Error(data.error ?? `HTTP ${res.status}`);
-      }
-
-      updateLesson(selectedLesson.id, {
-        voiceoverUrl: data.url,
-        status: "voiced",
-      });
+      if (!res.ok || !data.url) throw new Error(data.error ?? `HTTP ${res.status}`);
+      updateLesson(selectedLesson.id, { voiceoverUrl: data.url, status: "voiced" });
     } catch (err) {
-      setVoiceoverError(
-        err instanceof Error ? err.message : "Failed to generate voiceover"
-      );
+      setVoiceoverError(err instanceof Error ? err.message : "Failed to generate voiceover");
     } finally {
       setIsGenerating(false);
     }
@@ -155,6 +267,7 @@ export function PropertyPanel() {
           value="script"
           className="flex-1 flex flex-col min-h-0 px-3 pb-3 mt-3 gap-3"
         >
+          {/* Script textarea */}
           <Textarea
             value={scriptDraft}
             onChange={(e) => {
@@ -163,13 +276,16 @@ export function PropertyPanel() {
             }}
             placeholder="Write the lesson script here…"
             className="flex-1 min-h-0 resize-none text-sm bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 leading-relaxed"
+            style={{ WebkitUserSelect: "text", userSelect: "text" }}
           />
+
+          {/* Save / Discard */}
           {scriptDirty && (
             <div className="flex gap-2 shrink-0">
               <Button
                 onClick={handleSaveScript}
                 size="sm"
-                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
+                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5 min-h-[44px]"
               >
                 <Save className="w-3.5 h-3.5" />
                 Save
@@ -178,12 +294,94 @@ export function PropertyPanel() {
                 onClick={handleDiscardScript}
                 size="sm"
                 variant="outline"
-                className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5"
+                className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5 min-h-[44px]"
               >
                 Discard
               </Button>
             </div>
           )}
+
+          {/* ── Quick Edit ── */}
+          <div className="shrink-0 rounded-lg border border-zinc-700/60 bg-zinc-900/60 overflow-hidden">
+            {/* Header toggle */}
+            <button
+              type="button"
+              onClick={() => setQuickEditOpen((o) => !o)}
+              className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Wand2 className="w-3.5 h-3.5 text-violet-400" />
+                Quick Edit with AI
+              </span>
+              {quickEditOpen ? (
+                <ChevronUp className="w-3.5 h-3.5 text-zinc-500" />
+              ) : (
+                <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
+              )}
+            </button>
+
+            {/* Expandable body */}
+            {quickEditOpen && (
+              <div className="px-3 pb-3 space-y-2 border-t border-zinc-800">
+                <p className="text-[10px] text-zinc-500 pt-2">
+                  Type an instruction and press <kbd className="rounded border border-zinc-700 px-1 font-mono">Enter</kbd> or add a <kbd className="rounded border border-zinc-700 px-1 font-mono">,</kbd> to add more. AI applies all at once.
+                </p>
+
+                <ChipInput
+                  chips={editPrompts}
+                  onChange={setEditPrompts}
+                  placeholder="e.g. make it more upbeat, shorten by 20%…"
+                  disabled={isRewriting}
+                />
+
+                {/* Example suggestions */}
+                {editPrompts.length === 0 && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {[
+                      "Make it shorter",
+                      "Add more energy",
+                      "Include a call to action",
+                      "More conversational tone",
+                      "Add a story or example",
+                    ].map((suggestion) => (
+                      <button
+                        key={suggestion}
+                        type="button"
+                        onClick={() => setEditPrompts([suggestion])}
+                        className="rounded-full border border-zinc-700 px-2 py-0.5 text-[10px] text-zinc-500 hover:border-violet-500 hover:text-violet-300 transition-colors"
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {rewriteError && (
+                  <p className="text-xs text-red-400">{rewriteError}</p>
+                )}
+
+                <Button
+                  type="button"
+                  onClick={handleApplyQuickEdit}
+                  disabled={isRewriting || editPrompts.length === 0 || !scriptDraft.trim()}
+                  size="sm"
+                  className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white min-h-[44px] disabled:opacity-40"
+                >
+                  {isRewriting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Rewriting…
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="w-4 h-4" />
+                      Apply {editPrompts.length > 0 ? `${editPrompts.length} Edit${editPrompts.length !== 1 ? "s" : ""}` : "Edits"}
+                    </>
+                  )}
+                </Button>
+              </div>
+            )}
+          </div>
         </TabsContent>
 
         {/* Voice Tab */}
@@ -230,13 +428,9 @@ export function PropertyPanel() {
                 className="gap-2 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
               >
                 {isPlayingVoiceover ? (
-                  <>
-                    <Pause className="w-3.5 h-3.5" /> Pause
-                  </>
+                  <><Pause className="w-3.5 h-3.5" /> Pause</>
                 ) : (
-                  <>
-                    <Play className="w-3.5 h-3.5" /> Play
-                  </>
+                  <><Play className="w-3.5 h-3.5" /> Play</>
                 )}
               </Button>
             </div>
