@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Logo } from "@/components/shared/Logo";
 
 const COOLDOWN_SECONDS = 60;
 
-export default function VerifyEmailPage() {
+function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
 
@@ -75,44 +75,63 @@ export default function VerifyEmailPage() {
           : "Resend verification email";
 
   return (
+    <>
+      <div className="flex flex-col items-center gap-4">
+        <Logo size="lg" />
+        <div className="text-center">
+          <h1 className="text-2xl font-bold">Verify your email</h1>
+          <p className="text-sm text-muted-foreground mt-1">
+            We sent a verification link to{" "}
+            {email ? (
+              <span className="font-medium text-foreground">{email}</span>
+            ) : (
+              "your email address"
+            )}
+          </p>
+        </div>
+      </div>
+
+      <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
+        <p className="text-sm text-muted-foreground">
+          Click the link in the email to activate your account. If you
+          don&apos;t see it, check your spam folder.
+        </p>
+
+        <Button
+          type="button"
+          className="w-full bg-violet-600 hover:bg-violet-700"
+          disabled={buttonDisabled}
+          onClick={handleResend}
+        >
+          {buttonLabel}
+        </Button>
+      </div>
+
+      <p className="text-center text-sm text-muted-foreground">
+        <Link href="/login" className="font-medium text-violet-600 hover:underline">
+          Back to login
+        </Link>
+      </p>
+    </>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
     <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
       <div className="w-full max-w-sm space-y-6">
-        <div className="flex flex-col items-center gap-4">
-          <Logo size="lg" />
-          <div className="text-center">
-            <h1 className="text-2xl font-bold">Verify your email</h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              We sent a verification link to{" "}
-              {email ? (
-                <span className="font-medium text-foreground">{email}</span>
-              ) : (
-                "your email address"
-              )}
-            </p>
-          </div>
-        </div>
-
-        <div className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Click the link in the email to activate your account. If you
-            don&apos;t see it, check your spam folder.
-          </p>
-
-          <Button
-            type="button"
-            className="w-full bg-violet-600 hover:bg-violet-700"
-            disabled={buttonDisabled}
-            onClick={handleResend}
-          >
-            {buttonLabel}
-          </Button>
-        </div>
-
-        <p className="text-center text-sm text-muted-foreground">
-          <Link href="/login" className="font-medium text-violet-600 hover:underline">
-            Back to login
-          </Link>
-        </p>
+        <Suspense
+          fallback={
+            <div className="flex flex-col items-center gap-4">
+              <Logo size="lg" />
+              <p className="text-sm text-center text-muted-foreground py-2">
+                Loading...
+              </p>
+            </div>
+          }
+        >
+          <VerifyEmailContent />
+        </Suspense>
       </div>
     </div>
   );
