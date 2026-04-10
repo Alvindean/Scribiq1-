@@ -78,6 +78,7 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="current-password"
+                maxLength={128}
               />
             </div>
 

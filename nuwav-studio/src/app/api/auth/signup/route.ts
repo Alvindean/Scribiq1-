@@ -22,9 +22,17 @@ export async function POST(request: NextRequest): Promise<Response> {
     if (!email || !password) {
       throw new Error("Email and password are required");
     }
+    // Basic email format check server-side (HTML type="email" is bypassed by API callers)
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error("Invalid email address");
+    }
     if (!name) name = email.split("@")[0];
     if (password.length < 8) {
       throw new Error("Password must be at least 8 characters");
+    }
+    // bcrypt silently truncates at 72 bytes; cap here to avoid user confusion
+    if (password.length > 128) {
+      throw new Error("Password must be 128 characters or fewer");
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Invalid request body";
