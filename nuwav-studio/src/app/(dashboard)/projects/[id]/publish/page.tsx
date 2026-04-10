@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { Copy, Check, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { copyToClipboard } from "@/lib/clipboard";
 
 interface PublishedPageData {
   id: string;
@@ -112,9 +114,11 @@ export default function PublishPage() {
 
   async function handleCopyLink() {
     if (!previewUrl) return;
-    await navigator.clipboard.writeText(previewUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const ok = await copyToClipboard(previewUrl);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    }
   }
 
   if (loading) {
@@ -199,22 +203,51 @@ export default function PublishPage() {
             <CardTitle className="text-base">Preview Link</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center gap-2">
-              <Input value={previewUrl ?? ""} readOnly className="font-mono text-sm" />
-              <Button variant="outline" onClick={handleCopyLink} className="shrink-0">
-                {copied ? "Copied!" : "Copy"}
-              </Button>
+            {/* URL display — read-only, selectable for manual copy on mobile */}
+            <div
+              className="rounded-md border bg-muted px-3 py-2 font-mono text-xs text-muted-foreground break-all select-all"
+              style={{ WebkitUserSelect: "text", userSelect: "text" }}
+            >
+              {previewUrl}
             </div>
-            {previewUrl && (
-              <a
-                href={previewUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="text-sm text-primary underline underline-offset-2"
+
+            {/* Action buttons — full width, 44px+ touch targets */}
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Button
+                variant="outline"
+                onClick={handleCopyLink}
+                className="flex-1 gap-2 min-h-[44px] active:scale-95 transition-transform"
               >
-                Open preview
-              </a>
-            )}
+                {copied ? (
+                  <>
+                    <Check className="h-4 w-4 text-green-500" />
+                    <span className="text-green-600 font-medium">Link Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-4 w-4" />
+                    Copy Link
+                  </>
+                )}
+              </Button>
+              {previewUrl && (
+                <a
+                  href={previewUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex-1"
+                >
+                  <Button
+                    variant="outline"
+                    className="w-full gap-2 min-h-[44px] active:scale-95 transition-transform"
+                    type="button"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    Open Preview
+                  </Button>
+                </a>
+              )}
+            </div>
           </CardContent>
         </Card>
       )}
