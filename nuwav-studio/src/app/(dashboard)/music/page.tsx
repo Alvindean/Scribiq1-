@@ -2,8 +2,9 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { MusicSearch } from "@/components/music/MusicSearch";
 import { SongAnalyzer } from "@/components/music/SongAnalyzer";
+import { ImageSearch } from "@/components/music/ImageSearch";
 
-type Tab = "library" | "analyzer";
+type Tab = "library" | "analyzer" | "images";
 
 export default async function MusicPage({
   searchParams,
@@ -11,15 +12,16 @@ export default async function MusicPage({
   searchParams: Promise<{ tab?: string }>;
 }) {
   const { tab } = await searchParams;
-  const activeTab: Tab = tab === "analyzer" ? "analyzer" : "library";
+  const activeTab: Tab =
+    tab === "analyzer" ? "analyzer" : tab === "images" ? "images" : "library";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">Music</h1>
+        <h1 className="text-3xl font-bold">Media Assets</h1>
         <p className="text-muted-foreground mt-1">
-          Find background tracks or analyze any song&apos;s structure to inform your course tone and pacing.
+          Find background tracks, analyze song structure, or search royalty-free images for your courses and VSLs.
         </p>
       </div>
 
@@ -45,6 +47,16 @@ export default async function MusicPage({
         >
           Song Analyzer
         </Link>
+        <Link
+          href="/music?tab=images"
+          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+            activeTab === "images"
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Visual Assets
+        </Link>
       </div>
 
       {/* Tab content */}
@@ -62,7 +74,7 @@ export default async function MusicPage({
             <MusicSearch />
           </Suspense>
         </div>
-      ) : (
+      ) : activeTab === "analyzer" ? (
         <div className="space-y-4">
           <div className="rounded-lg border bg-violet-50/60 px-4 py-3 text-sm text-violet-800 space-y-1">
             <p className="font-medium">Multi-source song intelligence</p>
@@ -74,6 +86,19 @@ export default async function MusicPage({
           </div>
           <Suspense fallback={null}>
             <SongAnalyzer />
+          </Suspense>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="rounded-lg border bg-sky-50/60 px-4 py-3 text-sm text-sky-800 space-y-1">
+            <p className="font-medium">Royalty-free images for slides, thumbnails, and backgrounds</p>
+            <ul className="text-xs text-sky-700 space-y-0.5 list-disc list-inside">
+              <li><strong>Pixabay</strong> — Photos, illustrations, and vectors (add <code className="bg-sky-100 px-1 rounded">PIXABAY_API_KEY</code> to env)</li>
+              <li>All Pixabay content is free for commercial use — no attribution required</li>
+            </ul>
+          </div>
+          <Suspense fallback={null}>
+            <ImageSearch />
           </Suspense>
         </div>
       )}

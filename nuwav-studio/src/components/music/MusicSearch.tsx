@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Search, Play, Pause, ExternalLink, Music2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Search, Play, Pause, ExternalLink, Music2, Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { MusicTrack } from "@/app/api/music/search/route";
@@ -45,14 +44,12 @@ export function MusicSearch() {
   const [playingId, setPlayingId] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  async function handleSearch(e?: React.FormEvent) {
-    e?.preventDefault();
-    if (!query.trim() || query.trim().length < 2) return;
+  const doSearch = useCallback(async (q: string, src: Source) => {
     setLoading(true);
     setError(null);
     try {
       const res = await fetch(
-        `/api/music/search?q=${encodeURIComponent(query)}&source=${source}&limit=30`
+        `/api/music/search?q=${encodeURIComponent(q)}&source=${src}&limit=30`
       );
       const data = await res.json() as { tracks?: MusicTrack[]; sources?: Record<string, number>; error?: string };
       if (!res.ok) throw new Error(data.error ?? "Search failed");
@@ -64,7 +61,19 @@ export function MusicSearch() {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    if (query.trim().length < 2) {
+      setTracks([]);
+      setSourceCounts({});
+      return;
+    }
+    const timer = setTimeout(() => {
+      doSearch(query.trim(), source);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [query, source, doSearch]);
 
   function togglePlay(track: MusicTrack) {
     if (!track.previewUrl) return;
@@ -88,24 +97,18 @@ export function MusicSearch() {
   return (
     <div className="space-y-6">
       {/* Search bar */}
-      <form onSubmit={handleSearch} className="flex gap-2">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by song title, artist, mood, or genre…"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-        <Button
-          type="submit"
-          disabled={loading || query.trim().length < 2}
-          className="bg-violet-600 hover:bg-violet-700"
-        >
-          {loading ? "Searching…" : "Search"}
-        </Button>
-      </form>
+      <div className="relative flex-1">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Search by song title, artist, mood, or genre…"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          className="pl-9 pr-9"
+        />
+        {loading && (
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
+        )}
+      </div>
 
       {/* Source filter */}
       <div className="flex flex-wrap gap-2">
@@ -243,7 +246,7 @@ export function MusicSearch() {
             .map((tag) => (
               <button
                 key={tag}
-                onClick={() => { setQuery(tag); handleSearch(); }}
+                onClick={() => setQuery(tag)}
                 className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground hover:border-violet-400 hover:text-violet-600 transition-colors"
               >
                 {tag}
