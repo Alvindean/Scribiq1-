@@ -13,6 +13,7 @@ export default auth(async (req) => {
     pathname.startsWith("/dashboard") ||
     pathname.startsWith("/projects") ||
     pathname.startsWith("/templates") ||
+    pathname.startsWith("/music") ||
     pathname.startsWith("/settings");
 
   const isAuthRoute = pathname === "/login" || pathname === "/signup";

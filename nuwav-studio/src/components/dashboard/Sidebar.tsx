@@ -10,6 +10,7 @@ import {
   CreditCard,
   LogOut,
   Waves,
+  Music2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut } from "next-auth/react";
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/projects", icon: FolderOpen, label: "Projects" },
   { href: "/templates", icon: Layers, label: "Templates" },
+  { href: "/music", icon: Music2, label: "Music" },
   { href: "/settings", icon: Settings, label: "Settings" },
   { href: "/settings/billing", icon: CreditCard, label: "Billing" },
 ];
