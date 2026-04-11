@@ -80,51 +80,46 @@ export async function POST(
     );
   }
 
-  try {
-    // Insert modules and lessons
-    let totalLessonsCreated = 0;
+  // Insert modules and lessons
+  let totalLessonsCreated = 0;
 
-    for (let moduleOrder = 0; moduleOrder < template.modules.length; moduleOrder++) {
-      const templateModule = template.modules[moduleOrder];
+  for (let moduleOrder = 0; moduleOrder < template.modules.length; moduleOrder++) {
+    const templateModule = template.modules[moduleOrder];
 
-      const [newModule] = await db
-        .insert(modules)
-        .values({
-          projectId,
-          title: templateModule.title,
-          type: toDbModuleType(templateModule.type),
-          order: moduleOrder,
-        })
-        .returning({ id: modules.id });
+    const [newModule] = await db
+      .insert(modules)
+      .values({
+        projectId,
+        title: templateModule.title,
+        type: toDbModuleType(templateModule.type),
+        order: moduleOrder,
+      })
+      .returning({ id: modules.id });
 
-      if (!newModule) continue;
+    if (!newModule) continue;
 
-      for (
-        let lessonOrder = 0;
-        lessonOrder < templateModule.lessons.length;
-        lessonOrder++
-      ) {
-        const templateLesson = templateModule.lessons[lessonOrder];
+    for (
+      let lessonOrder = 0;
+      lessonOrder < templateModule.lessons.length;
+      lessonOrder++
+    ) {
+      const templateLesson = templateModule.lessons[lessonOrder];
 
-        await db.insert(lessons).values({
-          moduleId: newModule.id,
-          projectId,
-          title: templateLesson.title,
-          order: lessonOrder,
-          status: "draft",
-        });
+      await db.insert(lessons).values({
+        moduleId: newModule.id,
+        projectId,
+        title: templateLesson.title,
+        order: lessonOrder,
+        status: "draft",
+      });
 
-        totalLessonsCreated++;
-      }
+      totalLessonsCreated++;
     }
-
-    return Response.json({
-      success: true,
-      modulesCreated: template.modules.length,
-      lessonsCreated: totalLessonsCreated,
-    });
-  } catch (err) {
-    console.error("[POST /api/projects/[id]/apply-template]", err);
-    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
+
+  return Response.json({
+    success: true,
+    modulesCreated: template.modules.length,
+    lessonsCreated: totalLessonsCreated,
+  });
 }
