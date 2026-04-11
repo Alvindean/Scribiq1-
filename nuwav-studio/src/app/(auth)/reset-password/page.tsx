@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/shared/Logo";
+import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
 
 function ResetPasswordForm() {
   const router = useRouter();
@@ -74,13 +75,16 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="rounded-xl border bg-card p-6 shadow-sm">
-        <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
-          Invalid or missing reset token. Please request a new{" "}
-          <Link href="/forgot-password" className="font-medium underline">
-            password reset link
-          </Link>
-          .
-        </p>
+        <div className="flex items-start gap-2 text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2 transition-all duration-300">
+          <AlertCircle className="h-4 w-4 shrink-0 mt-0.5" />
+          <span>
+            Invalid or missing reset token. Please request a new{" "}
+            <Link href="/forgot-password" className="font-medium underline">
+              password reset link
+            </Link>
+            .
+          </span>
+        </div>
       </div>
     );
   }
@@ -88,9 +92,10 @@ function ResetPasswordForm() {
   return (
     <div className="rounded-xl border bg-card p-6 shadow-sm">
       {success ? (
-        <p className="text-sm text-center text-muted-foreground py-2">
-          Password updated! Redirecting...
-        </p>
+        <div className="flex items-center gap-2 text-sm text-green-600 bg-green-500/10 rounded-md px-3 py-2 transition-all duration-300">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          <span>Password updated! Redirecting...</span>
+        </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
@@ -100,7 +105,7 @@ function ResetPasswordForm() {
               type="password"
               placeholder="••••••••"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setError(null); setPassword(e.target.value); }}
               required
               autoComplete="new-password"
               maxLength={128}
@@ -114,7 +119,7 @@ function ResetPasswordForm() {
               type="password"
               placeholder="••••••••"
               value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              onChange={(e) => { setError(null); setConfirmPassword(e.target.value); }}
               required
               autoComplete="new-password"
               maxLength={128}
@@ -122,9 +127,10 @@ function ResetPasswordForm() {
           </div>
 
           {error && (
-            <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
-              {error}
-            </p>
+            <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2 transition-all duration-300">
+              <AlertCircle className="h-4 w-4 shrink-0" />
+              <span>{error}</span>
+            </div>
           )}
 
           <Button
@@ -132,7 +138,14 @@ function ResetPasswordForm() {
             className="w-full bg-violet-600 hover:bg-violet-700"
             disabled={loading}
           >
-            {loading ? "Updating..." : "Update Password"}
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Password"
+            )}
           </Button>
         </form>
       )}

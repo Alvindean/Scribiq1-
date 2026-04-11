@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/shared/Logo";
+import { CheckCircle2, Loader2 } from "lucide-react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -45,9 +46,10 @@ export default function ForgotPasswordPage() {
 
         <div className="rounded-xl border bg-card p-6 shadow-sm">
           {submitted ? (
-            <p className="text-sm text-center text-muted-foreground py-2">
-              If that email is registered, you&apos;ll receive a reset link shortly.
-            </p>
+            <div className="flex items-center gap-2 text-sm text-green-600 bg-green-500/10 rounded-md px-3 py-2 transition-all duration-300">
+              <CheckCircle2 className="h-4 w-4 shrink-0" />
+              <span>If that email is registered, you&apos;ll receive a reset link shortly.</span>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -57,7 +59,7 @@ export default function ForgotPasswordPage() {
                   type="email"
                   placeholder="you@example.com"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => { setEmail(e.target.value); }}
                   required
                   autoComplete="email"
                   autoCapitalize="none"
@@ -72,7 +74,14 @@ export default function ForgotPasswordPage() {
                 className="w-full bg-violet-600 hover:bg-violet-700"
                 disabled={loading}
               >
-                {loading ? "Sending..." : "Send Reset Link"}
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  "Send Reset Link"
+                )}
               </Button>
             </form>
           )}
