@@ -10,7 +10,10 @@ function countWords(text: string): number {
 }
 
 export function LyricEditor() {
-  const [lyrics, setLyrics] = useState("");
+  const [lyrics, setLyrics] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("soniq:lyric-editor-draft") ?? "";
+  });
   const [copied, setCopied] = useState(false);
   const [pasteError, setPasteError] = useState(false);
   const [undoVisible, setUndoVisible] = useState(false);
@@ -61,7 +64,7 @@ export function LyricEditor() {
     setLyrics("");
     setUndoVisible(true);
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
-    undoTimerRef.current = setTimeout(() => setUndoVisible(false), 5000);
+    undoTimerRef.current = setTimeout(() => { setUndoVisible(false); lastCleared.current = ""; }, 5000);
     textareaRef.current?.focus();
   }
 
@@ -69,9 +72,14 @@ export function LyricEditor() {
     if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
     setLyrics(lastCleared.current);
     setUndoVisible(false);
+    lastCleared.current = "";
   }
 
-  useEffect(() => () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); }, []);
+  useEffect(() => () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); lastCleared.current = ""; }, []);
+
+  useEffect(() => {
+    localStorage.setItem("soniq:lyric-editor-draft", lyrics);
+  }, [lyrics]);
 
   const charCount = lyrics.length;
   const wordCount = countWords(lyrics);
@@ -87,6 +95,10 @@ export function LyricEditor() {
         <span className="text-border">·</span>
         <span>{lineCount} lines</span>
       </div>
+
+      {lyrics.length > 0 && (
+        <p className="text-xs text-muted-foreground/50">Draft auto-saved</p>
+      )}
 
       {/* Action buttons */}
       <div className="flex gap-2">
