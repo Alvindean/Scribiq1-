@@ -27,6 +27,7 @@ export async function GET(): Promise<Response> {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  try {
   // ── aggregate counts ──────────────────────────────────────────────────────
   const [userCountRow] = await db
     .select({ count: sql<number>`count(*)::int` })
@@ -135,12 +136,16 @@ export async function GET(): Promise<Response> {
     createdAt: p.createdAt,
   }));
 
-  return Response.json({
-    userCount: userCountRow?.count ?? 0,
-    orgCount: orgCountRow?.count ?? 0,
-    projectCount: projectCountRow?.count ?? 0,
-    publishedCount: publishedCountRow?.count ?? 0,
-    recentUsers,
-    recentProjects,
-  });
+    return Response.json({
+      userCount: userCountRow?.count ?? 0,
+      orgCount: orgCountRow?.count ?? 0,
+      projectCount: projectCountRow?.count ?? 0,
+      publishedCount: publishedCountRow?.count ?? 0,
+      recentUsers,
+      recentProjects,
+    });
+  } catch (err) {
+    console.error("[GET /api/admin/stats]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
