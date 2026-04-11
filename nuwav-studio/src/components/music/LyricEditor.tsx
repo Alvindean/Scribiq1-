@@ -831,7 +831,7 @@ export function LyricEditor() {
           </div>
 
           {/* Right: action buttons */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5 flex-wrap">
             {/* Copy */}
             <button
               type="button"
@@ -931,7 +931,7 @@ export function LyricEditor() {
               aria-label="Clear all lyrics"
               className="flex items-center gap-1 rounded-md border border-red-900/60 bg-zinc-800/60 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-950/40 hover:text-red-300 disabled:opacity-40 transition-colors">
               <Trash2 className="w-3.5 h-3.5" />
-              Clear
+              Clear All
             </button>
 
             {/* Voice input */}
