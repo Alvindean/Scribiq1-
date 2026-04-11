@@ -46,25 +46,81 @@ export function SongAnalyzer() {
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
+  function getGenreScaffoldSections(genre: string | null): string[] {
+    const g = (genre ?? "").toLowerCase();
+    if (g.includes("hip") || g.includes("rap") || g.includes("trap")) {
+      return [
+        "[Verse 1]", "", "[Hook]", "",
+        "[Verse 2]", "", "[Hook]", "",
+        "[Verse 3]", "", "[Hook]", "", "[Outro]",
+      ];
+    }
+    if (g.includes("blues")) {
+      return ["[Verse 1]", "", "[Verse 2]", "", "[Verse 3]"];
+    }
+    if (
+      g.includes("edm") || g.includes("electronic") ||
+      g.includes("house") || g.includes("techno") || g.includes("dance")
+    ) {
+      return [
+        "[Verse 1]", "", "[Build-Up]", "", "[Drop]", "",
+        "[Verse 2]", "", "[Build-Up]", "", "[Drop]", "",
+        "[Breakdown]", "", "[Build-Up]", "", "[Drop]", "", "[Outro]",
+      ];
+    }
+    if (g.includes("jazz")) {
+      return [
+        "[Intro]", "",
+        "[Head]", "", "[Verse A]", "", "[Verse A]", "",
+        "[Bridge]", "", "[Verse A]", "", "[Outro]",
+      ];
+    }
+    if (g.includes("r&b") || g.includes("rnb") || g.includes("soul")) {
+      return [
+        "[Verse 1]", "", "[Pre-Chorus]", "", "[Chorus]", "",
+        "[Verse 2]", "", "[Pre-Chorus]", "", "[Chorus]", "",
+        "[Bridge]", "", "[Chorus]", "", "[Vamp/Outro]",
+      ];
+    }
+    if (g.includes("gospel")) {
+      return [
+        "[Verse 1]", "", "[Chorus]", "",
+        "[Verse 2]", "", "[Chorus]", "",
+        "[Bridge]", "", "[Vamp]", "", "[Outro]",
+      ];
+    }
+    if (g.includes("folk") || g.includes("acoustic") || g.includes("country")) {
+      return [
+        "[Verse 1]", "", "[Chorus]", "",
+        "[Verse 2]", "", "[Chorus]", "",
+        "[Verse 3]", "", "[Chorus]", "", "[Outro]",
+      ];
+    }
+    // Default: Pop / Rock
+    return [
+      "[Verse 1]", "", "[Pre-Chorus]", "", "[Chorus]", "",
+      "[Verse 2]", "", "[Pre-Chorus]", "", "[Chorus]", "",
+      "[Bridge]", "", "[Chorus]", "", "[Outro]",
+    ];
+  }
+
   function handleStartLyrics() {
     if (!result) return;
+    const sections = getGenreScaffoldSections(result.track.genre);
     const scaffold = [
       result.aiAnalysis.structure ? `# Structure: ${result.aiAnalysis.structure}` : "",
       result.aiAnalysis.mood ? `# Mood: ${result.aiAnalysis.mood}` : "",
+      result.track.genre ? `# Genre: ${result.track.genre}` : "",
       "",
-      "[Verse 1]",
-      "",
-      "[Chorus]",
-      "",
-      "[Verse 2]",
-      "",
-      "[Chorus]",
-      "",
-      "[Bridge]",
-      "",
-      "[Outro]",
+      ...sections,
     ].filter(Boolean).join("\n");
     localStorage.setItem("soniq:lyric-editor-draft", scaffold);
+    // Pre-select the genre in the lyric editor AI panel
+    if (result.track.genre) {
+      localStorage.setItem("soniq:lyric-editor-genre", result.track.genre);
+    } else {
+      localStorage.removeItem("soniq:lyric-editor-genre");
+    }
     router.push("/music?tab=lyrics");
   }
 

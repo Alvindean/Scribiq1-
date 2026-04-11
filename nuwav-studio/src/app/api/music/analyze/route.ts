@@ -173,12 +173,37 @@ async function generateAiAnalysis(
     features.valence !== null ? `Valence (happiness): ${(features.valence * 100).toFixed(0)}%` : null,
   ].filter(Boolean).join(", ");
 
+  // Genre-specific structural hints so the AI returns accurate section names
+  const GENRE_STRUCTURE_HINTS: Record<string, string> = {
+    "hip-hop": "Use [Verse] (16 bars), [Hook], [Outro] — not [Chorus]. Count bars if possible.",
+    rap: "Use [Verse] (16 bars), [Hook], [Outro] — not [Chorus]. Count bars if possible.",
+    blues: "Use 12-bar AAB verse structure. Label sections [Verse 1], [Verse 2], etc.",
+    jazz: "Use AABA 32-bar form: [Head], [Verse A], [Bridge (B)], [Verse A], [Outro].",
+    edm: "Include [Build-Up], [Drop], and [Breakdown] sections alongside [Verse] and [Outro].",
+    electronic: "Include [Build-Up], [Drop], and [Breakdown] sections alongside [Verse] and [Outro].",
+    dance: "Include [Build-Up], [Drop], and [Breakdown] sections alongside [Verse] and [Outro].",
+    gospel: "Include [Vamp] or call-and-response section before [Outro].",
+    "r&b": "Include [Pre-Chorus] and [Vamp/Outro] after the final chorus.",
+    soul: "Include [Pre-Chorus] and [Vamp/Outro] after the final chorus.",
+    pop: "Include [Pre-Chorus] between each [Verse] and [Chorus].",
+    rock: "Include a [Guitar Solo] (instrumental) section between second chorus and bridge.",
+    country: "Story-driven: label sections as [Verse 1], [Chorus], [Verse 2], [Chorus], [Bridge], [Outro].",
+    folk: "Narrative arc: typically 3–5 [Verse] sections with [Chorus] between each.",
+    reggae: "One-drop feel: [Verse], [Chorus], [Bridge], [Outro] — note rhythmic offbeat emphasis.",
+  };
+
+  const genreKey = genre?.toLowerCase() ?? "";
+  const structureHint = Object.entries(GENRE_STRUCTURE_HINTS).find(([k]) =>
+    genreKey.includes(k)
+  )?.[1] ?? "";
+
   const prompt = `You are a music and education expert. Analyze the song "${song}" by ${artist}${genre ? ` (genre: ${genre})` : ""}.
 ${featuresText ? `Audio data: ${featuresText}` : ""}
+${structureHint ? `Genre structure guide: ${structureHint}` : ""}
 
 Respond ONLY with a JSON object — no markdown, no explanation:
 {
-  "structure": "<concise breakdown of the song's typical structure, e.g. Intro (0:00–0:15) → Verse 1 (0:15–0:45) → Chorus (0:45–1:15) → ...>",
+  "structure": "<concise breakdown using correct genre section names, e.g. Intro (0:00–0:15) → Verse 1 (0:15–0:45) → Chorus (0:45–1:15) → ...>",
   "mood": "<2–3 sentence emotional and atmospheric description of the song>",
   "energy": "<1–2 sentence description of the song's energy level and intensity arc>",
   "suggestedTone": "<1–2 sentences on how a course creator could match this song's tone in their teaching style>",

@@ -12,6 +12,33 @@ import {
 import { Button } from "@/components/ui/button";
 import { BaseScriptEditor } from "@/components/editor/BaseScriptEditor";
 
+const GENRES = [
+  { value: "pop", label: "Pop" },
+  { value: "hip-hop", label: "Hip-Hop / Rap" },
+  { value: "r&b", label: "R&B / Soul" },
+  { value: "country", label: "Country" },
+  { value: "rock", label: "Rock / Alternative" },
+  { value: "edm", label: "EDM / Electronic" },
+  { value: "blues", label: "Blues" },
+  { value: "jazz", label: "Jazz" },
+  { value: "folk", label: "Folk / Acoustic" },
+  { value: "gospel", label: "Gospel" },
+  { value: "reggae", label: "Reggae" },
+] as const;
+
+const MOODS = [
+  { value: "uplifting", label: "Uplifting / Joyful" },
+  { value: "melancholic", label: "Melancholic / Sad" },
+  { value: "energetic", label: "Energetic / Intense" },
+  { value: "romantic", label: "Romantic / Sensual" },
+  { value: "rebellious", label: "Rebellious / Angry" },
+  { value: "peaceful", label: "Peaceful / Calm" },
+  { value: "nostalgic", label: "Nostalgic / Reflective" },
+  { value: "dark", label: "Dark / Mysterious" },
+  { value: "hopeful", label: "Hopeful / Inspired" },
+  { value: "playful", label: "Playful / Fun" },
+] as const;
+
 export function LyricEditor() {
   const [lyrics, setLyrics] = useState<string>(() => {
     if (typeof window === "undefined") return "";
@@ -19,6 +46,11 @@ export function LyricEditor() {
   });
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
+  const [aiGenre, setAiGenre] = useState<string>(() => {
+    if (typeof window === "undefined") return "";
+    return localStorage.getItem("soniq:lyric-editor-genre") ?? "";
+  });
+  const [aiMood, setAiMood] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [saveOpen, setSaveOpen] = useState(false);
@@ -55,7 +87,11 @@ export function LyricEditor() {
       const res = await fetch("/api/lyrics/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: aiPrompt.trim() }),
+        body: JSON.stringify({
+          prompt: aiPrompt.trim(),
+          ...(aiGenre && { genre: aiGenre }),
+          ...(aiMood && { mood: aiMood }),
+        }),
       });
       const data = (await res.json()) as { lyrics?: string; error?: string };
       if (!res.ok || !data.lyrics)
@@ -284,14 +320,46 @@ export function LyricEditor() {
           {aiOpen && (
             <div className="px-3 pb-3 space-y-2 border-t border-zinc-800">
               <p className="text-[10px] text-zinc-500 pt-2">
-                Describe the song, mood, or style and AI will write full lyrics
-                for you.
+                Choose a genre and mood, then describe the song — AI will write
+                genre-accurate lyrics with the right structure.
               </p>
+
+              {/* Genre + Mood row */}
+              <div className="grid grid-cols-2 gap-2">
+                <select
+                  value={aiGenre}
+                  onChange={(e) => setAiGenre(e.target.value)}
+                  disabled={isGenerating}
+                  aria-label="Genre"
+                  className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50"
+                >
+                  <option value="">Any genre</option>
+                  {GENRES.map((g) => (
+                    <option key={g.value} value={g.value}>
+                      {g.label}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={aiMood}
+                  onChange={(e) => setAiMood(e.target.value)}
+                  disabled={isGenerating}
+                  aria-label="Mood"
+                  className="rounded-md border border-zinc-700 bg-zinc-800 px-2 py-1.5 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50"
+                >
+                  <option value="">Any mood</option>
+                  {MOODS.map((m) => (
+                    <option key={m.value} value={m.value}>
+                      {m.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
               <textarea
                 value={aiPrompt}
                 onChange={(e) => setAiPrompt(e.target.value)}
-                placeholder="e.g. upbeat pop song about a summer road trip, chorus-heavy…"
+                placeholder="e.g. a road trip with an old friend, themes of letting go…"
                 rows={3}
                 disabled={isGenerating}
                 aria-label="AI lyric generation prompt"
