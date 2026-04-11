@@ -36,15 +36,15 @@ export default function MarketingPage() {
           and Video Sales Letters — scripts, voiceover, video, and hosted pages —
           fully automatically.
         </p>
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link href="/signup">
-            <Button size="lg" className="bg-violet-600 hover:bg-violet-700">
+            <Button size="lg" className="bg-violet-600 hover:bg-violet-700 px-8">
               Start Building Free
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </Link>
           <Link href="/login">
-            <Button size="lg" variant="outline">Sign In</Button>
+            <Button size="default" variant="outline">Sign In</Button>
           </Link>
         </div>
       </section>
