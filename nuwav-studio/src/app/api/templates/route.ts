@@ -86,32 +86,37 @@ const STARTER_TEMPLATES = [
 ] as const;
 
 export async function GET(): Promise<Response> {
-  const rows = await db
-    .select()
-    .from(templates)
-    .where(eq(templates.isPublic, true));
+  try {
+    const rows = await db
+      .select()
+      .from(templates)
+      .where(eq(templates.isPublic, true));
 
-  if (rows.length > 0) {
-    return Response.json(rows);
+    if (rows.length > 0) {
+      return Response.json(rows);
+    }
+
+    // Seed starter templates into the DB so subsequent requests and the
+    // templates page both return real rows.
+    const inserted = await db
+      .insert(templates)
+      .values(
+        STARTER_TEMPLATES.map((t) => ({
+          name: t.name,
+          type: t.type,
+          nicheCategory: t.nicheCategory,
+          description: t.description,
+          structure: t.structure,
+          thumbnailUrl: t.thumbnailUrl,
+          isPublic: t.isPublic,
+          createdBy: t.createdBy,
+        }))
+      )
+      .returning();
+
+    return Response.json(inserted);
+  } catch (err) {
+    console.error("[GET /api/templates]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  // Seed starter templates into the DB so subsequent requests and the
-  // templates page both return real rows.
-  const inserted = await db
-    .insert(templates)
-    .values(
-      STARTER_TEMPLATES.map((t) => ({
-        name: t.name,
-        type: t.type,
-        nicheCategory: t.nicheCategory,
-        description: t.description,
-        structure: t.structure,
-        thumbnailUrl: t.thumbnailUrl,
-        isPublic: t.isPublic,
-        createdBy: t.createdBy,
-      }))
-    )
-    .returning();
-
-  return Response.json(inserted);
 }
