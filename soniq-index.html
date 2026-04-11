@@ -2868,7 +2868,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div id="gz-pills-container"></div>
       <div class="gz-pair-count" id="gz-pair-count"></div>
       <div class="gz-footer">
-        <button class="gz-all" onclick="selectAllGenres()">All 24</button>
+        <button class="gz-all" onclick="selectAllGenres()">All 30</button>
         <button class="gz-clear" onclick="clearGenreZone()">Clear</button>
       </div>
     </div>
@@ -3380,7 +3380,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="uplan-price">$9.99<span>/mo</span></div>
         <ul class="uplan-features">
           <li>10 songs / month</li>
-          <li>All 24 genres</li>
+          <li>All 30 genres</li>
           <li>Visual Prompts</li>
           <li>Full production brief</li>
           <li>75+ quality score</li>
@@ -5929,14 +5929,14 @@ function apiErrHtml(msg, errCode) {
 
 // ── Genre Zone helpers ──
 const GZ_CATEGORIES = [
-  { label: 'Core',       keys: ['pop','rock','rnb','hiphop','country','folk'] },
-  { label: 'Electronic', keys: ['edm','altrock','punk','metal','kpop'] },
-  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae'] },
-  { label: 'Soulful',    keys: ['jazz','blues','neosoul','gospel','ss'] },
+  { label: 'Core',       keys: ['pop','rock','rnb','hiphop','country','folk','trap','indie'] },
+  { label: 'Electronic', keys: ['edm','altrock','punk','metal','kpop','lofi'] },
+  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae','dancehall'] },
+  { label: 'Soulful',    keys: ['jazz','blues','neosoul','gospel','ss','funk','classical'] },
   { label: 'Special',    keys: ['parody','comedy','children','tvmusical'] },
 ];
 
-// All 24 genres with display labels (superset of the old 18)
+// All 30 genres with display labels (superset of the old 18)
 const ALL_GENRE_LABELS = {
   pop:'Pop', hiphop:'Rap / Hip-Hop', rnb:'R&B / Soul', rock:'Rock',
   country:'Country', edm:'EDM / Electronic', latin:'Latin', reggaeton:'Reggaeton',
@@ -5944,6 +5944,8 @@ const ALL_GENRE_LABELS = {
   altrock:'Alt-Rock', reggae:'Reggae', afrobeats:'Afrobeats', blues:'Blues',
   punk:'Punk', kpop:'K-Pop', neosoul:'Neo-Soul', gospel:'Gospel',
   parody:'Parody', comedy:'Comedy', children:"Children's", tvmusical:'TV / Musical',
+  trap:'Trap', dancehall:'Dancehall', lofi:'Lo-Fi', indie:'Indie',
+  funk:'Funk', classical:'Classical',
 };
 
 // Translation to FUSION_DATA key parts (capitalized display names)
@@ -5952,7 +5954,8 @@ const GZ_FMAP = {
   edm:'EDM', latin:'Latin', reggaeton:'Reggaeton', folk:'Folk', metal:'Metal',
   jazz:'Jazz', ss:'Singer-Songwriter', altrock:'Alt-Rock', reggae:'Reggae',
   afrobeats:'Afrobeats', blues:'Blues', punk:'Punk', kpop:'K-Pop',
-  neosoul:'Neo-Soul', gospel:'Gospel',
+  neosoul:'Neo-Soul', gospel:'Gospel', trap:'Trap', dancehall:'Dancehall',
+  lofi:'Lo-Fi', indie:'Indie', funk:'Funk', classical:'Classical',
   // parody/comedy/children/tvmusical have no fusion pairs — handled as single-anchor mode
 };
 
@@ -6024,7 +6027,7 @@ function clearGenreZone(){
   renderGenreZonePills();
   updateGenreZoneBadge();
   updateGenreZonePairCount();
-  toast('🎲 Genre filter cleared — all 24 genres active');
+  toast('🎲 Genre filter cleared — all 30 genres active');
 }
 function selectAllGenres(){
   S.luckyLockedGenres=Object.keys(ALL_GENRE_LABELS);
@@ -8217,6 +8220,12 @@ const GENRES_DEF = [
   {id:'parody',label:'Parody',icon:'🎭',new:true},
   {id:'comedy',label:'Comedy',icon:'😂',new:true},
   {id:'tvmusical',label:'TV / Musical',icon:'🎬',new:true},
+  {id:'trap',label:'Trap',icon:'🎯',new:true},
+  {id:'dancehall',label:'Dancehall',icon:'🌴',new:true},
+  {id:'lofi',label:'Lo-Fi',icon:'☕',new:true},
+  {id:'indie',label:'Indie',icon:'🌟',new:true},
+  {id:'funk',label:'Funk',icon:'🪩',new:true},
+  {id:'classical',label:'Classical',icon:'🎻',new:true},
 ];
 
 function isGenreFree(gid) {
@@ -8233,7 +8242,7 @@ function initGenreGrid(){
     const overflow = i >= VISIBLE ? ' gp-overflow' : '';
     return `<div class="gp${overflow}${g.new?' new-g':''}${g.id===S.selectedGenre?' on':''}${locked?' gp-locked':''}"
          data-gid="${g.id}"
-         title="${locked?'Unlock all 24 genres with Starter — from $9/mo':''}"
+         title="${locked?'Unlock all 30 genres with Starter — from $9/mo':''}"
          onclick="${locked?`lockedGenreClick('${g.id}')`:`onGenreChange('${g.id}')`}">
       <div class="gp-icon">${g.icon}${locked?'<span class="gp-lock">🔒</span>':''}</div>
       <div class="gp-name">${g.label}</div>
