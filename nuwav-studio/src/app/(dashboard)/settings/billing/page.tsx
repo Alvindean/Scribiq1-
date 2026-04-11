@@ -13,6 +13,33 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { PLANS } from "@/lib/stripe/plans";
 import type { Plan } from "@/lib/stripe/plans";
+import { ManageSubscriptionButton } from "@/components/billing/ManageSubscriptionButton";
+
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function statusVariant(
+  status: string | null
+): "default" | "secondary" | "destructive" | "outline" {
+  if (!status || status === "active" || status === "trialing") return "default";
+  if (status === "past_due" || status === "unpaid") return "destructive";
+  if (status === "canceled" || status === "incomplete_expired") return "secondary";
+  return "outline";
+}
+
+function statusLabel(status: string | null, plan: string): string {
+  if (plan === "starter" && !status) return "Free";
+  if (!status) return "—";
+  return status.replace(/_/g, " ");
+}
+
+function formatDate(iso: string | null): string {
+  if (!iso) return "—";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(iso));
+}
 
 // ─── Plan card ────────────────────────────────────────────────────────────────
 
@@ -82,7 +109,13 @@ export default async function BillingPage() {
   const session = await auth();
   const userId = session?.user?.id;
 
-  let org: { id: string; plan: string } | null = null;
+  let org: {
+    id: string;
+    plan: string;
+    subscriptionStatus: string | null;
+    stripeCustomerId: string | null;
+    stripeSubscriptionId: string | null;
+  } | null = null;
   let projectCount = 0;
 
   if (userId) {
@@ -94,13 +127,24 @@ export default async function BillingPage() {
 
     if (profile?.orgId) {
       const [orgData] = await db
-        .select({ id: organizations.id, plan: organizations.plan })
+        .select({
+          id: organizations.id,
+          plan: organizations.plan,
+          subscriptionStatus: organizations.subscriptionStatus,
+          stripeCustomerId: organizations.stripeCustomerId,
+          stripeSubscriptionId: organizations.stripeSubscriptionId,
+        })
         .from(organizations)
         .where(eq(organizations.id, profile.orgId))
         .limit(1);
 
       if (orgData) {
-        org = orgData;
+        org = {
+          ...orgData,
+          subscriptionStatus: orgData.subscriptionStatus ?? null,
+          stripeCustomerId: orgData.stripeCustomerId ?? null,
+          stripeSubscriptionId: orgData.stripeSubscriptionId ?? null,
+        };
 
         const [countResult] = await db
           .select({ value: count() })
@@ -114,6 +158,7 @@ export default async function BillingPage() {
 
   const currentPlanId = org?.plan ?? "starter";
   const currentPlan = PLANS.find((p) => p.id === currentPlanId) ?? PLANS[0];
+  const isPaidPlan = currentPlanId !== "starter";
 
   const usagePercent =
     currentPlan.limits.projects === -1
@@ -122,6 +167,45 @@ export default async function BillingPage() {
           100,
           Math.round((projectCount / currentPlan.limits.projects) * 100)
         );
+
+  // Fetch renewal date from Stripe if available (best-effort, non-blocking)
+  let renewalDate: string | null = null;
+  if (org?.stripeSubscriptionId) {
+    try {
+      const { getStripe } = await import("@/lib/stripe/client");
+      const stripe = getStripe();
+      const sub = await stripe.subscriptions.retrieve(org.stripeSubscriptionId);
+      if (sub.current_period_end) {
+        renewalDate = new Date(sub.current_period_end * 1000).toISOString();
+      }
+    } catch {
+      // Non-fatal: Stripe may not be configured in all environments
+    }
+  }
+
+  const usageRows: { label: string; used: number | string; limit: string | number }[] = [
+    {
+      label: "Projects",
+      used: projectCount,
+      limit:
+        currentPlan.limits.projects === -1 ? "∞" : currentPlan.limits.projects,
+    },
+    {
+      label: "Renders / mo",
+      used: 0,
+      limit: currentPlan.limits.renders_per_month,
+    },
+    {
+      label: "AI Generations / mo",
+      used: 0,
+      limit: currentPlan.limits.ai_generations_per_month,
+    },
+    {
+      label: "Storage",
+      used: "0 GB",
+      limit: `${currentPlan.limits.storage_gb} GB`,
+    },
+  ];
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8 space-y-10">
@@ -133,43 +217,59 @@ export default async function BillingPage() {
         </p>
       </div>
 
-      {/* Current plan summary */}
+      {/* ── 1. Current Plan card ─────────────────────────────────────────── */}
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <CardTitle className="text-base">Current Plan</CardTitle>
-            <Badge className="capitalize">{currentPlanId}</Badge>
+            <div className="flex items-center gap-2">
+              <Badge className="capitalize text-sm px-3">{currentPlan.name}</Badge>
+              <Badge
+                variant={statusVariant(org?.subscriptionStatus ?? null)}
+                className="capitalize text-xs"
+              >
+                {statusLabel(org?.subscriptionStatus ?? null, currentPlanId)}
+              </Badge>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-5">
+          {/* Plan meta row */}
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-2 text-sm">
+            <div>
+              <span className="text-muted-foreground">Price: </span>
+              <span className="font-medium">${currentPlan.price}/mo</span>
+            </div>
+            {renewalDate && (
+              <div>
+                <span className="text-muted-foreground">Next renewal: </span>
+                <span className="font-medium">{formatDate(renewalDate)}</span>
+              </div>
+            )}
+            {!renewalDate && isPaidPlan && (
+              <div>
+                <span className="text-muted-foreground">Renewal date: </span>
+                <span className="font-medium text-muted-foreground">—</span>
+              </div>
+            )}
+          </div>
+
+          {/* Upgrade / Manage button */}
+          <ManageSubscriptionButton isPaidPlan={isPaidPlan} upgradeHref="#plans" />
+        </CardContent>
+      </Card>
+
+      {/* ── 2. Usage card ────────────────────────────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Usage</CardTitle>
+          <CardDescription>
+            Your current usage for this billing period.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {(
-              [
-                {
-                  label: "Projects",
-                  used: projectCount,
-                  limit:
-                    currentPlan.limits.projects === -1
-                      ? "∞"
-                      : currentPlan.limits.projects,
-                },
-                {
-                  label: "Renders / mo",
-                  used: 0,
-                  limit: currentPlan.limits.renders_per_month,
-                },
-                {
-                  label: "AI Generations / mo",
-                  used: 0,
-                  limit: currentPlan.limits.ai_generations_per_month,
-                },
-                {
-                  label: "Storage",
-                  used: 0,
-                  limit: `${currentPlan.limits.storage_gb} GB`,
-                },
-              ] as { label: string; used: number; limit: string | number }[]
-            ).map(({ label, used, limit }) => (
+            {usageRows.map(({ label, used, limit }) => (
               <div key={label} className="space-y-1">
                 <p className="text-xs text-muted-foreground">{label}</p>
                 <p className="text-base font-semibold">
@@ -200,9 +300,11 @@ export default async function BillingPage() {
         </CardContent>
       </Card>
 
-      {/* Plan cards */}
-      <div>
-        <h2 className="text-xl font-semibold mb-6">Upgrade your plan</h2>
+      {/* ── 3. Plan upgrade cards ─────────────────────────────────────────── */}
+      <div id="plans">
+        <h2 className="text-xl font-semibold mb-6">
+          {isPaidPlan ? "Available Plans" : "Upgrade your plan"}
+        </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
           {PLANS.map((plan) => (
             <PlanCard key={plan.id} plan={plan} currentPlanId={currentPlanId} />
@@ -210,7 +312,26 @@ export default async function BillingPage() {
         </div>
       </div>
 
-      {/* Enterprise / custom */}
+      {/* ── 4. Invoice history ───────────────────────────────────────────── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Invoice History</CardTitle>
+          <CardDescription>Past invoices and payment receipts.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isPaidPlan ? (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              Invoice history will appear here once your first billing cycle completes.
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground py-4 text-center">
+              Invoice history will appear here after you upgrade to a paid plan.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ── Enterprise / custom ──────────────────────────────────────────── */}
       <Card className="border-dashed">
         <CardContent className="flex flex-col items-center gap-4 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>

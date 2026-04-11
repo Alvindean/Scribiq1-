@@ -2,6 +2,7 @@ import Link from "next/link";
 import { db } from "@/lib/db";
 import { templates } from "@/lib/db/schema";
 import { eq, asc } from "drizzle-orm";
+import type { InferSelectModel } from "drizzle-orm";
 import {
   Card,
   CardContent,
@@ -11,12 +12,12 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import type { Template } from "@/types/template";
 
+type DbTemplate = InferSelectModel<typeof templates>;
 type FilterType = "all" | "course" | "vsl" | "hybrid";
 
 function templateTypeBadge(
-  type: Template["type"]
+  type: DbTemplate["type"]
 ): "default" | "secondary" | "outline" {
   switch (type) {
     case "course":
@@ -36,19 +37,16 @@ export default async function TemplatesPage({
   const { type } = await searchParams;
   const filterType = (type ?? "all") as FilterType;
 
-  const query = db
+  const allTemplates = await db
     .select()
     .from(templates)
     .where(eq(templates.isPublic, true))
     .orderBy(asc(templates.name));
 
-  const allTemplates = await query;
-
-  const typedTemplates = (
+  const displayTemplates =
     filterType === "all"
       ? allTemplates
-      : allTemplates.filter((t) => t.type === filterType)
-  ) as unknown as Template[];
+      : allTemplates.filter((t) => t.type === filterType);
 
   const filterOptions: { value: FilterType; label: string }[] = [
     { value: "all", label: "All" },
@@ -67,7 +65,7 @@ export default async function TemplatesPage({
             Start your next project with a professionally designed template.
           </p>
         </div>
-        <Button asChild>
+        <Button asChild className="bg-violet-600 hover:bg-violet-700">
           <Link href="/projects/new">New Project</Link>
         </Button>
       </div>
@@ -75,7 +73,10 @@ export default async function TemplatesPage({
       {/* Filters */}
       <div className="flex flex-wrap gap-2">
         {filterOptions.map((opt) => (
-          <Link key={opt.value} href={opt.value === "all" ? "/templates" : `/templates?type=${opt.value}`}>
+          <Link
+            key={opt.value}
+            href={opt.value === "all" ? "/templates" : `/templates?type=${opt.value}`}
+          >
             <Badge
               variant={filterType === opt.value ? "default" : "outline"}
               className="cursor-pointer px-3 py-1 text-sm"
@@ -87,7 +88,7 @@ export default async function TemplatesPage({
       </div>
 
       {/* Template grid */}
-      {typedTemplates.length === 0 ? (
+      {displayTemplates.length === 0 ? (
         <div className="rounded-lg border border-dashed py-16 text-center text-muted-foreground">
           <p className="text-lg font-medium">No templates found</p>
           <p className="text-sm mt-1">
@@ -98,12 +99,12 @@ export default async function TemplatesPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {typedTemplates.map((tpl) => (
+          {displayTemplates.map((tpl) => (
             <Card key={tpl.id} className="overflow-hidden flex flex-col">
-              {tpl.thumbnail_url ? (
+              {tpl.thumbnailUrl ? (
                 <div className="overflow-hidden">
                   <img
-                    src={tpl.thumbnail_url}
+                    src={tpl.thumbnailUrl}
                     alt={tpl.name}
                     className="h-40 w-full object-cover transition-transform hover:scale-105"
                   />
@@ -139,9 +140,9 @@ export default async function TemplatesPage({
                     {tpl.type}
                   </Badge>
                 </div>
-                {tpl.niche_category && (
+                {tpl.nicheCategory && (
                   <p className="text-xs text-muted-foreground">
-                    {tpl.niche_category}
+                    {tpl.nicheCategory}
                   </p>
                 )}
               </CardHeader>
@@ -151,9 +152,7 @@ export default async function TemplatesPage({
                   {tpl.description ?? "No description available."}
                 </CardDescription>
                 <Button asChild size="sm" variant="outline" className="w-full">
-                  <Link
-                    href={`/projects/new?template=${tpl.id}&type=${tpl.type}`}
-                  >
+                  <Link href={`/projects/new?templateId=${tpl.id}&type=${tpl.type}`}>
                     Use Template
                   </Link>
                 </Button>

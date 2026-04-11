@@ -8,6 +8,14 @@ import {
   timestamp,
 } from "drizzle-orm/pg-core";
 
+export interface VisualSettings {
+  backgroundColor?: string;
+  backgroundImageUrl?: string;
+  backgroundImageThumb?: string;
+  titlePosition?: "top" | "center" | "bottom";
+  textColor?: "light" | "dark";
+}
+
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   email: text("email").notNull().unique(),
@@ -108,6 +116,7 @@ export const lessons = pgTable("lessons", {
   videoUrl: text("video_url"),
   thumbnailUrl: text("thumbnail_url"),
   durationSeconds: integer("duration_seconds"),
+  visualSettings: jsonb("visual_settings").$type<VisualSettings>(),
   status: text("status")
     .$type<"draft" | "scripted" | "voiced" | "rendered" | "published">()
     .default("draft")
