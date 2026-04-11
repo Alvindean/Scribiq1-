@@ -113,6 +113,22 @@ export function LyricEditor() {
     }
   }
 
+  function insertSection(marker: string) {
+    const el = textareaRef.current;
+    const pos = el ? (el.selectionStart ?? lyrics.length) : lyrics.length;
+    const prefix = pos > 0 && lyrics[pos - 1] !== "\n" ? "\n\n" : "";
+    const insert = `${prefix}[${marker}]\n`;
+    const next = lyrics.slice(0, pos) + insert + lyrics.slice(pos);
+    setLyrics(next);
+    // Restore cursor after inserted text
+    const newPos = pos + insert.length;
+    requestAnimationFrame(() => {
+      if (!el) return;
+      el.selectionStart = el.selectionEnd = newPos;
+      el.focus();
+    });
+  }
+
   async function handleSaveToLesson() {
     if (!lessonId.trim() || !lyrics) return;
     setIsSaving(true);
@@ -160,6 +176,16 @@ export function LyricEditor() {
       {lyrics.length > 0 && (
         <p className="text-xs text-muted-foreground/50">Draft auto-saved</p>
       )}
+
+      {/* Section template pills */}
+      <div className="flex gap-1.5 overflow-x-auto pb-1 shrink-0">
+        {["Verse 1", "Verse 2", "Pre-Chorus", "Chorus", "Bridge", "Outro", "Hook", "Intro"].map((s) => (
+          <button key={s} type="button" onClick={() => insertSection(s)}
+            className="shrink-0 rounded-full border border-zinc-700 px-2.5 py-1 text-xs text-zinc-400 hover:border-violet-500 hover:text-violet-300 transition-colors whitespace-nowrap">
+            + {s}
+          </button>
+        ))}
+      </div>
 
       {/* Action buttons */}
       <div className="flex gap-2">
