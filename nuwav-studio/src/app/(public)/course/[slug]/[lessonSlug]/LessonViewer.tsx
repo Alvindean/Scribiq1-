@@ -180,7 +180,7 @@ export function LessonViewer({
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* ── Sticky header ─────────────────────────────────────────── */}
-      <header className="border-b bg-background sticky top-0 z-20">
+      <header className="border-b bg-background/95 backdrop-blur sticky top-0 z-20">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between gap-4">
           {/* Breadcrumb */}
           <nav className="flex items-center gap-1 text-sm min-w-0" aria-label="Breadcrumb">
