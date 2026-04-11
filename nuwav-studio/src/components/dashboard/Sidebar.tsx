@@ -25,7 +25,12 @@ const navItems = [
   { href: "/settings/billing", icon: CreditCard, label: "Billing" },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  /** Called when a nav item or sign-out is tapped — used by the mobile wrapper to close the overlay. */
+  onClose?: () => void;
+}
+
+export function Sidebar({ onClose }: SidebarProps = {}) {
   const pathname = usePathname();
   const router = useRouter();
   const { data: session } = useSession();
@@ -34,6 +39,7 @@ export function Sidebar() {
   const initials = userName.charAt(0).toUpperCase() || "?";
 
   async function handleSignOut() {
+    onClose?.();
     await signOut({ redirect: false });
     router.push("/login");
   }
@@ -62,14 +68,15 @@ export function Sidebar() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={onClose}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                "flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                 isActive
                   ? "bg-violet-50 text-violet-700"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
             >
-              <Icon className="h-4 w-4" />
+              <Icon className="h-4 w-4 shrink-0" />
               {item.label}
             </Link>
           );
@@ -91,9 +98,9 @@ export function Sidebar() {
         <div className="p-3">
           <button
             onClick={handleSignOut}
-            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+            className="flex min-h-[44px] w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
           >
-            <LogOut className="h-4 w-4" />
+            <LogOut className="h-4 w-4 shrink-0" />
             Sign Out
           </button>
         </div>
