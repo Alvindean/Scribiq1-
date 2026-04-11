@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
-import { MoreHorizontal, Clapperboard } from "lucide-react";
+import { MoreHorizontal, Clapperboard, BarChart2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface ProjectActionsProps {
@@ -69,6 +69,14 @@ export function ProjectActions({ id }: ProjectActionsProps) {
           </div>
         )}
       </div>
+
+      {/* Analytics */}
+      <Button asChild variant="outline" size="sm" className="gap-1.5">
+        <Link href={`/projects/${id}/analytics`}>
+          <BarChart2 className="h-4 w-4" />
+          Analytics
+        </Link>
+      </Button>
 
       {/* VSL Builder */}
       <Button asChild variant="outline" size="sm" className="gap-1.5">
