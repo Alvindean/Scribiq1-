@@ -7,11 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import type { VisualSettings } from "@/lib/db/schema";
 import type { PixabayImage } from "@/app/api/images/search/route";
+import { VoiceoverPanel } from "./VoiceoverPanel";
 import {
   Mic,
   Save,
-  Play,
-  Pause,
   LayoutGrid,
   Clock,
   FileText,
@@ -510,18 +509,12 @@ export function PropertyPanel() {
     selectedLesson,
     activeTab,
     setActiveTab,
-    isGenerating,
-    setIsGenerating,
-    isPlayingVoiceover,
-    setIsPlayingVoiceover,
   } = useEditorStore();
   const { updateLesson } = useProjectStore();
 
   const [scriptDraft, setScriptDraft] = useState<string>("");
   const [durationInput, setDurationInput] = useState<string>("");
   const [scriptDirty, setScriptDirty] = useState(false);
-  const [voiceoverError, setVoiceoverError] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Quick Edit state
   const [quickEditOpen, setQuickEditOpen] = useState(false);
@@ -538,7 +531,6 @@ export function PropertyPanel() {
           : ""
       );
       setScriptDirty(false);
-      setVoiceoverError(null);
       setRewriteError(null);
       setEditPrompts([]);
     }
@@ -593,40 +585,6 @@ export function PropertyPanel() {
     } finally {
       setIsRewriting(false);
     }
-  };
-
-  const handleGenerateVoiceover = async () => {
-    const text = selectedLesson.script;
-    if (!text) {
-      setVoiceoverError("Write a script first before generating voiceover.");
-      return;
-    }
-    setIsGenerating(true);
-    setVoiceoverError(null);
-    try {
-      const res = await fetch("/api/voiceover", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lessonId: selectedLesson.id, text }),
-      });
-      const data = (await res.json()) as { url?: string; error?: string };
-      if (!res.ok || !data.url) throw new Error(data.error ?? `HTTP ${res.status}`);
-      updateLesson(selectedLesson.id, { voiceoverUrl: data.url, status: "voiced" });
-    } catch (err) {
-      setVoiceoverError(err instanceof Error ? err.message : "Failed to generate voiceover");
-    } finally {
-      setIsGenerating(false);
-    }
-  };
-
-  const handleTogglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlayingVoiceover) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlayingVoiceover(!isPlayingVoiceover);
   };
 
   const handleSaveDuration = () => {
@@ -805,60 +763,16 @@ export function PropertyPanel() {
         {/* Voice Tab */}
         <TabsContent
           value="voice"
-          className="flex-1 flex flex-col px-3 pb-3 mt-3 gap-4"
+          className="flex-1 overflow-y-auto px-3 pb-3 mt-3"
         >
-          <Button
-            onClick={handleGenerateVoiceover}
-            disabled={isGenerating}
-            className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Generating…
-              </>
-            ) : (
-              <>
-                <Mic className="w-4 h-4" />
-                Generate Voiceover
-              </>
-            )}
-          </Button>
-
-          {voiceoverError && (
-            <p className="text-xs text-red-400 text-center">{voiceoverError}</p>
-          )}
-
-          {selectedLesson.voiceoverUrl && (
-            <div className="rounded-lg bg-zinc-800 border border-zinc-700 p-4 flex flex-col gap-3">
-              <p className="text-xs text-zinc-400 font-medium">Voiceover</p>
-              <audio
-                ref={audioRef}
-                src={selectedLesson.voiceoverUrl}
-                onPlay={() => setIsPlayingVoiceover(true)}
-                onPause={() => setIsPlayingVoiceover(false)}
-                onEnded={() => setIsPlayingVoiceover(false)}
-              />
-              <Button
-                onClick={handleTogglePlay}
-                size="sm"
-                variant="outline"
-                className="gap-2 border-zinc-700 text-zinc-300 hover:bg-zinc-700"
-              >
-                {isPlayingVoiceover ? (
-                  <><Pause className="w-3.5 h-3.5" /> Pause</>
-                ) : (
-                  <><Play className="w-3.5 h-3.5" /> Play</>
-                )}
-              </Button>
-            </div>
-          )}
-
-          {!selectedLesson.voiceoverUrl && !voiceoverError && (
-            <p className="text-xs text-zinc-600 text-center py-4">
-              No voiceover generated yet.
-            </p>
-          )}
+          <VoiceoverPanel
+            key={selectedLesson.id}
+            lessonId={selectedLesson.id}
+            initialVoiceoverUrl={selectedLesson.voiceoverUrl ?? null}
+            onVoiceoverGenerated={(url) =>
+              updateLesson(selectedLesson.id, { voiceoverUrl: url, status: "voiced" })
+            }
+          />
         </TabsContent>
 
         {/* Visuals Tab */}
