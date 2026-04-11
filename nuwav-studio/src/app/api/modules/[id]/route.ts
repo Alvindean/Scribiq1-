@@ -48,26 +48,31 @@ export async function PATCH(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const body = (await request.json()) as { title?: unknown };
-  const title = typeof body.title === "string" ? body.title.trim() : "";
-  if (!title) {
-    return Response.json({ error: "title is required" }, { status: 400 });
+    const body = (await request.json()) as { title?: unknown };
+    const title = typeof body.title === "string" ? body.title.trim() : "";
+    if (!title) {
+      return Response.json({ error: "title is required" }, { status: 400 });
+    }
+
+    const mod = await resolveModule(id, session.user.id);
+    if (!mod) {
+      return Response.json({ error: "Module not found" }, { status: 404 });
+    }
+
+    const [updated] = await db
+      .update(modules)
+      .set({ title })
+      .where(eq(modules.id, id))
+      .returning();
+
+    return Response.json({ module: updated });
+  } catch (err) {
+    console.error("[PATCH /api/modules/[id]]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const mod = await resolveModule(id, session.user.id);
-  if (!mod) {
-    return Response.json({ error: "Module not found" }, { status: 404 });
-  }
-
-  const [updated] = await db
-    .update(modules)
-    .set({ title })
-    .where(eq(modules.id, id))
-    .returning();
-
-  return Response.json({ module: updated });
 }
 
 // DELETE /api/modules/[id] — delete a module and all its lessons
@@ -80,16 +85,21 @@ export async function DELETE(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const mod = await resolveModule(id, session.user.id);
-  if (!mod) {
-    return Response.json({ error: "Module not found" }, { status: 404 });
+    const mod = await resolveModule(id, session.user.id);
+    if (!mod) {
+      return Response.json({ error: "Module not found" }, { status: 404 });
+    }
+
+    // Delete child lessons first (no cascade in schema)
+    await db.delete(lessons).where(eq(lessons.moduleId, id));
+    await db.delete(modules).where(eq(modules.id, id));
+
+    return new Response(null, { status: 204 });
+  } catch (err) {
+    console.error("[DELETE /api/modules/[id]]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  // Delete child lessons first (no cascade in schema)
-  await db.delete(lessons).where(eq(lessons.moduleId, id));
-  await db.delete(modules).where(eq(modules.id, id));
-
-  return new Response(null, { status: 204 });
 }

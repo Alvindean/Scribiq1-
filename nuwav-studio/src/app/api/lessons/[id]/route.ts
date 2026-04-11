@@ -49,26 +49,31 @@ export async function PATCH(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const body = (await request.json()) as { title?: unknown };
-  const title = typeof body.title === "string" ? body.title.trim() : "";
-  if (!title) {
-    return Response.json({ error: "title is required" }, { status: 400 });
+    const body = (await request.json()) as { title?: unknown };
+    const title = typeof body.title === "string" ? body.title.trim() : "";
+    if (!title) {
+      return Response.json({ error: "title is required" }, { status: 400 });
+    }
+
+    const lesson = await resolveLesson(id, session.user.id);
+    if (!lesson) {
+      return Response.json({ error: "Lesson not found" }, { status: 404 });
+    }
+
+    const [updated] = await db
+      .update(lessons)
+      .set({ title, updatedAt: new Date() })
+      .where(eq(lessons.id, id))
+      .returning();
+
+    return Response.json({ lesson: updated });
+  } catch (err) {
+    console.error("[PATCH /api/lessons/[id]]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const lesson = await resolveLesson(id, session.user.id);
-  if (!lesson) {
-    return Response.json({ error: "Lesson not found" }, { status: 404 });
-  }
-
-  const [updated] = await db
-    .update(lessons)
-    .set({ title, updatedAt: new Date() })
-    .where(eq(lessons.id, id))
-    .returning();
-
-  return Response.json({ lesson: updated });
 }
 
 // DELETE /api/lessons/[id] — delete a single lesson
@@ -81,14 +86,19 @@ export async function DELETE(
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { id } = await params;
+  try {
+    const { id } = await params;
 
-  const lesson = await resolveLesson(id, session.user.id);
-  if (!lesson) {
-    return Response.json({ error: "Lesson not found" }, { status: 404 });
+    const lesson = await resolveLesson(id, session.user.id);
+    if (!lesson) {
+      return Response.json({ error: "Lesson not found" }, { status: 404 });
+    }
+
+    await db.delete(lessons).where(eq(lessons.id, id));
+
+    return new Response(null, { status: 204 });
+  } catch (err) {
+    console.error("[DELETE /api/lessons/[id]]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  await db.delete(lessons).where(eq(lessons.id, id));
-
-  return new Response(null, { status: 204 });
 }
