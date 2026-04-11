@@ -14,6 +14,10 @@ import {
   GraduationCap,
   RefreshCw,
   X,
+  Trash2,
+  Mic,
+  MicOff,
+  Star,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -196,6 +200,9 @@ interface LineRowProps {
   onSaveEdit: (text: string) => void;
   onCancelEdit: () => void;
   onRegenerate: () => void;
+  isEditingSection?: boolean;
+  onStartSectionEdit?: () => void;
+  onSaveSectionEdit?: (label: string) => void;
 }
 
 function LineRow({
@@ -206,6 +213,9 @@ function LineRow({
   onSaveEdit,
   onCancelEdit,
   onRegenerate,
+  isEditingSection,
+  onStartSectionEdit,
+  onSaveSectionEdit,
 }: LineRowProps) {
   const [draft, setDraft] = useState(line.text);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -228,11 +238,33 @@ function LineRow({
   }
 
   if (line.type === "section") {
+    const innerLabel = line.text.trim().replace(/^\[|\]$/g, "");
+    if (isEditingSection) {
+      return (
+        <div className="flex items-center gap-2 py-1.5 px-3">
+          <input
+            autoFocus
+            defaultValue={innerLabel}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { e.preventDefault(); onSaveSectionEdit?.(e.currentTarget.value); }
+              if (e.key === "Escape") onSaveSectionEdit?.(innerLabel);
+            }}
+            onBlur={(e) => onSaveSectionEdit?.(e.currentTarget.value)}
+            className="rounded-full bg-amber-900/50 border border-amber-500 px-3 py-0.5 text-xs font-semibold text-amber-200 tracking-wide outline-none w-40"
+          />
+        </div>
+      );
+    }
     return (
-      <div className="flex items-center gap-2 py-1.5 px-3">
-        <span className="inline-flex items-center rounded-full bg-amber-900/50 border border-amber-700/60 px-3 py-0.5 text-xs font-semibold text-amber-300 tracking-wide">
+      <div className="flex items-center gap-2 py-1.5 px-3 group">
+        <span
+          onClick={onStartSectionEdit}
+          title="Click to rename section"
+          className="inline-flex items-center rounded-full bg-amber-900/50 border border-amber-700/60 px-3 py-0.5 text-xs font-semibold text-amber-300 tracking-wide cursor-pointer hover:border-amber-500 hover:text-amber-200 transition-colors"
+        >
           {line.text.trim()}
         </span>
+        <span className="text-[10px] text-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity">click to rename</span>
       </div>
     );
   }
@@ -349,6 +381,19 @@ export function LyricEditor() {
   // Copy state
   const [copied, setCopied] = useState(false);
 
+  // Clear All + undo toast
+  const [undoVisible, setUndoVisible] = useState(false);
+  const lastCleared = useRef("");
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Voice input
+  const [isRecording, setIsRecording] = useState(false);
+  const [voiceSupported, setVoiceSupported] = useState(false);
+  const recognitionRef = useRef<InstanceType<typeof SpeechRecognition> | null>(null);
+
+  // Editable section labels
+  const [editingSectionIndex, setEditingSectionIndex] = useState<number | null>(null);
+
   // AI generate panel
   const [aiOpen, setAiOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState("");
@@ -382,6 +427,10 @@ export function LyricEditor() {
   useEffect(() => {
     if (aiGenre) localStorage.setItem("soniq:lyric-editor-genre", aiGenre);
   }, [aiGenre]);
+
+  useEffect(() => {
+    setVoiceSupported(!!(window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition));
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Parsed lines + stats
@@ -428,6 +477,75 @@ export function LyricEditor() {
   const handleCancelEdit = useCallback(() => {
     setEditingIndex(null);
   }, []);
+
+  // ---------------------------------------------------------------------------
+  // Clear All + undo
+  // ---------------------------------------------------------------------------
+
+  function handleClearAll() {
+    if (!lyrics) return;
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    pushHistory(lyrics);
+    lastCleared.current = lyrics;
+    setLyrics("");
+    setUndoVisible(true);
+    undoTimerRef.current = setTimeout(() => {
+      setUndoVisible(false);
+      lastCleared.current = "";
+    }, 5000);
+  }
+
+  function handleUndo() {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setLyrics(lastCleared.current);
+    setUndoVisible(false);
+    lastCleared.current = "";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Voice input
+  // ---------------------------------------------------------------------------
+
+  function toggleRecording() {
+    if (isRecording) {
+      recognitionRef.current?.stop();
+      setIsRecording(false);
+      return;
+    }
+    const SR = window.SpeechRecognition || (window as unknown as { webkitSpeechRecognition?: typeof SpeechRecognition }).webkitSpeechRecognition;
+    if (!SR) return;
+    const recognition = new SR();
+    recognition.continuous = true;
+    recognition.interimResults = false;
+    recognition.lang = "en-US";
+    recognition.onresult = (e: SpeechRecognitionEvent) => {
+      const transcript = Array.from(e.results)
+        .slice(e.resultIndex)
+        .filter((r) => r.isFinal)
+        .map((r) => r[0].transcript.trim())
+        .filter(Boolean)
+        .join("\n");
+      if (transcript) setLyrics((prev) => (prev ? `${prev}\n${transcript}` : transcript));
+    };
+    recognition.onend = () => setIsRecording(false);
+    recognition.onerror = () => setIsRecording(false);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Editable section labels
+  // ---------------------------------------------------------------------------
+
+  function handleSaveSectionEdit(index: number, newLabel: string) {
+    const trimmed = newLabel.trim();
+    setEditingSectionIndex(null);
+    if (!trimmed) return;
+    const lines = lyrics.split("\n");
+    lines[index] = `[${trimmed}]`;
+    setLyrics(lines.join("\n"));
+  }
 
   // ---------------------------------------------------------------------------
   // Per-line regeneration
@@ -699,6 +817,17 @@ export function LyricEditor() {
                 {stats.overLimit}
               </span>
             </span>
+            {coachResult && (
+              <>
+                <span className="text-zinc-700">·</span>
+                <span className="flex items-center gap-1">
+                  <Star className="w-3 h-3 text-amber-400" />
+                  <span className={`font-semibold ${coachResult.overallScore >= 8 ? "text-green-400" : coachResult.overallScore >= 6 ? "text-amber-400" : "text-red-400"}`}>
+                    {coachResult.overallScore}/10
+                  </span>
+                </span>
+              </>
+            )}
           </div>
 
           {/* Right: action buttons */}
@@ -796,6 +925,24 @@ export function LyricEditor() {
               <GraduationCap className="w-3.5 h-3.5" />
               Coach
             </button>
+
+            {/* Clear All */}
+            <button type="button" onClick={handleClearAll} disabled={!lyrics}
+              aria-label="Clear all lyrics"
+              className="flex items-center gap-1 rounded-md border border-red-900/60 bg-zinc-800/60 px-2.5 py-1.5 text-xs text-red-400 hover:bg-red-950/40 hover:text-red-300 disabled:opacity-40 transition-colors">
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear
+            </button>
+
+            {/* Voice input */}
+            {voiceSupported && (
+              <button type="button" onClick={toggleRecording}
+                aria-label={isRecording ? "Stop recording" : "Record lyrics with voice"}
+                className={`flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-xs transition-colors ${isRecording ? "border-red-600 bg-red-900/40 text-red-300 hover:bg-red-900/60 animate-pulse" : "border-zinc-700 bg-zinc-800/60 text-zinc-300 hover:bg-zinc-700 hover:text-white"}`}>
+                {isRecording ? <MicOff className="w-3.5 h-3.5" /> : <Mic className="w-3.5 h-3.5" />}
+                {isRecording ? "Stop" : "Voice"}
+              </button>
+            )}
           </div>
         </div>
 
@@ -813,6 +960,33 @@ export function LyricEditor() {
               </button>
             )
           )}
+        </div>
+
+        {/* Bracket / annotation library */}
+        <div className="flex flex-wrap gap-1.5 pb-1">
+          <span className="text-[10px] text-zinc-600 self-center pr-1">Insert:</span>
+          {[
+            "(ad-lib)", "(repeat)", "(x2)", "(x3)", "(fade out)", "(spoken)",
+            "(yeah)", "(woah)", "(hey)", "(na-na-na)", "(ooh)", "(uh)",
+          ].map((ann) => (
+            <button
+              key={ann}
+              type="button"
+              onClick={() => setLyrics((prev) => {
+                const lines = prev.split("\n");
+                const lastNonEmpty = [...lines].reverse().findIndex((l) => l.trim());
+                if (lastNonEmpty !== -1) {
+                  const idx = lines.length - 1 - lastNonEmpty;
+                  lines[idx] = lines[idx].trimEnd() + " " + ann;
+                  return lines.join("\n");
+                }
+                return prev ? `${prev} ${ann}` : ann;
+              })}
+              className="shrink-0 rounded-full border border-zinc-700/80 px-2 py-0.5 text-[11px] text-zinc-500 hover:border-amber-600/60 hover:text-amber-400 transition-colors font-mono"
+            >
+              {ann}
+            </button>
+          ))}
         </div>
 
         {/* Line-by-line editor */}
@@ -843,6 +1017,9 @@ export function LyricEditor() {
                     line.type === "lyric" &&
                     handleRegenerateLine(line.index, line.text)
                   }
+                  isEditingSection={line.type === "section" && editingSectionIndex === line.index}
+                  onStartSectionEdit={() => setEditingSectionIndex(line.index)}
+                  onSaveSectionEdit={(label) => handleSaveSectionEdit(line.index, label)}
                 />
               ))}
             </div>
@@ -1019,6 +1196,13 @@ export function LyricEditor() {
       {/* ------------------------------------------------------------------ */}
       {/* Coach slide-in panel                                                */}
       {/* ------------------------------------------------------------------ */}
+      {undoVisible && (
+        <div role="alert" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-xl border border-zinc-700 bg-zinc-900 px-4 py-2.5 shadow-xl text-sm">
+          <span className="text-zinc-300">Lyrics cleared</span>
+          <button onClick={handleUndo} className="text-violet-400 hover:text-violet-300 font-medium transition-colors">Undo</button>
+        </div>
+      )}
+
       {coachOpen && (
         <div className="absolute right-0 top-0 w-80 h-full flex flex-col rounded-lg border border-zinc-700 bg-zinc-900 shadow-xl overflow-hidden">
           {/* Panel header */}
