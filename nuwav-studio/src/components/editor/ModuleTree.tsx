@@ -1,5 +1,6 @@
 "use client";
 import { useRef, useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import type { Lesson, Module } from "@/types/project";
 import { useProjectStore } from "@/stores/project-store";
 import { useEditorStore } from "@/stores/editor-store";
@@ -8,10 +9,12 @@ import {
   ChevronDown,
   ChevronRight,
   GripVertical,
+  LayoutTemplate,
   Loader2,
   MoreHorizontal,
   Plus,
 } from "lucide-react";
+import { COURSE_TEMPLATES, templateLessonCount } from "@/lib/templates";
 import {
   DndContext,
   DragOverlay,
