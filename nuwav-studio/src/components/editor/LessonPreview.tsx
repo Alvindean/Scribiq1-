@@ -143,19 +143,38 @@ export function LessonPreview() {
             poster={selectedLesson.thumbnailUrl ?? undefined}
           />
         ) : (
-          <Player
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            component={LessonVideo as any}
-            inputProps={previewProps}
-            durationInFrames={totalFrames}
-            fps={30}
-            compositionWidth={1920}
-            compositionHeight={1080}
-            style={{ width: "100%", height: "100%" }}
-            controls
-            loop
-          />
+          <>
+            <Player
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              component={LessonVideo as any}
+              inputProps={previewProps}
+              durationInFrames={totalFrames}
+              fps={30}
+              compositionWidth={1920}
+              compositionHeight={1080}
+              style={{ width: "100%", height: "100%" }}
+              controls
+              loop
+            />
+            {/* No thumbnail placeholder: show lesson title centred */}
+            {!selectedLesson.thumbnailUrl && (
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <span className="text-white/20 text-xl font-semibold text-center px-6 select-none">
+                  {selectedLesson.title}
+                </span>
+              </div>
+            )}
+          </>
         )}
+        {/* Quick-access Render Video button — top-right of the video container */}
+        <button
+          onClick={handleRender}
+          disabled={isGenerating}
+          title="Render Video"
+          className="absolute top-2 right-2 z-10 flex items-center justify-center w-8 h-8 rounded-lg bg-violet-600/80 hover:bg-violet-600 disabled:opacity-50 disabled:cursor-not-allowed text-white backdrop-blur-sm transition-colors"
+        >
+          <Video className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Lesson Meta */}
@@ -196,7 +215,10 @@ export function LessonPreview() {
               Script Preview
             </span>
           </div>
-          <p className="text-sm text-zinc-300 leading-relaxed">{scriptPreview}</p>
+          <div className="relative overflow-hidden">
+            <p className="text-sm text-zinc-300 leading-relaxed">{scriptPreview}</p>
+            <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-zinc-800/60 to-transparent rounded-b-lg pointer-events-none" />
+          </div>
         </div>
       )}
 
