@@ -26,6 +26,8 @@ export function LyricEditor() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [lessonOptions, setLessonOptions] = useState<Array<{ projectTitle: string; lessonId: string; lessonTitle: string; moduleTitle: string }>>([]);
+  const [loadingLessons, setLoadingLessons] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastCleared = useRef<string>("");
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -244,7 +246,32 @@ export function LyricEditor() {
       <div>
         <Button
           type="button"
-          onClick={() => { setSaveOpen((o) => !o); setSaveStatus("idle"); setSaveError(null); }}
+          onClick={() => {
+            const opening = !saveOpen;
+            setSaveOpen(opening);
+            setSaveStatus("idle");
+            setSaveError(null);
+            if (opening) {
+              setLoadingLessons(true);
+              fetch("/api/user/lessons")
+                .then((r) => r.json() as Promise<{ projects?: Array<{ id: string; title: string; lessons: Array<{ id: string; title: string; moduleTitle: string }> }>; error?: string }>)
+                .then((data) => {
+                  if (data.projects) {
+                    const flat = data.projects.flatMap((p) =>
+                      p.lessons.map((l) => ({
+                        projectTitle: p.title,
+                        lessonId: l.id,
+                        lessonTitle: l.title,
+                        moduleTitle: l.moduleTitle,
+                      }))
+                    );
+                    setLessonOptions(flat);
+                  }
+                })
+                .catch(() => { /* silently fail — user can still type */ })
+                .finally(() => setLoadingLessons(false));
+            }
+          }}
           disabled={!lyrics}
           size="sm"
           variant="outline"
@@ -258,15 +285,26 @@ export function LyricEditor() {
         {saveOpen && (
           <div className="mt-2 flex flex-col gap-2">
             <div className="flex gap-2">
-              <input
-                type="text"
+              <select
                 value={lessonId}
                 onChange={(e) => setLessonId(e.target.value)}
-                placeholder="Paste lesson ID from the URL"
-                disabled={isSaving}
-                aria-label="Lesson ID"
-                className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
-              />
+                disabled={isSaving || loadingLessons}
+                aria-label="Select a lesson"
+                className="w-full rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-xs text-zinc-100 focus:outline-none focus:ring-1 focus:ring-violet-500 disabled:opacity-50"
+              >
+                <option value="">{loadingLessons ? "Loading lessons…" : "— Select a lesson —"}</option>
+                {Array.from(new Set(lessonOptions.map((o) => o.projectTitle))).map((projectTitle) => (
+                  <optgroup key={projectTitle} label={projectTitle}>
+                    {lessonOptions
+                      .filter((o) => o.projectTitle === projectTitle)
+                      .map((o) => (
+                        <option key={o.lessonId} value={o.lessonId}>
+                          {`[${o.moduleTitle}] → ${o.lessonTitle}`}
+                        </option>
+                      ))}
+                  </optgroup>
+                ))}
+              </select>
               <Button
                 type="button"
                 onClick={handleSaveToLesson}
