@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, modules, lessons } from "@/lib/db/schema";
+import { projects, modules, lessons, templates } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateOutline, generateScript } from "@/lib/ai/pipeline";
 
@@ -26,9 +26,11 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   let projectId: string;
+  let requestTemplateId: string | undefined;
   try {
-    const body = (await request.json()) as { projectId: string };
+    const body = (await request.json()) as { projectId: string; templateId?: string };
     projectId = body.projectId;
+    requestTemplateId = body.templateId;
     if (!projectId) throw new Error("Missing projectId");
   } catch {
     return new Response(JSON.stringify({ error: "Invalid request body" }), {
@@ -50,6 +52,23 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
   }
 
+  // Resolve templateId: prefer the one sent in the request body, fall back to
+  // the value stored on the project row itself.
+  const resolvedTemplateId = requestTemplateId ?? project.templateId ?? null;
+
+  let templateStructure: object | null = null;
+  if (resolvedTemplateId) {
+    const [template] = await db
+      .select({ structure: templates.structure })
+      .from(templates)
+      .where(eq(templates.id, resolvedTemplateId))
+      .limit(1);
+
+    if (template?.structure && Object.keys(template.structure as object).length > 0) {
+      templateStructure = template.structure as object;
+    }
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
       const send = (event: ProgressEvent) => {
@@ -67,7 +86,7 @@ export async function POST(request: NextRequest): Promise<Response> {
           tone: project.tone,
           duration_target: project.durationTarget ?? undefined,
           type: project.type,
-          template_structure: null,
+          template_structure: templateStructure,
         });
 
         send({
