@@ -11,6 +11,7 @@ import {
   LogOut,
   Waves,
   Music2,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { signOut, useSession } from "next-auth/react";
@@ -37,6 +38,7 @@ export function Sidebar({ onClose }: SidebarProps = {}) {
   const userName = session?.user?.name ?? "";
   const userEmail = session?.user?.email ?? "";
   const initials = userName.charAt(0).toUpperCase() || "?";
+  const isAdmin = (session?.user as { isAdmin?: boolean } | undefined)?.isAdmin === true;
 
   async function handleSignOut() {
     onClose?.();
@@ -81,6 +83,21 @@ export function Sidebar({ onClose }: SidebarProps = {}) {
             </Link>
           );
         })}
+        {isAdmin && (
+          <Link
+            href="/admin"
+            onClick={onClose}
+            className={cn(
+              "flex min-h-[44px] items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+              pathname.startsWith("/admin")
+                ? "bg-violet-50 text-violet-700"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            )}
+          >
+            <ShieldCheck className="h-4 w-4 shrink-0" />
+            Admin
+          </Link>
+        )}
       </nav>
 
       {/* User profile + sign out */}
