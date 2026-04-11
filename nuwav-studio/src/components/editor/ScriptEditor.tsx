@@ -27,7 +27,10 @@ export function ScriptEditor({
   const [dirty, setDirty] = useState<boolean>(false);
   const [copied, setCopied] = useState(false);
   const [pasteError, setPasteError] = useState(false);
+  const [undoVisible, setUndoVisible] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const lastCleared = useRef<string>("");
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -48,9 +51,19 @@ export function ScriptEditor({
   };
 
   const handleClearAll = () => {
-    if (!window.confirm("Clear all script content? This cannot be undone.")) return;
+    lastCleared.current = script;
     setScript("");
     setDirty("" !== initialScript);
+    setUndoVisible(true);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = setTimeout(() => setUndoVisible(false), 5000);
+  };
+
+  const handleUndo = () => {
+    setScript(lastCleared.current);
+    setDirty(lastCleared.current !== initialScript);
+    setUndoVisible(false);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
   };
 
   async function handleCopy() {
@@ -198,6 +211,20 @@ export function ScriptEditor({
           style={{ WebkitUserSelect: "text", userSelect: "text" }}
         />
       </div>
+
+      {/* Undo toast */}
+      {undoVisible && (
+        <div className="flex items-center justify-between rounded-md bg-zinc-800 border border-zinc-700 px-3 py-2 text-xs text-zinc-300 shrink-0">
+          <span>Script cleared.</span>
+          <button
+            type="button"
+            onClick={handleUndo}
+            className="ml-4 font-semibold text-violet-400 hover:text-violet-300 transition-colors"
+          >
+            Undo
+          </button>
+        </div>
+      )}
 
       {/* Save / Discard / Clear row */}
       <div className="flex gap-2 shrink-0">
