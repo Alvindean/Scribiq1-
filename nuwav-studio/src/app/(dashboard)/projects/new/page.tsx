@@ -504,6 +504,10 @@ export default function NewProjectPage() {
     <div className="mx-auto max-w-3xl px-4 py-10">
       {/* Progress bar */}
       <div className="mb-10">
+        {/* Mobile-only compact step counter */}
+        <span className="sm:hidden block text-xs text-muted-foreground mb-3">
+          Step {step + 1} of {STEPS.length} — {STEPS[step]}
+        </span>
         <div className="flex items-center gap-0">
           {STEPS.map((label, i) => (
             <div key={label} className="flex flex-1 items-center">
@@ -520,7 +524,7 @@ export default function NewProjectPage() {
                   {i < step ? "✓" : i + 1}
                 </div>
                 <span
-                  className={`mt-1 text-xs ${i === step ? "text-primary font-medium" : "text-muted-foreground"}`}
+                  className={`hidden sm:inline mt-1 text-xs truncate max-w-[4rem] text-center ${i === step ? "text-primary font-medium" : "text-muted-foreground"}`}
                 >
                   {label}
                 </span>
