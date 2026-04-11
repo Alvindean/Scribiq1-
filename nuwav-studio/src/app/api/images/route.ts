@@ -1,9 +1,9 @@
 import { NextRequest } from "next/server";
+import { eq } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 import { generateSlideBackground } from "@/lib/media/images";
-
-type ImageStyle = "photorealistic" | "illustration" | "abstract" | "minimal";
-type AspectRatio = "16:9" | "1:1" | "9:16";
+import { db } from "@/lib/db";
+import { lessons } from "@/lib/db/schema";
 
 export async function POST(request: NextRequest): Promise<Response> {
   const session = await auth();
@@ -16,40 +16,61 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   let prompt: string;
-  let style: ImageStyle | undefined;
-  let aspectRatio: AspectRatio | undefined;
+  let lessonId: string | undefined;
 
   try {
     const body = (await request.json()) as {
       prompt: string;
-      style?: ImageStyle;
-      aspectRatio?: AspectRatio;
+      lessonId?: string;
     };
     prompt = body.prompt;
-    style = body.style;
-    aspectRatio = body.aspectRatio;
+    lessonId = body.lessonId;
 
-    if (!prompt) throw new Error("Missing prompt");
-  } catch {
-    return new Response(JSON.stringify({ error: "Invalid request body" }), {
+    if (!prompt || typeof prompt !== "string" || prompt.trim() === "") {
+      throw new Error("Missing or empty prompt");
+    }
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Invalid request body";
+    return new Response(JSON.stringify({ error: message }), {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
   }
 
   try {
-    const result = await generateSlideBackground({
-      prompt,
-      style,
-      aspectRatio,
-    });
+    const result = await generateSlideBackground(prompt.trim());
 
-    return new Response(JSON.stringify({ url: result.url }), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    // Persist background colours to the lesson's visualSettings when a
+    // lessonId is supplied so the canvas can pick them up without re-calling
+    // this endpoint.
+    if (lessonId) {
+      await db
+        .update(lessons)
+        .set({
+          visualSettings: {
+            backgroundColor: result.css,
+            backgroundImageUrl: result.svgDataUrl,
+            textColor: result.colors.text === "#ffffff" ? "light" : "dark",
+          },
+          updatedAt: new Date(),
+        })
+        .where(eq(lessons.id, lessonId));
+    }
+
+    return new Response(
+      JSON.stringify({
+        svgDataUrl: result.svgDataUrl,
+        css: result.css,
+        colors: result.colors,
+      }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Internal server error";
+    const message =
+      err instanceof Error ? err.message : "Internal server error";
     return new Response(JSON.stringify({ error: message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
