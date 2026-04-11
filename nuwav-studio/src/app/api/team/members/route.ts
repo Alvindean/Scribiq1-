@@ -29,50 +29,55 @@ export async function GET(): Promise<Response> {
     });
   }
 
-  const [org] = await db
-    .select({ name: organizations.name })
-    .from(organizations)
-    .where(eq(organizations.id, profile.orgId))
-    .limit(1);
+  try {
+    const [org] = await db
+      .select({ name: organizations.name })
+      .from(organizations)
+      .where(eq(organizations.id, profile.orgId))
+      .limit(1);
 
-  // All members of this org
-  const members = await db
-    .select({
-      id: profiles.id,
-      email: profiles.email,
-      name: profiles.name,
-      role: profiles.role,
-      avatarUrl: profiles.avatarUrl,
-      createdAt: profiles.createdAt,
-    })
-    .from(profiles)
-    .where(eq(profiles.orgId, profile.orgId));
+    // All members of this org
+    const members = await db
+      .select({
+        id: profiles.id,
+        email: profiles.email,
+        name: profiles.name,
+        role: profiles.role,
+        avatarUrl: profiles.avatarUrl,
+        createdAt: profiles.createdAt,
+      })
+      .from(profiles)
+      .where(eq(profiles.orgId, profile.orgId));
 
-  // Pending invitations (not accepted, not expired)
-  const now = new Date();
-  const allInvitations = await db
-    .select({
-      id: invitations.id,
-      email: invitations.email,
-      role: invitations.role,
-      expiresAt: invitations.expiresAt,
-      acceptedAt: invitations.acceptedAt,
-      createdAt: invitations.createdAt,
-    })
-    .from(invitations)
-    .where(
-      and(eq(invitations.orgId, profile.orgId), isNull(invitations.acceptedAt))
+    // Pending invitations (not accepted, not expired)
+    const now = new Date();
+    const allInvitations = await db
+      .select({
+        id: invitations.id,
+        email: invitations.email,
+        role: invitations.role,
+        expiresAt: invitations.expiresAt,
+        acceptedAt: invitations.acceptedAt,
+        createdAt: invitations.createdAt,
+      })
+      .from(invitations)
+      .where(
+        and(eq(invitations.orgId, profile.orgId), isNull(invitations.acceptedAt))
+      );
+
+    const pendingInvitations = allInvitations.filter(
+      (inv) => inv.expiresAt > now
     );
 
-  const pendingInvitations = allInvitations.filter(
-    (inv) => inv.expiresAt > now
-  );
-
-  return Response.json({
-    members,
-    pendingInvitations,
-    orgName: org?.name ?? null,
-    currentUserId: profile.id,
-    currentUserRole: profile.role,
-  });
+    return Response.json({
+      members,
+      pendingInvitations,
+      orgName: org?.name ?? null,
+      currentUserId: profile.id,
+      currentUserRole: profile.role,
+    });
+  } catch (err) {
+    console.error("[GET /api/team/members]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

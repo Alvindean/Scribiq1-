@@ -130,15 +130,20 @@ export async function GET(): Promise<Response> {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const groups: EnvCheckGroup[] = GROUPS.map(({ name, checks }) => ({
-    name,
-    checks: checks.map(({ key, required }) => ({
-      key,
-      present: isPresent(key),
-      required,
-    })),
-  }));
+  try {
+    const groups: EnvCheckGroup[] = GROUPS.map(({ name, checks }) => ({
+      name,
+      checks: checks.map(({ key, required }) => ({
+        key,
+        present: isPresent(key),
+        required,
+      })),
+    }));
 
-  const response: EnvCheckResponse = { groups };
-  return Response.json(response);
+    const response: EnvCheckResponse = { groups };
+    return Response.json(response);
+  } catch (err) {
+    console.error("[GET /api/admin/env-check]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
