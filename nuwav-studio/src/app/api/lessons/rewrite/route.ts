@@ -4,11 +4,26 @@ import { db } from "@/lib/db";
 import { lessons, projects } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateText } from "@/lib/ai/claude";
+import { checkUserRateLimit } from "@/lib/ratelimit/upstash";
 
 export async function POST(request: NextRequest): Promise<Response> {
   const session = await auth();
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rl = await checkUserRateLimit(session.user.id, "lessons-rewrite", 30, 3600);
+  if (!rl.success) {
+    return Response.json(
+      { error: "Rate limit exceeded. Try again shortly." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(rl.limit),
+          "X-RateLimit-Remaining": String(rl.remaining),
+        },
+      }
+    );
   }
 
   let lessonId: string;

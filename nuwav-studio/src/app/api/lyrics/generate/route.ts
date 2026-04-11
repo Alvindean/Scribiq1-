@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { lyrics } from "@/lib/db/schema";
 import { generateText } from "@/lib/ai/claude";
+import { checkUserRateLimit } from "@/lib/ratelimit/upstash";
 
 // Per-genre structural guidance injected into the system prompt
 const GENRE_PROMPTS: Record<string, { structure: string; style: string; rhyme: string }> = {
@@ -115,6 +116,20 @@ export async function POST(request: NextRequest): Promise<Response> {
   const session = await auth();
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rl = await checkUserRateLimit(session.user.id, "lyrics-generate", 20, 3600);
+  if (!rl.success) {
+    return Response.json(
+      { error: "Rate limit exceeded. Try again shortly." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(rl.limit),
+          "X-RateLimit-Remaining": String(rl.remaining),
+        },
+      }
+    );
   }
 
   let prompt: string;

@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { generateText } from "@/lib/ai/claude";
+import { checkUserRateLimit } from "@/lib/ratelimit/upstash";
 
 export interface AudioFeatures {
   tempo: number | null;       // BPM
@@ -230,6 +231,20 @@ export async function POST(request: NextRequest): Promise<Response> {
   const session = await auth();
   if (!session?.user?.id) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rl = await checkUserRateLimit(session.user.id, "music-analyze", 20, 3600);
+  if (!rl.success) {
+    return Response.json(
+      { error: "Rate limit exceeded. Try again shortly." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(rl.limit),
+          "X-RateLimit-Remaining": String(rl.remaining),
+        },
+      }
+    );
   }
 
   let song: string;

@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { projects, modules, lessons, templates } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateOutline, generateScript } from "@/lib/ai/pipeline";
+import { checkUserRateLimit } from "@/lib/ratelimit/upstash";
 
 interface ProgressEvent {
   step: string;
@@ -23,6 +24,20 @@ export async function POST(request: NextRequest): Promise<Response> {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  const rl = await checkUserRateLimit(session.user.id, "generate", 5, 3600);
+  if (!rl.success) {
+    return Response.json(
+      { error: "Rate limit exceeded. Try again shortly." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(rl.limit),
+          "X-RateLimit-Remaining": String(rl.remaining),
+        },
+      }
+    );
   }
 
   let projectId: string;

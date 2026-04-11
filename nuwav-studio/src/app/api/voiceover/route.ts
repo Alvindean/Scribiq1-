@@ -5,6 +5,7 @@ import { lessons } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateVoiceover } from "@/lib/elevenlabs/tts";
 import { uploadToR2, buildR2Key } from "@/lib/media/r2";
+import { checkUserRateLimit } from "@/lib/ratelimit/upstash";
 
 export async function POST(request: NextRequest): Promise<Response> {
   const session = await auth();
@@ -14,6 +15,20 @@ export async function POST(request: NextRequest): Promise<Response> {
       status: 401,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  const rl = await checkUserRateLimit(session.user.id, "voiceover", 10, 3600);
+  if (!rl.success) {
+    return Response.json(
+      { error: "Rate limit exceeded. Try again shortly." },
+      {
+        status: 429,
+        headers: {
+          "X-RateLimit-Limit": String(rl.limit),
+          "X-RateLimit-Remaining": String(rl.remaining),
+        },
+      }
+    );
   }
 
   let lessonId: string;
