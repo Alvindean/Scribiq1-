@@ -293,7 +293,7 @@ export function PropertyPanel() {
                 <Button
                   onClick={handleSaveScript}
                   size="sm"
-                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5 min-h-[44px]"
+                  className="flex-1 min-w-0 bg-violet-600 hover:bg-violet-700 text-white gap-1.5 min-h-[48px] text-xs"
                 >
                   <Save className="w-3.5 h-3.5" />
                   Save
@@ -302,7 +302,7 @@ export function PropertyPanel() {
                   onClick={handleDiscardScript}
                   size="sm"
                   variant="outline"
-                  className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5 min-h-[44px]"
+                  className="flex-1 min-w-0 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5 min-h-[48px] text-xs"
                 >
                   Discard
                 </Button>
@@ -313,7 +313,7 @@ export function PropertyPanel() {
               disabled={!scriptDraft}
               size="sm"
               variant="outline"
-              className="flex-1 gap-1.5 border-red-900/60 text-red-400 hover:bg-red-950/40 hover:text-red-300 disabled:opacity-40 min-h-[44px]"
+              className="flex-1 min-w-0 gap-1.5 border-red-900/60 text-red-400 hover:bg-red-950/40 hover:text-red-300 disabled:opacity-40 min-h-[48px] text-xs"
             >
               <Trash2 className="w-3.5 h-3.5" />
               Clear All
@@ -384,7 +384,7 @@ export function PropertyPanel() {
                   onClick={handleApplyQuickEdit}
                   disabled={isRewriting || editPrompts.length === 0 || !scriptDraft.trim()}
                   size="sm"
-                  className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white min-h-[44px] disabled:opacity-40"
+                  className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white min-h-[48px] disabled:opacity-40"
                 >
                   {isRewriting ? (
                     <>
