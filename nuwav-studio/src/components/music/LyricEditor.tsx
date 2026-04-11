@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Trash2, Copy, Check, ClipboardPaste } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/clipboard";
@@ -13,7 +13,10 @@ export function LyricEditor() {
   const [lyrics, setLyrics] = useState("");
   const [copied, setCopied] = useState(false);
   const [pasteError, setPasteError] = useState(false);
+  const [undoVisible, setUndoVisible] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const lastCleared = useRef<string>("");
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setLyrics(e.target.value);
@@ -54,10 +57,21 @@ export function LyricEditor() {
 
   function handleClearAll() {
     if (!lyrics) return;
-    if (!window.confirm("Clear all lyrics? This cannot be undone.")) return;
+    lastCleared.current = lyrics;
     setLyrics("");
+    setUndoVisible(true);
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    undoTimerRef.current = setTimeout(() => setUndoVisible(false), 5000);
     textareaRef.current?.focus();
   }
+
+  function handleUndo() {
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    setLyrics(lastCleared.current);
+    setUndoVisible(false);
+  }
+
+  useEffect(() => () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); }, []);
 
   const charCount = lyrics.length;
   const wordCount = countWords(lyrics);
@@ -136,6 +150,20 @@ export function LyricEditor() {
         style={{ WebkitUserSelect: "text", userSelect: "text" }}
         spellCheck
       />
+
+      {/* Undo toast */}
+      {undoVisible && (
+        <div className="flex items-center justify-between rounded-lg bg-zinc-800 border border-zinc-700 px-4 py-2 text-sm text-zinc-200">
+          <span>Lyrics cleared.</span>
+          <button
+            type="button"
+            onClick={handleUndo}
+            className="ml-4 font-medium text-violet-400 hover:text-violet-300 transition-colors"
+          >
+            Undo
+          </button>
+        </div>
+      )}
     </div>
   );
 }
