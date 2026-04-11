@@ -29,11 +29,6 @@ function mapStatusToPlan(status: SubscriptionStatus, priceId: string | null): Db
   return mapPriceIdToPlan(priceId);
 }
 
-// Disable Next.js body parsing — Stripe requires the raw body for signature verification
-export const config = {
-  api: { bodyParser: false },
-};
-
 export async function POST(request: NextRequest): Promise<Response> {
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!webhookSecret) {
