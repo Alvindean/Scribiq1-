@@ -8,6 +8,7 @@ import {
   Download,
   ExternalLink,
   Image as ImageIcon,
+  X,
 } from "lucide-react";
 
 interface PixabayImage {
@@ -148,9 +149,18 @@ export function ImageSearch() {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value)}
           className="w-full rounded-lg border bg-background py-2 pl-9 pr-10 text-sm outline-none focus:ring-2 focus:ring-violet-500"
         />
-        {loading && (
+        {loading ? (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin text-muted-foreground" />
-        )}
+        ) : query ? (
+          <button
+            type="button"
+            onClick={() => setQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Clear search"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        ) : null}
       </div>
 
       {/* Type filter pills */}
@@ -191,10 +201,21 @@ export function ImageSearch() {
       {!loading && !missingKey && images.length === 0 && !error && (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center text-muted-foreground">
           <ImageIcon className="mb-3 h-10 w-10 opacity-30" />
-          <p className="font-medium">Search for images</p>
-          <p className="mt-1 text-sm">
-            Try "nature", "technology", or "abstract background"
-          </p>
+          {query.trim() ? (
+            <>
+              <p className="font-medium">No results</p>
+              <p className="mt-1 text-sm max-w-xs">
+                No images found for &ldquo;{query.trim()}&rdquo; &mdash; try different keywords or check your Pixabay API key.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="font-medium">Search for images</p>
+              <p className="mt-1 text-sm">
+                Try &ldquo;nature&rdquo;, &ldquo;technology&rdquo;, or &ldquo;abstract background&rdquo;
+              </p>
+            </>
+          )}
         </div>
       )}
 
