@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useCallback, useEffect } from "react";
-import { Trash2, Copy, Check, ClipboardPaste } from "lucide-react";
+import { useState, useRef, useCallback, useEffect, useLayoutEffect } from "react";
+import { Trash2, Copy, Check, ClipboardPaste, Wand2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/clipboard";
 
@@ -17,9 +17,14 @@ export function LyricEditor() {
   const [copied, setCopied] = useState(false);
   const [pasteError, setPasteError] = useState(false);
   const [undoVisible, setUndoVisible] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState("");
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastCleared = useRef<string>("");
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingCursorRef = useRef<number | null>(null);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setLyrics(e.target.value);
@@ -49,14 +54,20 @@ export function LyricEditor() {
       const end = el.selectionEnd ?? lyrics.length;
       const next = lyrics.slice(0, start) + text + lyrics.slice(end);
       setLyrics(next);
-      requestAnimationFrame(() => {
-        el.selectionStart = el.selectionEnd = start + text.length;
-        el.focus();
-      });
+      pendingCursorRef.current = start + text.length;
     } catch {
       textareaRef.current?.focus();
     }
   }
+
+  useLayoutEffect(() => {
+    if (pendingCursorRef.current === null) return;
+    const el = textareaRef.current;
+    if (!el) return;
+    el.selectionStart = el.selectionEnd = pendingCursorRef.current;
+    el.focus();
+    pendingCursorRef.current = null;
+  }, [lyrics]);
 
   function handleClearAll() {
     if (!lyrics) return;
@@ -75,6 +86,28 @@ export function LyricEditor() {
     lastCleared.current = "";
   }
 
+  async function handleAiGenerate() {
+    if (!aiPrompt.trim()) return;
+    setIsGenerating(true);
+    setAiError(null);
+    try {
+      const res = await fetch("/api/lyrics/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: aiPrompt.trim() }),
+      });
+      const data = await res.json() as { lyrics?: string; error?: string };
+      if (!res.ok || !data.lyrics) throw new Error(data.error ?? "Generation failed");
+      setLyrics(data.lyrics);
+      setAiOpen(false);
+      setAiPrompt("");
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "Generation failed");
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
   useEffect(() => () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); lastCleared.current = ""; }, []);
 
   useEffect(() => {
@@ -88,7 +121,7 @@ export function LyricEditor() {
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="flex flex-wrap gap-3 text-xs text-muted-foreground">
+      <div id="lyric-stats" role="status" aria-live="polite" aria-atomic="true" className="flex flex-wrap gap-3 text-xs text-muted-foreground">
         <span>{charCount} characters</span>
         <span className="text-border">·</span>
         <span>{wordCount} words</span>
@@ -108,6 +141,7 @@ export function LyricEditor() {
           disabled={!lyrics}
           size="sm"
           variant="outline"
+          aria-label={copied ? "Lyrics copied to clipboard" : "Copy lyrics"}
           className="flex-1 gap-2 min-h-[44px]"
         >
           {copied ? (
@@ -127,6 +161,7 @@ export function LyricEditor() {
           onClick={handlePaste}
           size="sm"
           variant="outline"
+          aria-label="Paste from clipboard"
           className="flex-1 gap-2 min-h-[44px]"
         >
           <ClipboardPaste className="w-4 h-4" />
@@ -138,6 +173,7 @@ export function LyricEditor() {
           disabled={!lyrics}
           size="sm"
           variant="outline"
+          aria-label="Clear all lyrics"
           className="flex-1 gap-2 min-h-[44px] border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600 disabled:opacity-40"
         >
           <Trash2 className="w-4 h-4" />
@@ -158,6 +194,8 @@ export function LyricEditor() {
         onChange={handleChange}
         placeholder={`Write your lyrics here…\n\n[Verse 1]\n\n[Chorus]\n\n[Bridge]`}
         rows={24}
+        aria-label="Lyric editor"
+        aria-describedby="lyric-stats"
         className="w-full resize-none rounded-lg border bg-background px-4 py-3 text-sm font-mono leading-relaxed placeholder:text-muted-foreground/40 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:border-transparent"
         style={{ WebkitUserSelect: "text", userSelect: "text" }}
         spellCheck
@@ -165,11 +203,12 @@ export function LyricEditor() {
 
       {/* Undo toast */}
       {undoVisible && (
-        <div className="flex items-center justify-between rounded-lg bg-zinc-800 border border-zinc-700 px-4 py-2 text-sm text-zinc-200">
+        <div role="alert" className="flex items-center justify-between rounded-lg bg-zinc-800 border border-zinc-700 px-4 py-2 text-sm text-zinc-200">
           <span>Lyrics cleared.</span>
           <button
             type="button"
             onClick={handleUndo}
+            aria-label="Undo clear"
             className="ml-4 font-medium text-violet-400 hover:text-violet-300 transition-colors"
           >
             Undo
