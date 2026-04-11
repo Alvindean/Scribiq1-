@@ -21,7 +21,6 @@ interface InviteInfo {
   isNewUser: boolean;
   expired?: boolean;
   accepted?: boolean;
-  invalid?: boolean;
 }
 
 export default function AcceptInvitePage() {
@@ -44,7 +43,9 @@ export default function AcceptInvitePage() {
 
     const load = async () => {
       try {
-        const res = await fetch(`/api/team/invite-info?token=${encodeURIComponent(token)}`);
+        const res = await fetch(
+          `/api/team/invite-info?token=${encodeURIComponent(token)}`
+        );
         const data = (await res.json()) as InviteInfo & { error?: string };
 
         if (!res.ok) {
@@ -98,6 +99,8 @@ export default function AcceptInvitePage() {
       setSubmitting(false);
     }
   }
+
+  // ─── Loading ────────────────────────────────────────────────────────────────
 
   if (loading) {
     return (
@@ -277,7 +280,10 @@ export default function AcceptInvitePage() {
 
         <p className="text-center text-sm text-muted-foreground">
           Already have an account?{" "}
-          <Link href="/login" className="font-medium text-violet-600 hover:underline">
+          <Link
+            href="/login"
+            className="font-medium text-violet-600 hover:underline"
+          >
             Sign in
           </Link>
         </p>

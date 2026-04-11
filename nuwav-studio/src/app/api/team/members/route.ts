@@ -20,7 +20,13 @@ export async function GET(): Promise<Response> {
   }
 
   if (!profile.orgId) {
-    return Response.json({ members: [], pendingInvitations: [], orgName: null });
+    return Response.json({
+      members: [],
+      pendingInvitations: [],
+      orgName: null,
+      currentUserId: profile.id,
+      currentUserRole: profile.role,
+    });
   }
 
   const [org] = await db
@@ -55,10 +61,7 @@ export async function GET(): Promise<Response> {
     })
     .from(invitations)
     .where(
-      and(
-        eq(invitations.orgId, profile.orgId),
-        isNull(invitations.acceptedAt)
-      )
+      and(eq(invitations.orgId, profile.orgId), isNull(invitations.acceptedAt))
     );
 
   const pendingInvitations = allInvitations.filter(

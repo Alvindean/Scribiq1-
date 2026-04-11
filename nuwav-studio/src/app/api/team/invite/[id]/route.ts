@@ -27,11 +27,17 @@ export async function DELETE(
   }
 
   if (profile.role !== "admin" && profile.role !== "owner") {
-    return Response.json({ error: "Only admins can cancel invitations" }, { status: 403 });
+    return Response.json(
+      { error: "Only admins can cancel invitations" },
+      { status: 403 }
+    );
   }
 
   if (!profile.orgId) {
-    return Response.json({ error: "You are not part of an organization" }, { status: 400 });
+    return Response.json(
+      { error: "You are not part of an organization" },
+      { status: 400 }
+    );
   }
 
   try {

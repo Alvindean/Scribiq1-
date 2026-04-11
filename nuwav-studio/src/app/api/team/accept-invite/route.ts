@@ -5,7 +5,11 @@ import { eq } from "drizzle-orm";
 import bcrypt from "bcryptjs";
 
 export async function POST(request: NextRequest): Promise<Response> {
-  const body = (await request.json()) as { token?: string; name?: string; password?: string };
+  const body = (await request.json()) as {
+    token?: string;
+    name?: string;
+    password?: string;
+  };
   const token = (body.token ?? "").trim();
   const name = (body.name ?? "").trim() || null;
   const password = (body.password ?? "").trim();
@@ -26,11 +30,17 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   if (invite.acceptedAt) {
-    return Response.json({ error: "This invitation has already been accepted" }, { status: 409 });
+    return Response.json(
+      { error: "This invitation has already been accepted" },
+      { status: 409 }
+    );
   }
 
   if (invite.expiresAt < new Date()) {
-    return Response.json({ error: "This invitation has expired" }, { status: 410 });
+    return Response.json(
+      { error: "This invitation has expired" },
+      { status: 410 }
+    );
   }
 
   // Check if a user with this email already exists
@@ -55,18 +65,22 @@ export async function POST(request: NextRequest): Promise<Response> {
     // Password is required for new users
     if (!password || password.length < 8) {
       return Response.json(
-        { error: "A password of at least 8 characters is required for new accounts" },
+        {
+          error:
+            "A password of at least 8 characters is required for new accounts",
+        },
         { status: 400 }
       );
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
+    const displayName = name ?? invite.email.split("@")[0];
 
     const [newUser] = await db
       .insert(users)
       .values({
         email: invite.email,
-        name: name ?? invite.email.split("@")[0],
+        name: displayName,
         passwordHash,
       })
       .returning({ id: users.id });
@@ -77,7 +91,7 @@ export async function POST(request: NextRequest): Promise<Response> {
     await db.insert(profiles).values({
       id: userId,
       email: invite.email,
-      name: name ?? invite.email.split("@")[0],
+      name: displayName,
       orgId: invite.orgId,
       role: invite.role,
     });

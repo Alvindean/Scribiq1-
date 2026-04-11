@@ -138,7 +138,10 @@ export default function TeamSettingsPage() {
       const res = await fetch("/api/team/invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: inviteEmail.trim().toLowerCase(), role: inviteRole }),
+        body: JSON.stringify({
+          email: inviteEmail.trim().toLowerCase(),
+          role: inviteRole,
+        }),
       });
 
       const d = (await res.json()) as { success?: boolean; error?: string };
@@ -202,7 +205,8 @@ export default function TeamSettingsPage() {
 
   if (!data) return null;
 
-  const isAdmin = data.currentUserRole === "admin" || data.currentUserRole === "owner";
+  const isAdmin =
+    data.currentUserRole === "admin" || data.currentUserRole === "owner";
 
   // Non-admins: read-only view
   if (!isAdmin) {
@@ -217,7 +221,10 @@ export default function TeamSettingsPage() {
             </span>
           </p>
         </div>
-        <MemberList members={data.members} currentUserId={data.currentUserId} />
+        <MemberList
+          members={data.members}
+          currentUserId={data.currentUserId}
+        />
       </div>
     );
   }
@@ -267,7 +274,9 @@ export default function TeamSettingsPage() {
                 <Label htmlFor="invite-role">Role</Label>
                 <Select
                   value={inviteRole}
-                  onValueChange={(v) => setInviteRole(v as "member" | "admin")}
+                  onValueChange={(v) =>
+                    setInviteRole(v as "member" | "admin")
+                  }
                 >
                   <SelectTrigger id="invite-role">
                     <SelectValue />
@@ -330,7 +339,10 @@ export default function TeamSettingsPage() {
                   </div>
 
                   <div className="flex items-center gap-3 shrink-0">
-                    <Badge variant={roleBadgeVariant(inv.role)} className="capitalize">
+                    <Badge
+                      variant={roleBadgeVariant(inv.role)}
+                      className="capitalize"
+                    >
                       {inv.role}
                     </Badge>
                     <Button
@@ -375,10 +387,7 @@ function MemberList({
       <CardContent className="p-0">
         <ul className="divide-y divide-border">
           {members.map((member) => (
-            <li
-              key={member.id}
-              className="flex items-center gap-4 px-6 py-4"
-            >
+            <li key={member.id} className="flex items-center gap-4 px-6 py-4">
               <Avatar
                 name={member.name}
                 email={member.email}
@@ -404,7 +413,10 @@ function MemberList({
                 </p>
               </div>
 
-              <Badge variant={roleBadgeVariant(member.role)} className="capitalize shrink-0">
+              <Badge
+                variant={roleBadgeVariant(member.role)}
+                className="capitalize shrink-0"
+              >
                 {member.role}
               </Badge>
             </li>

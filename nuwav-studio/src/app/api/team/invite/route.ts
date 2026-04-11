@@ -73,13 +73,14 @@ export async function POST(request: NextRequest): Promise<Response> {
   // Check if there is already a pending (not accepted, not expired) invitation
   const now = new Date();
   const existingInvites = await db
-    .select({ id: invitations.id, expiresAt: invitations.expiresAt, acceptedAt: invitations.acceptedAt })
+    .select({
+      id: invitations.id,
+      expiresAt: invitations.expiresAt,
+      acceptedAt: invitations.acceptedAt,
+    })
     .from(invitations)
     .where(
-      and(
-        eq(invitations.orgId, profile.orgId),
-        eq(invitations.email, email)
-      )
+      and(eq(invitations.orgId, profile.orgId), eq(invitations.email, email))
     );
 
   const pendingInvite = existingInvites.find(
@@ -118,9 +119,15 @@ export async function POST(request: NextRequest): Promise<Response> {
   try {
     await sendInviteEmail(email, inviterName, org.name, inviteUrl);
   } catch (err) {
-    console.warn("[invite] Email send failed — logging invite URL instead:", inviteUrl);
+    console.warn(
+      "[invite] Email send failed — logging invite URL instead:",
+      inviteUrl
+    );
     console.error(err);
   }
 
-  return Response.json({ success: true, invitationId: newInvite.id }, { status: 201 });
+  return Response.json(
+    { success: true, invitationId: newInvite.id },
+    { status: 201 }
+  );
 }
