@@ -77,14 +77,17 @@ export default async function VSLPage({ params }: Props) {
               className="w-full rounded-xl aspect-video bg-black mb-8 max-w-2xl mx-auto"
             />
           ) : (
-            <div className="w-full aspect-video rounded-xl bg-violet-800/50 max-w-2xl mx-auto mb-8 flex items-center justify-center">
-              <p className="text-violet-300 text-sm">Video loading...</p>
+            <div className="w-full aspect-video rounded-xl bg-violet-800/50 max-w-2xl mx-auto mb-8 flex flex-col items-center justify-center gap-2">
+              <span className="text-4xl">🎬</span>
+              <p className="text-violet-300 text-sm font-medium">Video coming soon</p>
             </div>
           )}
-          <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-black font-bold">
-            {content.hero_cta ?? "Get Instant Access"}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link href={`/checkout/${content.checkout_slug ?? slug}`}>
+            <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-black font-bold">
+              {content.hero_cta ?? "Enroll Now"}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 
@@ -127,18 +130,12 @@ export default async function VSLPage({ params }: Props) {
             <div className="text-4xl font-bold text-violet-700 mb-6">
               {content.offer_section.price}
             </div>
-            {content.checkout_slug ? (
-              <Link href={`/checkout/${content.checkout_slug}`}>
-                <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-white px-12">
-                  {content.offer_section.cta}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Button>
-              </Link>
-            ) : (
+            <Link href={`/checkout/${content.checkout_slug ?? slug}`}>
               <Button size="lg" className="bg-violet-600 hover:bg-violet-700 text-white px-12">
-                {content.offer_section.cta}
+                {content.offer_section.cta ?? "Enroll Now"}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-            )}
+            </Link>
           </div>
         </section>
       )}
