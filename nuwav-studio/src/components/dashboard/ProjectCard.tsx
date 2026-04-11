@@ -39,7 +39,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const Icon = typeIcons[project.type];
 
   return (
-    <Card className="group relative overflow-hidden transition-shadow hover:shadow-md">
+    <Card className="group relative overflow-hidden transition-all duration-200 hover:shadow-md hover:border-violet-200 dark:hover:border-violet-800 cursor-pointer">
       {/* Thumbnail placeholder */}
       <div className="aspect-video bg-gradient-to-br from-violet-100 to-purple-100 flex items-center justify-center">
         <Icon className="h-12 w-12 text-violet-400" />
@@ -48,7 +48,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold truncate text-sm leading-tight">
+            <h3 className="font-semibold truncate text-sm leading-tight group-hover:text-violet-600 transition-colors">
               {project.title}
             </h3>
             {project.niche && (
@@ -79,7 +79,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
 
       <CardFooter className="px-4 pb-4 pt-0">
         <Link href={`/projects/${project.id}`} className="w-full">
-          <Button variant="outline" size="sm" className="w-full">
+          <Button variant="outline" size="sm" className="w-full group-hover:translate-x-0.5 transition-transform">
             Open Project
           </Button>
         </Link>
