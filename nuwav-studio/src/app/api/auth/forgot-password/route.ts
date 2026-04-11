@@ -3,7 +3,7 @@ import crypto from "crypto";
 import { db } from "@/lib/db";
 import { users, passwordResetTokens } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
-import { sendPasswordResetEmail } from "@/lib/email";
+import { sendPasswordResetEmail } from "@/lib/email/send";
 
 const SAFE_RESPONSE = {
   message: "If that email is registered, a reset link has been sent.",
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   try {
     const [user] = await db
-      .select({ id: users.id, email: users.email })
+      .select({ id: users.id, email: users.email, name: users.name })
       .from(users)
       .where(eq(users.email, email))
       .limit(1);
@@ -46,8 +46,7 @@ export async function POST(request: NextRequest): Promise<Response> {
           expiresAt,
         });
 
-        const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/reset-password?token=${token}`;
-        await sendPasswordResetEmail(email, resetUrl);
+        await sendPasswordResetEmail(email, user.name ?? "", token);
       } catch (err) {
         console.error("[forgot-password] Failed to send reset email:", err);
       }
