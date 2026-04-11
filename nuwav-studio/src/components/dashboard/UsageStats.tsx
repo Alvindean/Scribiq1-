@@ -58,7 +58,7 @@ export function UsageStats({ stats }: UsageStatsProps) {
   ];
 
   return (
-    <Card>
+    <Card className="hover:shadow-sm transition-shadow">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-medium">Usage This Month</CardTitle>
       </CardHeader>

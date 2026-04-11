@@ -10,6 +10,8 @@ interface EmptyStateProps {
   action?: {
     label: string;
     href: string;
+    variant?: "default" | "secondary" | "outline" | "destructive" | "ghost" | "link";
+    size?: "default" | "sm" | "lg" | "icon";
   };
   className?: string;
 }
@@ -40,7 +42,7 @@ export function EmptyState({
         )}
       </div>
       {action && (
-        <Button asChild>
+        <Button asChild variant={action.variant ?? "default"} size={action.size ?? "lg"}>
           <Link href={action.href}>{action.label}</Link>
         </Button>
       )}

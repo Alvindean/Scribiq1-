@@ -22,8 +22,12 @@ export default async function DashboardPage() {
         .limit(1)
     : [null];
 
-  const firstName = profileFull?.name?.split(" ")[0] ?? "there";
+  const firstName = profileFull?.name?.split(" ")[0] ?? null;
   const orgId = profileFull?.orgId;
+
+  const hour = new Date().getHours();
+  const timeGreeting =
+    hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   // Recent projects for display (limited to 20)
   const projectList = orgId
@@ -79,9 +83,11 @@ export default async function DashboardPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Good morning, {firstName}</h1>
+          <h1 className="text-2xl font-bold">
+            {firstName ? `Welcome back, ${firstName}` : "Welcome back"}
+          </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Build and publish AI-powered courses and VSLs
+            {timeGreeting} — build and publish AI-powered courses and VSLs
           </p>
         </div>
         <Link href="/projects/new">
@@ -127,7 +133,7 @@ export default async function DashboardPage() {
         <div className="space-y-4">
           <UsageStats stats={usageStats} />
 
-          <div className="rounded-xl border p-4 space-y-3">
+          <div className="rounded-xl border p-4 space-y-3 hover:shadow-sm transition-shadow">
             <h3 className="text-sm font-medium">Quick Start</h3>
             <div className="space-y-2">
               {[
