@@ -28,6 +28,23 @@ export const organizations = pgTable("organizations", {
     .default("starter")
     .notNull(),
   stripeCustomerId: text("stripe_customer_id"),
+  // Stripe subscription fields — requires migration:
+  //   ALTER TABLE organizations
+  //     ADD COLUMN stripe_subscription_id text,
+  //     ADD COLUMN stripe_price_id text,
+  //     ADD COLUMN subscription_status text;
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
+  subscriptionStatus: text("subscription_status").$type<
+    | "active"
+    | "trialing"
+    | "past_due"
+    | "canceled"
+    | "incomplete"
+    | "incomplete_expired"
+    | "paused"
+    | "unpaid"
+  >(),
   settings: jsonb("settings").default({}).notNull(),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
