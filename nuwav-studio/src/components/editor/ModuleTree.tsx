@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import type { Lesson, Module } from "@/types/project";
 import { useProjectStore } from "@/stores/project-store";
 import { useEditorStore } from "@/stores/editor-store";
@@ -32,6 +32,35 @@ const STATUS_COLORS: Record<Lesson["status"], string> = {
   rendered: "bg-emerald-400",
   published: "bg-violet-500",
 };
+
+// ─── Save status indicator ────────────────────────────────────────────────────
+
+type SaveStatus = "idle" | "saving" | "saved" | "error";
+
+function SaveStatusBadge({ status }: { status: SaveStatus }) {
+  if (status === "idle") return null;
+  const label =
+    status === "saving"
+      ? "Saving…"
+      : status === "saved"
+        ? "Saved"
+        : "Save failed";
+  const colour =
+    status === "saving"
+      ? "text-zinc-400"
+      : status === "saved"
+        ? "text-emerald-400"
+        : "text-red-400";
+  return (
+    <span
+      role="status"
+      aria-live="polite"
+      className={`text-[10px] font-medium transition-opacity ${colour}`}
+    >
+      {label}
+    </span>
+  );
+}
 
 // ─── Sortable lesson row ──────────────────────────────────────────────────────
 
@@ -198,6 +227,9 @@ export function ModuleTree() {
   const { selectedLessonId, setSelectedLesson } = useEditorStore();
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
 
+  // Save status for the inline badge
+  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+
   // Track what is being dragged for the overlay
   const [activeModuleId, setActiveModuleId] = useState<string | null>(null);
   const [activeLessonId, setActiveLessonId] = useState<string | null>(null);
@@ -213,6 +245,23 @@ export function ModuleTree() {
   const toggleModule = (moduleId: string) => {
     setCollapsed((prev) => ({ ...prev, [moduleId]: !prev[moduleId] }));
   };
+
+  // Helper: show "Saving…" then "Saved" / "Save failed"
+  const withSaveIndicator = useCallback(
+    async (persist: () => Promise<void>, onError: () => void) => {
+      setSaveStatus("saving");
+      try {
+        await persist();
+        setSaveStatus("saved");
+        setTimeout(() => setSaveStatus("idle"), 2000);
+      } catch {
+        onError();
+        setSaveStatus("error");
+        setTimeout(() => setSaveStatus("idle"), 3000);
+      }
+    },
+    []
+  );
 
   // ── Module-level drag handlers ────────────────────────────────────────────
 
@@ -231,16 +280,30 @@ export function ModuleTree() {
     if (oldIdx === -1 || newIdx === -1) return;
 
     const newOrder = arrayMove(ids, oldIdx, newIdx);
+
+    // Snapshot before optimistic update so we can revert
+    const previousOrder = [...ids];
+
     reorderModules(newOrder);
 
-    // Persist to server (fire-and-forget; optimistic update already done)
-    if (project?.id) {
-      void fetch(`/api/projects/${project.id}/modules/reorder`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderedIds: newOrder }),
-      });
-    }
+    if (!project?.id) return;
+
+    const projectId = project.id;
+
+    void withSaveIndicator(
+      async () => {
+        const res = await fetch("/api/modules/reorder", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ projectId, orderedIds: newOrder }),
+        });
+        if (!res.ok) throw new Error("Failed to persist module order");
+      },
+      () => {
+        // Revert optimistic update
+        reorderModules(previousOrder);
+      }
+    );
   };
 
   // ── Lesson-level drag handlers (one set; moduleId captured at start) ──────
@@ -271,16 +334,26 @@ export function ModuleTree() {
     if (oldIdx === -1 || newIdx === -1) return;
 
     const newOrder = arrayMove(ids, oldIdx, newIdx);
+
+    // Snapshot before optimistic update so we can revert
+    const previousOrder = [...ids];
+
     reorderLessons(moduleId, newOrder);
 
-    // Persist to server (fire-and-forget)
-    if (project?.id) {
-      void fetch(`/api/projects/${project.id}/lessons/reorder`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ moduleId, orderedIds: newOrder }),
-      });
-    }
+    void withSaveIndicator(
+      async () => {
+        const res = await fetch("/api/lessons/reorder", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ moduleId, orderedIds: newOrder }),
+        });
+        if (!res.ok) throw new Error("Failed to persist lesson order");
+      },
+      () => {
+        // Revert optimistic update
+        reorderLessons(moduleId, previousOrder);
+      }
+    );
   };
 
   // Resolve overlay items
@@ -299,10 +372,11 @@ export function ModuleTree() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-4 py-3 border-b border-zinc-800 shrink-0">
+      <div className="px-4 py-3 border-b border-zinc-800 shrink-0 flex items-center justify-between">
         <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
           Modules &amp; Lessons
         </p>
+        <SaveStatusBadge status={saveStatus} />
       </div>
 
       <ScrollArea className="flex-1">
