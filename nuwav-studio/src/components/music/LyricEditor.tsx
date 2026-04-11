@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useCallback, useEffect, useLayoutEffect } from "react";
-import { Trash2, Copy, Check, ClipboardPaste, Wand2, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Trash2, Copy, Check, ClipboardPaste, Wand2, Loader2, ChevronDown, ChevronUp, BookOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/clipboard";
 
@@ -21,6 +21,11 @@ export function LyricEditor() {
   const [aiPrompt, setAiPrompt] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [lessonId, setLessonId] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "success" | "error">("idle");
+  const [saveError, setSaveError] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const lastCleared = useRef<string>("");
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -108,6 +113,29 @@ export function LyricEditor() {
     }
   }
 
+  async function handleSaveToLesson() {
+    if (!lessonId.trim() || !lyrics) return;
+    setIsSaving(true);
+    setSaveStatus("idle");
+    setSaveError(null);
+    try {
+      const res = await fetch("/api/lyrics/save", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lessonId: lessonId.trim(), lyrics }),
+      });
+      const data = await res.json() as { success?: boolean; error?: string };
+      if (!res.ok || !data.success) throw new Error(data.error ?? "Save failed");
+      setSaveStatus("success");
+      setTimeout(() => setSaveStatus("idle"), 3000);
+    } catch (err) {
+      setSaveStatus("error");
+      setSaveError(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   useEffect(() => () => { if (undoTimerRef.current) clearTimeout(undoTimerRef.current); lastCleared.current = ""; }, []);
 
   useEffect(() => {
@@ -186,6 +214,126 @@ export function LyricEditor() {
           Paste permission denied — tap inside the editor and use your keyboard&apos;s paste option.
         </p>
       )}
+
+      {/* Save to Lesson */}
+      <div>
+        <Button
+          type="button"
+          onClick={() => { setSaveOpen((o) => !o); setSaveStatus("idle"); setSaveError(null); }}
+          disabled={!lyrics}
+          size="sm"
+          variant="outline"
+          aria-label="Save lyrics to a lesson"
+          className="gap-2 min-h-[44px] disabled:opacity-40"
+        >
+          <BookOpen className="w-4 h-4" />
+          Save to Lesson
+        </Button>
+
+        {saveOpen && (
+          <div className="mt-2 flex flex-col gap-2">
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={lessonId}
+                onChange={(e) => setLessonId(e.target.value)}
+                placeholder="Paste lesson ID from the URL"
+                disabled={isSaving}
+                aria-label="Lesson ID"
+                className="flex-1 rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
+              />
+              <Button
+                type="button"
+                onClick={handleSaveToLesson}
+                disabled={isSaving || !lessonId.trim() || !lyrics}
+                size="sm"
+                className="gap-2 bg-violet-600 hover:bg-violet-700 text-white min-h-[44px] disabled:opacity-40"
+              >
+                {isSaving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : saveStatus === "success" ? (
+                  <>
+                    <Check className="w-4 h-4 text-green-300" />
+                    Saved!
+                  </>
+                ) : (
+                  "Save"
+                )}
+              </Button>
+            </div>
+            {saveStatus === "error" && saveError && (
+              <p className="text-xs text-red-400">{saveError}</p>
+            )}
+            {saveStatus === "success" && (
+              <p className="text-xs text-green-500">Lyrics saved to lesson script.</p>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* AI Generate panel */}
+      <div className="rounded-lg border border-zinc-700/60 bg-zinc-900/60 overflow-hidden">
+        {/* Header toggle */}
+        <button
+          type="button"
+          onClick={() => setAiOpen((o) => !o)}
+          aria-expanded={aiOpen}
+          className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-medium text-zinc-300 hover:text-white hover:bg-zinc-800/60 transition-colors"
+        >
+          <span className="flex items-center gap-2">
+            <Wand2 className="w-3.5 h-3.5 text-violet-400" />
+            Generate with AI
+          </span>
+          {aiOpen ? (
+            <ChevronUp className="w-3.5 h-3.5 text-zinc-500" />
+          ) : (
+            <ChevronDown className="w-3.5 h-3.5 text-zinc-500" />
+          )}
+        </button>
+
+        {/* Expandable body */}
+        {aiOpen && (
+          <div className="px-3 pb-3 space-y-2 border-t border-zinc-800">
+            <p className="text-[10px] text-zinc-500 pt-2">
+              Describe the song, mood, or style and AI will write full lyrics for you.
+            </p>
+
+            <textarea
+              value={aiPrompt}
+              onChange={(e) => setAiPrompt(e.target.value)}
+              placeholder="e.g. upbeat pop song about a summer road trip, chorus-heavy…"
+              rows={3}
+              disabled={isGenerating}
+              aria-label="AI lyric generation prompt"
+              className="w-full resize-none rounded-md border border-zinc-700 bg-zinc-800 px-3 py-2 text-xs text-zinc-100 placeholder:text-zinc-600 focus:outline-none focus:ring-1 focus:ring-violet-500 focus:border-transparent disabled:opacity-50"
+            />
+
+            {aiError && (
+              <p className="text-xs text-red-400">{aiError}</p>
+            )}
+
+            <Button
+              type="button"
+              onClick={handleAiGenerate}
+              disabled={isGenerating || !aiPrompt.trim()}
+              size="sm"
+              className="w-full gap-2 bg-violet-600 hover:bg-violet-700 text-white min-h-[44px] disabled:opacity-40"
+            >
+              {isGenerating ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Generating…
+                </>
+              ) : (
+                <>
+                  <Wand2 className="w-4 h-4" />
+                  Generate
+                </>
+              )}
+            </Button>
+          </div>
+        )}
+      </div>
 
       {/* Textarea */}
       <textarea
