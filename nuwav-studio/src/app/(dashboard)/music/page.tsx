@@ -3,8 +3,9 @@ import Link from "next/link";
 import { MusicSearch } from "@/components/music/MusicSearch";
 import { SongAnalyzer } from "@/components/music/SongAnalyzer";
 import { ImageSearch } from "@/components/music/ImageSearch";
+import { LyricEditor } from "@/components/music/LyricEditor";
 
-type Tab = "library" | "analyzer" | "images";
+type Tab = "library" | "analyzer" | "images" | "lyrics";
 
 export default async function MusicPage({
   searchParams,
@@ -13,7 +14,10 @@ export default async function MusicPage({
 }) {
   const { tab } = await searchParams;
   const activeTab: Tab =
-    tab === "analyzer" ? "analyzer" : tab === "images" ? "images" : "library";
+    tab === "analyzer" ? "analyzer"
+    : tab === "images" ? "images"
+    : tab === "lyrics" ? "lyrics"
+    : "library";
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 space-y-8">
@@ -57,6 +61,16 @@ export default async function MusicPage({
         >
           Visual Assets
         </Link>
+        <Link
+          href="/music?tab=lyrics"
+          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
+            activeTab === "lyrics"
+              ? "bg-background shadow-sm text-foreground"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Lyric Editor
+        </Link>
       </div>
 
       {/* Tab content */}
@@ -88,7 +102,7 @@ export default async function MusicPage({
             <SongAnalyzer />
           </Suspense>
         </div>
-      ) : (
+      ) : activeTab === "images" ? (
         <div className="space-y-4">
           <div className="rounded-lg border bg-sky-50/60 px-4 py-3 text-sm text-sky-800 space-y-1">
             <p className="font-medium">Royalty-free images for slides, thumbnails, and backgrounds</p>
@@ -99,6 +113,16 @@ export default async function MusicPage({
           </div>
           <Suspense fallback={null}>
             <ImageSearch />
+          </Suspense>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="rounded-lg border bg-violet-50/60 px-4 py-3 text-sm text-violet-800 space-y-1">
+            <p className="font-medium">Write and edit your song lyrics</p>
+            <p className="text-xs text-violet-700">Use section markers like <code className="bg-violet-100 px-1 rounded">[Verse 1]</code>, <code className="bg-violet-100 px-1 rounded">[Chorus]</code>, or <code className="bg-violet-100 px-1 rounded">[Bridge]</code> to organize your lyrics. Copy to clipboard when ready.</p>
+          </div>
+          <Suspense fallback={null}>
+            <LyricEditor />
           </Suspense>
         </div>
       )}
