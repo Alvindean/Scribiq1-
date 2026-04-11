@@ -122,7 +122,7 @@ const PLANS = [
 const FAQS = [
   {
     q: "Do I need any video editing experience?",
-    a: "Not at all. NuWav Studio handles the entire production pipeline — script, voice, animation, and rendering — automatically. If you can describe what you want to teach, you can publish a course.",
+    a: "Not at all. Soniq handles the entire production pipeline — script, voice, animation, and rendering — automatically. If you can describe what you want to teach, you can publish a course.",
   },
   {
     q: "Which AI models power the platform?",
@@ -155,7 +155,7 @@ const STEPS = [
   {
     num: "02",
     title: "AI generates everything",
-    body: "NuWav Studio writes the scripts, renders the videos, synthesizes the voiceover, and assembles the course portal automatically.",
+    body: "Soniq writes the scripts, renders the videos, synthesizes the voiceover, and assembles the course portal automatically.",
   },
   {
     num: "03",
@@ -307,7 +307,7 @@ export default function MarketingPage() {
           </h1>
 
           <p className="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Describe your course, let NuWav Studio generate the scripts, voiceover,
+            Describe your course, let Soniq generate the scripts, voiceover,
             videos, and sales page — then publish and sell in minutes.
           </p>
 
@@ -582,7 +582,7 @@ export default function MarketingPage() {
             </h2>
             <p className="text-zinc-400 max-w-md mx-auto">
               Still have questions?{" "}
-              <a href="mailto:hello@nuwavstudio.com" className="text-violet-400 hover:underline">
+              <a href="mailto:hello@soniq.app" className="text-violet-400 hover:underline">
                 Reach out to us
               </a>
               .
@@ -635,21 +635,21 @@ export default function MarketingPage() {
               </p>
               <div className="flex items-center gap-3">
                 <a
-                  href="https://twitter.com/nuwavstudio"
+                  href="https://twitter.com/soniqapp"
                   aria-label="Twitter / X"
                   className="text-zinc-500 hover:text-zinc-300 transition-colors"
                 >
                   <MessageCircle className="h-5 w-5" />
                 </a>
                 <a
-                  href="https://github.com/nuwavstudio"
+                  href="https://github.com/soniqapp"
                   aria-label="GitHub"
                   className="text-zinc-500 hover:text-zinc-300 transition-colors"
                 >
                   <Share2 className="h-5 w-5" />
                 </a>
                 <a
-                  href="mailto:hello@nuwavstudio.com"
+                  href="mailto:hello@soniq.app"
                   aria-label="Email"
                   className="text-zinc-500 hover:text-zinc-300 transition-colors"
                 >
@@ -717,7 +717,7 @@ export default function MarketingPage() {
           </div>
 
           <div className="border-t border-zinc-800 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-600">
-            <span>© {new Date().getFullYear()} NuWav Studio. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Soniq. All rights reserved.</span>
             <span>
               Built with Claude AI +{" "}
               <span className="text-violet-500">ElevenLabs</span>

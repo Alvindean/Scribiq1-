@@ -338,7 +338,7 @@ export default async function BillingPage() {
             </p>
           </div>
           <Button variant="outline" className="shrink-0" asChild>
-            <a href="mailto:support@nuwavstudio.com">Contact Sales</a>
+            <a href="mailto:support@soniq.app">Contact Sales</a>
           </Button>
         </CardContent>
       </Card>

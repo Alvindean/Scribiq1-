@@ -196,7 +196,7 @@ export default function AcceptInvitePage() {
         {/* Header */}
         <div className="text-center space-y-1">
           <div className="text-xl font-bold text-violet-600 tracking-tight">
-            NuWav Studio
+            Soniq
           </div>
           <h1 className="text-2xl font-bold">You&apos;ve been invited</h1>
           <p className="text-sm text-muted-foreground">

@@ -20,4 +20,4 @@ export const resend: Resend = new Proxy({} as Resend, {
 });
 
 export const FROM_EMAIL =
-  process.env.FROM_EMAIL ?? "NuWav Studio <onboarding@nuwavstudio.com>";
+  process.env.FROM_EMAIL ?? "Soniq <onboarding@soniq.app>";

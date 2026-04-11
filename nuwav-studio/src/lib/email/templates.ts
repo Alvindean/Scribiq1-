@@ -23,10 +23,10 @@ function htmlShell(content: string): string {
 <body>
   <div class="wrapper">
     <div class="card">
-      <div class="logo">NuWav Studio</div>
+      <div class="logo">Soniq</div>
       ${content}
     </div>
-    <p class="footer">&copy; ${new Date().getFullYear()} NuWav Studio. All rights reserved.</p>
+    <p class="footer">&copy; ${new Date().getFullYear()} Soniq. All rights reserved.</p>
   </div>
 </body>
 </html>`;
@@ -35,12 +35,12 @@ function htmlShell(content: string): string {
 export function welcomeEmailHtml(name: string): string {
   const displayName = name || "there";
   return htmlShell(`
-    <h1>Welcome to NuWav Studio, ${displayName}!</h1>
-    <p>We&rsquo;re thrilled to have you on board. NuWav Studio is your all-in-one platform for creating, producing, and distributing professional audio and video content.</p>
+    <h1>Welcome to Soniq, ${displayName}!</h1>
+    <p>We&rsquo;re thrilled to have you on board. Soniq is your all-in-one platform for creating, producing, and distributing professional audio and video content.</p>
     <p>Get started by exploring your dashboard &mdash; create your first project, invite collaborators, and bring your creative vision to life.</p>
-    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.nuwavstudio.com"}/dashboard" class="btn">Go to Dashboard</a>
+    <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.soniq.app"}/dashboard" class="btn">Go to Dashboard</a>
     <hr class="divider" />
-    <p class="expiry">Need help? Reply to this email or visit our <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.nuwavstudio.com"}/support" style="color:#7c3aed;text-decoration:none;">support center</a>.</p>
+    <p class="expiry">Need help? Reply to this email or visit our <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://app.soniq.app"}/support" style="color:#7c3aed;text-decoration:none;">support center</a>.</p>
   `);
 }
 
@@ -48,10 +48,10 @@ export function verificationEmailHtml(name: string, verifyUrl: string): string {
   const displayName = name || "there";
   return htmlShell(`
     <h1>Verify your email address</h1>
-    <p>Hi ${displayName}, thanks for signing up for NuWav Studio! Please verify your email address to activate your account and get started.</p>
+    <p>Hi ${displayName}, thanks for signing up for Soniq! Please verify your email address to activate your account and get started.</p>
     <a href="${verifyUrl}" class="btn">Verify Email</a>
     <hr class="divider" />
-    <p class="expiry">This link expires in <strong style="color:#a1a1aa">24 hours</strong>. If you did not create a NuWav Studio account, you can safely ignore this email.</p>
+    <p class="expiry">This link expires in <strong style="color:#a1a1aa">24 hours</strong>. If you did not create a Soniq account, you can safely ignore this email.</p>
   `);
 }
 
@@ -59,7 +59,7 @@ export function passwordResetEmailHtml(name: string, resetUrl: string): string {
   const displayName = name || "there";
   return htmlShell(`
     <h1>Reset your password</h1>
-    <p>Hi ${displayName}, we received a request to reset the password for your NuWav Studio account. Click the button below to choose a new password.</p>
+    <p>Hi ${displayName}, we received a request to reset the password for your Soniq account. Click the button below to choose a new password.</p>
     <a href="${resetUrl}" class="btn">Reset Password</a>
     <hr class="divider" />
     <p class="expiry">This link expires in <strong style="color:#a1a1aa">1 hour</strong>. If you did not request a password reset, you can safely ignore this email &mdash; your password will not change.</p>
@@ -73,7 +73,7 @@ export function inviteEmailHtml(
 ): string {
   return htmlShell(`
     <h1>You&rsquo;ve been invited to ${orgName}</h1>
-    <p><strong style="color:#ffffff">${inviterName}</strong> has invited you to collaborate on <strong style="color:#ffffff">${orgName}</strong> in NuWav Studio.</p>
+    <p><strong style="color:#ffffff">${inviterName}</strong> has invited you to collaborate on <strong style="color:#ffffff">${orgName}</strong> in Soniq.</p>
     <p>Accept the invitation to join the team and start collaborating on projects together.</p>
     <a href="${inviteUrl}" class="btn">Accept Invitation</a>
     <hr class="divider" />

@@ -54,7 +54,7 @@ export function Sidebar({ onClose }: SidebarProps = {}) {
           <Waves className="h-5 w-5 text-white" />
         </div>
         <span className="font-bold text-base">
-          NuWav<span className="text-violet-600">Studio</span>
+          Soniq
         </span>
       </div>
 

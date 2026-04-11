@@ -34,7 +34,7 @@ const STAGES: StageInfo[] = [
 const STAGE_ORDER: GenerationStage[] = ["outline", "scripts", "voiceover", "complete"];
 
 const TIPS = [
-  "NuWav AI writes scripts optimized for engagement and retention.",
+  "Soniq AI writes scripts optimized for engagement and retention.",
   "Your voiceover is generated using human-like ElevenLabs voices.",
   "Each lesson script is tailored to your target audience's language level.",
   "You can edit any script in the editor before rendering video.",

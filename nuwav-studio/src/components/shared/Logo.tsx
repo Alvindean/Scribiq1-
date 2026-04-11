@@ -18,7 +18,7 @@ export function Logo({ className, showText = true, size = "md" }: LogoProps) {
       </div>
       {showText && (
         <span className={cn("font-bold tracking-tight", textSize)}>
-          NuWav<span className="text-violet-600">Studio</span>
+          So<span className="text-violet-500">niq</span>
         </span>
       )}
     </div>

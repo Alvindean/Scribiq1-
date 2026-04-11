@@ -112,7 +112,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   // Send invite email — fall back to console log if Resend is not configured
   const APP_URL =
-    process.env.NEXT_PUBLIC_APP_URL ?? "https://app.nuwavstudio.com";
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://app.soniq.app";
   const inviteUrl = `${APP_URL}/invite/${token}`;
   const inviterName = profile.name ?? session.user.email ?? "A team member";
 

@@ -82,9 +82,9 @@ function IllustrationTips() {
 const STEPS = [
   {
     illustration: <IllustrationStudio />,
-    title: "Welcome to NuWav Studio",
+    title: "Welcome to Soniq",
     description:
-      "NuWav Studio is your all-in-one AI-powered platform for building online courses, video sales letters, and music-backed content — from script to published, in minutes.",
+      "Soniq is your all-in-one AI-powered platform for building online courses, video sales letters, and music-backed content — from script to published, in minutes.",
     tip: null,
   },
   {

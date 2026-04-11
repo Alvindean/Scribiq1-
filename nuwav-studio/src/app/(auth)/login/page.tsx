@@ -47,7 +47,7 @@ export default function LoginPage() {
           <div className="text-center">
             <h1 className="text-2xl font-bold">Welcome back</h1>
             <p className="text-sm text-muted-foreground mt-1">
-              Sign in to your NuWav Studio account
+              Sign in to your Soniq account
             </p>
           </div>
         </div>

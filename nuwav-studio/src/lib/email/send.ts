@@ -7,7 +7,7 @@ import {
 } from "./templates";
 
 const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? "https://app.nuwavstudio.com";
+  process.env.NEXT_PUBLIC_APP_URL ?? "https://app.soniq.app";
 
 export async function sendWelcomeEmail(
   to: string,
@@ -16,7 +16,7 @@ export async function sendWelcomeEmail(
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: "Welcome to NuWav Studio!",
+    subject: "Welcome to Soniq!",
     html: welcomeEmailHtml(name),
   });
 
@@ -35,7 +35,7 @@ export async function sendVerificationEmail(
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: "Verify your NuWav Studio email address",
+    subject: "Verify your Soniq email address",
     html: verificationEmailHtml(name, verifyUrl),
   });
 
@@ -54,7 +54,7 @@ export async function sendPasswordResetEmail(
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: "Reset your NuWav Studio password",
+    subject: "Reset your Soniq password",
     html: passwordResetEmailHtml(name, resetUrl),
   });
 
@@ -72,7 +72,7 @@ export async function sendInviteEmail(
   const { error } = await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: `You've been invited to join ${orgName} on NuWav Studio`,
+    subject: `You've been invited to join ${orgName} on Soniq`,
     html: inviteEmailHtml(inviterName, orgName, inviteUrl),
   });
 

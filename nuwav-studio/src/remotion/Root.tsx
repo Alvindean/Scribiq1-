@@ -6,13 +6,13 @@ import { VSLVideo } from "./compositions/VSLVideo";
 const DEFAULT_BRAND = {
   primaryColor: "#6366f1",
   backgroundColor: "#0d0d1a",
-  companyName: "NuWav Studio",
+  companyName: "Soniq",
 };
 
 const DEFAULT_VSL_SLIDES = [
   {
     type: "title" as const,
-    title: "Welcome to NuWav Studio",
+    title: "Welcome to Soniq",
     subtitle: "AI-powered video creation",
     durationInFrames: 90,
   },
@@ -26,7 +26,7 @@ const DEFAULT_VSL_SLIDES = [
   {
     type: "cta" as const,
     ctaText: "Get Started Today",
-    subText: "Join thousands of creators already using NuWav Studio",
+    subText: "Join thousands of creators already using Soniq",
     durationInFrames: 90,
   },
 ];
