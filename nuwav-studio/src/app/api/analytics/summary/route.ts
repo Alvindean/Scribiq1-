@@ -43,86 +43,91 @@ export async function GET(request: NextRequest): Promise<Response> {
     return Response.json({ error: "Project not found or access denied" }, { status: 404 });
   }
 
-  // Time window
-  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+  try {
+    // Time window
+    const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
-  // Fetch all events for the project in the window
-  const events = await db
-    .select({
-      event: analyticsEvents.event,
-      lessonId: analyticsEvents.lessonId,
-      studentEmail: analyticsEvents.studentEmail,
-      createdAt: analyticsEvents.createdAt,
-    })
-    .from(analyticsEvents)
-    .where(
-      and(
-        eq(analyticsEvents.projectId, projectId),
-        gte(analyticsEvents.createdAt, since)
-      )
-    );
+    // Fetch all events for the project in the window
+    const events = await db
+      .select({
+        event: analyticsEvents.event,
+        lessonId: analyticsEvents.lessonId,
+        studentEmail: analyticsEvents.studentEmail,
+        createdAt: analyticsEvents.createdAt,
+      })
+      .from(analyticsEvents)
+      .where(
+        and(
+          eq(analyticsEvents.projectId, projectId),
+          gte(analyticsEvents.createdAt, since)
+        )
+      );
 
-  // Aggregate top-level counts
-  let totalViews = 0;
-  let totalCompletions = 0;
-  let enrollments = 0;
-  const studentEmails = new Set<string>();
-  const lessonViews = new Map<string, number>();
-  const lessonCompletions = new Map<string, number>();
-  const viewsByDate = new Map<string, number>();
+    // Aggregate top-level counts
+    let totalViews = 0;
+    let totalCompletions = 0;
+    let enrollments = 0;
+    const studentEmails = new Set<string>();
+    const lessonViews = new Map<string, number>();
+    const lessonCompletions = new Map<string, number>();
+    const viewsByDate = new Map<string, number>();
 
-  for (const ev of events) {
-    // Track unique students
-    if (ev.studentEmail) {
-      studentEmails.add(ev.studentEmail);
+    for (const ev of events) {
+      // Track unique students
+      if (ev.studentEmail) {
+        studentEmails.add(ev.studentEmail);
+      }
+
+      if (ev.event === "lesson_view") {
+        totalViews++;
+        if (ev.lessonId) {
+          lessonViews.set(ev.lessonId, (lessonViews.get(ev.lessonId) ?? 0) + 1);
+        }
+        // Daily aggregation
+        if (ev.createdAt) {
+          const dateKey = ev.createdAt.toISOString().slice(0, 10);
+          viewsByDate.set(dateKey, (viewsByDate.get(dateKey) ?? 0) + 1);
+        }
+      } else if (ev.event === "lesson_complete") {
+        totalCompletions++;
+        if (ev.lessonId) {
+          lessonCompletions.set(ev.lessonId, (lessonCompletions.get(ev.lessonId) ?? 0) + 1);
+        }
+      } else if (ev.event === "enrollment") {
+        enrollments++;
+      }
     }
 
-    if (ev.event === "lesson_view") {
-      totalViews++;
-      if (ev.lessonId) {
-        lessonViews.set(ev.lessonId, (lessonViews.get(ev.lessonId) ?? 0) + 1);
-      }
-      // Daily aggregation
-      if (ev.createdAt) {
-        const dateKey = ev.createdAt.toISOString().slice(0, 10);
-        viewsByDate.set(dateKey, (viewsByDate.get(dateKey) ?? 0) + 1);
-      }
-    } else if (ev.event === "lesson_complete") {
-      totalCompletions++;
-      if (ev.lessonId) {
-        lessonCompletions.set(ev.lessonId, (lessonCompletions.get(ev.lessonId) ?? 0) + 1);
-      }
-    } else if (ev.event === "enrollment") {
-      enrollments++;
-    }
-  }
-
-  // Top lessons — union of all lesson IDs seen, sorted by views desc
-  const allLessonIds = new Set([...lessonViews.keys(), ...lessonCompletions.keys()]);
-  const topLessons = [...allLessonIds]
-    .map((lessonId) => ({
-      lessonId,
-      views: lessonViews.get(lessonId) ?? 0,
-      completions: lessonCompletions.get(lessonId) ?? 0,
-    }))
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 10);
-
-  // Daily views — fill in every day in the range (0 if no views)
-  const dailyViews: Array<{ date: string; views: number }> = [];
-  for (let d = days - 1; d >= 0; d--) {
-    const date = new Date(Date.now() - d * 24 * 60 * 60 * 1000)
-      .toISOString()
+    // Top lessons — union of all lesson IDs seen, sorted by views desc
+    const allLessonIds = new Set([...lessonViews.keys(), ...lessonCompletions.keys()]);
+    const topLessons = [...allLessonIds]
+      .map((lessonId) => ({
+        lessonId,
+        views: lessonViews.get(lessonId) ?? 0,
+        completions: lessonCompletions.get(lessonId) ?? 0,
+      }))
+      .sort((a, b) => b.views - a.views)
       .slice(0, 10);
-    dailyViews.push({ date, views: viewsByDate.get(date) ?? 0 });
-  }
 
-  return Response.json({
-    totalViews,
-    totalCompletions,
-    enrollments,
-    uniqueStudents: studentEmails.size,
-    topLessons,
-    dailyViews,
-  });
+    // Daily views — fill in every day in the range (0 if no views)
+    const dailyViews: Array<{ date: string; views: number }> = [];
+    for (let d = days - 1; d >= 0; d--) {
+      const date = new Date(Date.now() - d * 24 * 60 * 60 * 1000)
+        .toISOString()
+        .slice(0, 10);
+      dailyViews.push({ date, views: viewsByDate.get(date) ?? 0 });
+    }
+
+    return Response.json({
+      totalViews,
+      totalCompletions,
+      enrollments,
+      uniqueStudents: studentEmails.size,
+      topLessons,
+      dailyViews,
+    });
+  } catch (err) {
+    console.error("[GET /api/analytics/summary]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }
