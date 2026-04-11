@@ -2,8 +2,8 @@ import { NextRequest } from "next/server";
 import Stripe from "stripe";
 import { stripe } from "@/lib/stripe/client";
 import { db } from "@/lib/db";
-import { organizations } from "@/lib/db/schema";
-import { eq } from "drizzle-orm";
+import { organizations, enrollments, publishedPages } from "@/lib/db/schema";
+import { and, eq } from "drizzle-orm";
 
 type SubscriptionStatus =
   | "active"
@@ -128,6 +128,99 @@ export async function POST(request: NextRequest): Promise<Response> {
         }
 
         console.log(`checkout.session.completed: org=${orgId ?? "(by customerId)"} plan=${plan}`);
+
+        // ---------------------------------------------------------------- //
+        // Course enrollment: if metadata.slug is set this is a course sale.
+        // Look up the checkout page by slug, then find the course_portal page
+        // for the same project, and insert an enrollment record.
+        // ---------------------------------------------------------------- //
+        const checkoutSlug = session.metadata?.slug ?? null;
+        if (checkoutSlug) {
+          try {
+            const studentEmail =
+              session.customer_email ??
+              session.customer_details?.email ??
+              null;
+
+            if (studentEmail) {
+              // Find the checkout published page to get the projectId
+              const [checkoutPage] = await db
+                .select({ projectId: publishedPages.projectId })
+                .from(publishedPages)
+                .where(
+                  and(
+                    eq(publishedPages.slug, checkoutSlug),
+                    eq(publishedPages.pageType, "checkout")
+                  )
+                )
+                .limit(1);
+
+              if (checkoutPage) {
+                // Find the course_portal page for this project to get courseSlug
+                const [portalPage] = await db
+                  .select({ slug: publishedPages.slug })
+                  .from(publishedPages)
+                  .where(
+                    and(
+                      eq(publishedPages.projectId, checkoutPage.projectId),
+                      eq(publishedPages.pageType, "course_portal")
+                    )
+                  )
+                  .limit(1);
+
+                if (portalPage) {
+                  const courseSlug = portalPage.slug;
+                  const normalizedEmail = studentEmail.toLowerCase().trim();
+
+                  // Upsert-style: only insert if not already enrolled
+                  const [existing] = await db
+                    .select({ id: enrollments.id })
+                    .from(enrollments)
+                    .where(
+                      and(
+                        eq(enrollments.courseSlug, courseSlug),
+                        eq(enrollments.studentEmail, normalizedEmail)
+                      )
+                    )
+                    .limit(1);
+
+                  if (!existing) {
+                    await db.insert(enrollments).values({
+                      courseSlug,
+                      projectId: checkoutPage.projectId,
+                      studentEmail: normalizedEmail,
+                      studentName: session.metadata?.buyer_name ?? null,
+                      stripeSessionId: session.id,
+                    });
+                    console.log(
+                      `checkout.session.completed: enrolled ${normalizedEmail} in course "${courseSlug}" (session ${session.id})`
+                    );
+                  } else {
+                    console.log(
+                      `checkout.session.completed: ${normalizedEmail} already enrolled in course "${courseSlug}" — skipped`
+                    );
+                  }
+                } else {
+                  console.warn(
+                    `checkout.session.completed: no course_portal page found for project ${checkoutPage.projectId} (checkout slug: ${checkoutSlug})`
+                  );
+                }
+              } else {
+                console.warn(
+                  `checkout.session.completed: no checkout page found for slug "${checkoutSlug}"`
+                );
+              }
+            } else {
+              console.warn(
+                `checkout.session.completed: no customer email on session ${session.id} — skipping enrollment`
+              );
+            }
+          } catch (enrollErr) {
+            // Don't fail the webhook response — log and continue
+            console.error("checkout.session.completed: enrollment error", enrollErr);
+          }
+        }
+
         break;
       }
 

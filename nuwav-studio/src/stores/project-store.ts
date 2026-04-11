@@ -11,6 +11,13 @@ interface ProjectStore {
   updateProject: (updates: Partial<Project>) => void;
   reorderLessons: (moduleId: string, orderedIds: string[]) => void;
   reorderModules: (orderedIds: string[]) => void;
+  // CRUD helpers
+  addModule: (mod: Module & { lessons: Lesson[] }) => void;
+  removeModule: (moduleId: string) => void;
+  renameModule: (moduleId: string, title: string) => void;
+  addLesson: (moduleId: string, lesson: Lesson) => void;
+  removeLesson: (lessonId: string) => void;
+  renameLesson: (lessonId: string, title: string) => void;
 }
 
 export const useProjectStore = create<ProjectStore>((set) => ({
@@ -58,4 +65,46 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         .map((m, idx) => ({ ...m, order: idx }));
       return { modules: reordered };
     }),
+
+  addModule: (mod) =>
+    set((state) => ({ modules: [...state.modules, mod] })),
+
+  removeModule: (moduleId) =>
+    set((state) => ({
+      modules: state.modules.filter((m) => m.id !== moduleId),
+    })),
+
+  renameModule: (moduleId, title) =>
+    set((state) => ({
+      modules: state.modules.map((m) =>
+        m.id === moduleId ? { ...m, title } : m
+      ),
+    })),
+
+  addLesson: (moduleId, lesson) =>
+    set((state) => ({
+      modules: state.modules.map((mod) =>
+        mod.id === moduleId
+          ? { ...mod, lessons: [...mod.lessons, lesson] }
+          : mod
+      ),
+    })),
+
+  removeLesson: (lessonId) =>
+    set((state) => ({
+      modules: state.modules.map((mod) => ({
+        ...mod,
+        lessons: mod.lessons.filter((l) => l.id !== lessonId),
+      })),
+    })),
+
+  renameLesson: (lessonId, title) =>
+    set((state) => ({
+      modules: state.modules.map((mod) => ({
+        ...mod,
+        lessons: mod.lessons.map((l) =>
+          l.id === lessonId ? { ...l, title } : l
+        ),
+      })),
+    })),
 }));

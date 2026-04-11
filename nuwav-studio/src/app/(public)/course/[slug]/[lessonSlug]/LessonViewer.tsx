@@ -32,6 +32,7 @@ export interface ModuleItem {
 }
 
 export interface LessonViewerProps {
+  projectId: string;
   courseSlug: string;
   courseTitle: string;
   moduleTitle: string;
@@ -149,10 +150,64 @@ function useProgress(courseSlug: string) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Analytics                                                            */
+/* ------------------------------------------------------------------ */
+
+function fireAnalyticsEvent(payload: {
+  projectId: string;
+  courseSlug: string;
+  lessonId: string;
+  event: string;
+  studentEmail?: string | null;
+}) {
+  // Fire-and-forget — never blocks the UI
+  fetch("/api/analytics/event", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      projectId: payload.projectId,
+      courseSlug: payload.courseSlug,
+      lessonId: payload.lessonId,
+      event: payload.event,
+      studentEmail: payload.studentEmail ?? undefined,
+    }),
+  }).catch(() => {
+    // Silently ignore network errors
+  });
+}
+
+function useAnalytics(projectId: string, courseSlug: string, lessonId: string) {
+  useEffect(() => {
+    let studentEmail: string | null = null;
+    try {
+      studentEmail = localStorage.getItem("soniq:student-email");
+    } catch {
+      // ignore
+    }
+    fireAnalyticsEvent({ projectId, courseSlug, lessonId, event: "lesson_view", studentEmail });
+    // Only fire on mount (lesson change) — intentionally no re-fire on prop identity changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectId, courseSlug, lessonId]);
+
+  const trackComplete = useCallback(() => {
+    let studentEmail: string | null = null;
+    try {
+      studentEmail = localStorage.getItem("soniq:student-email");
+    } catch {
+      // ignore
+    }
+    fireAnalyticsEvent({ projectId, courseSlug, lessonId, event: "lesson_complete", studentEmail });
+  }, [projectId, courseSlug, lessonId]);
+
+  return { trackComplete };
+}
+
+/* ------------------------------------------------------------------ */
 /* Main component                                                       */
 /* ------------------------------------------------------------------ */
 
 export function LessonViewer({
+  projectId,
   courseSlug,
   courseTitle,
   moduleTitle,
@@ -166,6 +221,7 @@ export function LessonViewer({
 }: LessonViewerProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { completed, markComplete, unmarkComplete } = useProgress(courseSlug);
+  const { trackComplete } = useAnalytics(projectId, courseSlug, lesson.id);
 
   const isDone = completed.has(lesson.id);
 
@@ -351,7 +407,14 @@ export function LessonViewer({
                 "gap-2",
                 isDone && "text-green-700 dark:text-green-400 border-green-300 dark:border-green-700 bg-green-50 dark:bg-green-950/40 hover:bg-green-100 dark:hover:bg-green-950/60"
               )}
-              onClick={() => (isDone ? unmarkComplete(lesson.id) : markComplete(lesson.id))}
+              onClick={() => {
+                if (isDone) {
+                  unmarkComplete(lesson.id);
+                } else {
+                  markComplete(lesson.id);
+                  trackComplete();
+                }
+              }}
             >
               {isDone ? (
                 <CheckCircle className="h-4 w-4 text-green-600" />

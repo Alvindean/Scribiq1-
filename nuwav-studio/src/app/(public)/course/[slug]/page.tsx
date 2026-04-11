@@ -17,14 +17,23 @@ import {
   Users,
   CalendarDays,
   Unlock,
+  Lock,
   ChevronDown,
   ArrowRight,
+  DollarSign,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { formatDuration, formatMinutes } from "@/lib/utils/duration";
 import type { Lesson } from "@/types/project";
 import CourseProgress from "./CourseProgress";
+
+interface CheckoutPageContent {
+  price?: string;
+  product_name?: string;
+  price_cents?: number;
+  currency?: string;
+}
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -162,7 +171,7 @@ export default async function CoursePortalPage({ params }: Props) {
 
   const content = page.content as CoursePortalContent;
 
-  const checkoutSlug = content.checkout_slug ?? null;
+  const checkoutSlugFromContent = content.checkout_slug ?? null;
   const instructorName =
     content.instructor_name ?? org?.name ?? null;
   const description =
@@ -173,6 +182,38 @@ export default async function CoursePortalPage({ params }: Props) {
 
   // Last updated: prefer page.updatedAt, fall back to project.updatedAt
   const lastUpdated = page.updatedAt ?? project.updatedAt ?? null;
+
+  // Look up checkout page for this project (pageType: "checkout")
+  const [checkoutPage] = await db
+    .select({
+      slug: publishedPages.slug,
+      content: publishedPages.content,
+    })
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.projectId, project.id),
+        eq(publishedPages.pageType, "checkout"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
+
+  // Prefer checkout page found via DB; fall back to content.checkout_slug
+  const checkoutSlug = checkoutPage?.slug ?? checkoutSlugFromContent ?? null;
+  const isPaidCourse = !!checkoutSlug;
+
+  // Derive display price from the checkout page content
+  const checkoutContent = (checkoutPage?.content ?? {}) as CheckoutPageContent;
+  const priceCents = checkoutContent.price_cents ?? 0;
+  const displayPrice =
+    checkoutContent.price ??
+    (priceCents > 0
+      ? new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: checkoutContent.currency ?? "usd",
+        }).format(priceCents / 100)
+      : null);
 
   return (
     <div className="min-h-screen bg-background">
@@ -191,9 +232,22 @@ export default async function CoursePortalPage({ params }: Props) {
 
         {/* Course hero */}
         <div className="mb-8">
-          <Badge variant="secondary" className="mb-3 capitalize">
-            {project.niche ?? "Online Course"}
-          </Badge>
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            <Badge variant="secondary" className="capitalize">
+              {project.niche ?? "Online Course"}
+            </Badge>
+            {isPaidCourse ? (
+              <Badge className="bg-violet-600 text-white gap-1">
+                <Lock className="h-3 w-3" />
+                Paid Course
+              </Badge>
+            ) : (
+              <Badge variant="outline" className="text-green-700 border-green-300 gap-1">
+                <Unlock className="h-3 w-3" />
+                Free Course
+              </Badge>
+            )}
+          </div>
 
           <h1 className="text-2xl sm:text-3xl font-bold mb-3 leading-tight">
             {project.title}
@@ -239,7 +293,7 @@ export default async function CoursePortalPage({ params }: Props) {
         </div>
 
         {/* CTA — enroll or start */}
-        {checkoutSlug ? (
+        {isPaidCourse ? (
           <div className="mb-8 flex flex-col sm:flex-row gap-3">
             <Button
               asChild
@@ -247,7 +301,8 @@ export default async function CoursePortalPage({ params }: Props) {
               className="bg-violet-600 hover:bg-violet-700 text-white font-semibold"
             >
               <Link href={`/checkout/${checkoutSlug}`}>
-                Enroll Now
+                <DollarSign className="mr-1 h-4 w-4" />
+                {displayPrice ? `Enroll Now — ${displayPrice}` : "Enroll Now"}
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -303,29 +358,38 @@ export default async function CoursePortalPage({ params }: Props) {
               </summary>
 
               <div className="divide-y">
-                {module.lessons.map((lesson) => (
-                  <Link
-                    key={lesson.id}
-                    href={`/course/${slug}/${lesson.id}`}
-                    className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group/lesson"
-                  >
-                    <PlayCircle className="h-5 w-5 text-violet-500 shrink-0" />
-                    <span className="flex-1 text-sm font-medium group-hover/lesson:text-violet-600 dark:group-hover/lesson:text-violet-400 truncate">
-                      {lesson.title}
-                    </span>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {(lesson as unknown as Lesson).durationSeconds ? (
-                        <span className="text-xs text-muted-foreground">
-                          {formatDuration(
-                            (lesson as unknown as Lesson).durationSeconds!
-                          )}
-                        </span>
-                      ) : null}
-                      {/* Lock icon placeholder for future enrollment gating — shows unlocked for now */}
-                      <Unlock className="h-3.5 w-3.5 text-muted-foreground/50" />
-                    </div>
-                  </Link>
-                ))}
+                {module.lessons.map((lesson) => {
+                  const globalIdx = allLessons.findIndex((l) => l.id === lesson.id);
+                  const isLocked = isPaidCourse && globalIdx > 0;
+                  return (
+                    <Link
+                      key={lesson.id}
+                      href={`/course/${slug}/${lesson.id}`}
+                      className="flex items-center gap-3 px-4 py-3 hover:bg-muted/30 transition-colors group/lesson"
+                    >
+                      <PlayCircle className="h-5 w-5 text-violet-500 shrink-0" />
+                      <span className="flex-1 text-sm font-medium group-hover/lesson:text-violet-600 dark:group-hover/lesson:text-violet-400 truncate">
+                        {lesson.title}
+                      </span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {(lesson as unknown as Lesson).durationSeconds ? (
+                          <span className="text-xs text-muted-foreground">
+                            {formatDuration(
+                              (lesson as unknown as Lesson).durationSeconds!
+                            )}
+                          </span>
+                        ) : null}
+                        {globalIdx === 0 && isPaidCourse ? (
+                          <span className="text-xs text-green-600 font-medium">Free preview</span>
+                        ) : isLocked ? (
+                          <Lock className="h-3.5 w-3.5 text-muted-foreground" />
+                        ) : (
+                          <Unlock className="h-3.5 w-3.5 text-muted-foreground/50" />
+                        )}
+                      </div>
+                    </Link>
+                  );
+                })}
               </div>
             </details>
           ))}
@@ -339,14 +403,15 @@ export default async function CoursePortalPage({ params }: Props) {
               {allLessons.length} lessons ·{" "}
               {totalDuration > 0 ? formatMinutes(totalDuration) : "Self-paced"}
             </p>
-            {checkoutSlug ? (
+            {isPaidCourse ? (
               <Button
                 asChild
                 size="lg"
                 className="bg-violet-600 hover:bg-violet-700 text-white font-semibold"
               >
                 <Link href={`/checkout/${checkoutSlug}`}>
-                  Enroll Now
+                  <DollarSign className="mr-1 h-4 w-4" />
+                  {displayPrice ? `Enroll Now — ${displayPrice}` : "Enroll Now"}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>

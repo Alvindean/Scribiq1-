@@ -114,6 +114,7 @@ export default async function LessonPage({ params }: Props) {
 
   return (
     <LessonViewer
+      projectId={project.id}
       courseSlug={slug}
       courseTitle={project.title}
       moduleTitle={currentModule?.title ?? ""}

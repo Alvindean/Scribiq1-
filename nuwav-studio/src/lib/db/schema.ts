@@ -207,6 +207,102 @@ export const templates = pgTable("templates", {
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
 });
 
+export const enrollments = pgTable("enrollments", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  courseSlug: text("course_slug").notNull(),
+  projectId: uuid("project_id").notNull(),
+  studentEmail: text("student_email").notNull(),
+  studentName: text("student_name"),
+  stripeSessionId: text("stripe_session_id"),
+  enrolledAt: timestamp("enrolled_at", { withTimezone: true }).defaultNow(),
+});
+
+/*
+ * SQL migration required to create the enrollments table:
+ *
+ * CREATE TABLE IF NOT EXISTS enrollments (
+ *   id             uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   course_slug    text        NOT NULL,
+ *   project_id     uuid        NOT NULL,
+ *   student_email  text        NOT NULL,
+ *   student_name   text,
+ *   stripe_session_id text,
+ *   enrolled_at    timestamptz DEFAULT now()
+ * );
+ *
+ * CREATE INDEX IF NOT EXISTS idx_enrollments_email_slug
+ *   ON enrollments (student_email, course_slug);
+ */
+
+export const analyticsEvents = pgTable("analytics_events", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  projectId: uuid("project_id").notNull(),
+  courseSlug: text("course_slug"),
+  lessonId: uuid("lesson_id"),
+  event: text("event").notNull(), // "lesson_view" | "lesson_complete" | "course_view" | "enrollment"
+  studentEmail: text("student_email"),
+  metadata: jsonb("metadata"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+/*
+ * SQL migration required to create the analytics_events table:
+ *
+ * CREATE TABLE IF NOT EXISTS analytics_events (
+ *   id             uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   project_id     uuid        NOT NULL,
+ *   course_slug    text,
+ *   lesson_id      uuid,
+ *   event          text        NOT NULL,
+ *   student_email  text,
+ *   metadata       jsonb,
+ *   created_at     timestamptz DEFAULT now()
+ * );
+ *
+ * CREATE INDEX IF NOT EXISTS idx_analytics_events_project_id
+ *   ON analytics_events (project_id);
+ *
+ * CREATE INDEX IF NOT EXISTS idx_analytics_events_created_at
+ *   ON analytics_events (created_at);
+ */
+
+export const invitations = pgTable("invitations", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orgId: uuid("org_id").notNull(),
+  email: text("email").notNull(),
+  role: text("role")
+    .$type<"member" | "admin">()
+    .default("member")
+    .notNull(),
+  token: text("token").notNull().unique(),
+  invitedBy: uuid("invited_by").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  acceptedAt: timestamp("accepted_at", { withTimezone: true }),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
+});
+
+export type Invitation = typeof invitations.$inferSelect;
+
+/*
+ * SQL migration required to create the invitations table:
+ *
+ * CREATE TABLE IF NOT EXISTS invitations (
+ *   id           uuid        PRIMARY KEY DEFAULT gen_random_uuid(),
+ *   org_id       uuid        NOT NULL,
+ *   email        text        NOT NULL,
+ *   role         text        NOT NULL DEFAULT 'member',
+ *   token        text        NOT NULL UNIQUE,
+ *   invited_by   uuid        NOT NULL,
+ *   expires_at   timestamptz NOT NULL,
+ *   accepted_at  timestamptz,
+ *   created_at   timestamptz DEFAULT now()
+ * );
+ *
+ * CREATE INDEX IF NOT EXISTS idx_invitations_org_id   ON invitations (org_id);
+ * CREATE INDEX IF NOT EXISTS idx_invitations_email    ON invitations (email);
+ * CREATE INDEX IF NOT EXISTS idx_invitations_token    ON invitations (token);
+ */
+
 export const passwordResetTokens = pgTable("password_reset_tokens", {
   id: uuid("id").primaryKey().defaultRandom(),
   userId: uuid("user_id").notNull(),
