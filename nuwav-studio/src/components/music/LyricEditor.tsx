@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { copyToClipboard } from "@/lib/clipboard";
 
 function countWords(text: string): number {
-  return text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+  return text.trim() === "" ? 0 : text.trim().split(/[\s\u00A0\u200B\u2000-\u200A\u202F\u205F\u3000]+/).length;
 }
 
 export function LyricEditor() {
@@ -75,7 +75,7 @@ export function LyricEditor() {
 
   const charCount = lyrics.length;
   const wordCount = countWords(lyrics);
-  const lineCount = lyrics === "" ? 0 : lyrics.split("\n").length;
+  const lineCount = lyrics === "" ? 0 : lyrics.split("\n").filter(l => l.trim() !== "").length;
 
   return (
     <div className="space-y-4">
