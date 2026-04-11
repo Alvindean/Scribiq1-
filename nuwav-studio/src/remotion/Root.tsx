@@ -9,7 +9,7 @@ const DEFAULT_BRAND = {
   companyName: "NuWav Studio",
 };
 
-const DEFAULT_SLIDES = [
+const DEFAULT_VSL_SLIDES = [
   {
     type: "title" as const,
     title: "Welcome to NuWav Studio",
@@ -31,27 +31,26 @@ const DEFAULT_SLIDES = [
   },
 ];
 
-const TOTAL_DEFAULT_FRAMES = DEFAULT_SLIDES.reduce(
+const TOTAL_VSL_FRAMES = DEFAULT_VSL_SLIDES.reduce(
   (sum, s) => sum + s.durationInFrames,
   0
 );
 
-export const Root: React.FC = () => {
+export const RemotionRoot: React.FC = () => {
   return (
     <>
       <Composition
         id="LessonVideo"
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         component={LessonVideo as unknown as React.ComponentType<Record<string, unknown>>}
-        durationInFrames={TOTAL_DEFAULT_FRAMES}
+        durationInFrames={300}
         fps={30}
         width={1920}
         height={1080}
         defaultProps={{
-          title: "My Lesson",
-          slides: DEFAULT_SLIDES,
-          voiceoverUrl: undefined,
-          brandSettings: DEFAULT_BRAND,
+          title: "Lesson",
+          script: "",
+          modules: "",
         }}
       />
 
@@ -59,13 +58,13 @@ export const Root: React.FC = () => {
         id="VSLVideo"
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         component={VSLVideo as unknown as React.ComponentType<Record<string, unknown>>}
-        durationInFrames={TOTAL_DEFAULT_FRAMES}
+        durationInFrames={TOTAL_VSL_FRAMES}
         fps={30}
         width={1920}
         height={1080}
         defaultProps={{
           title: "My VSL",
-          slides: DEFAULT_SLIDES,
+          slides: DEFAULT_VSL_SLIDES,
           voiceoverUrl: undefined,
           brandSettings: DEFAULT_BRAND,
           countdownAtSeconds: 30,
@@ -74,3 +73,6 @@ export const Root: React.FC = () => {
     </>
   );
 };
+
+/** @deprecated Use RemotionRoot */
+export const Root = RemotionRoot;

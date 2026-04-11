@@ -28,66 +28,24 @@ function formatDuration(seconds: number | null): string {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-/** Build minimal Remotion slide data from a lesson for in-editor preview. */
+/** Estimate total Remotion frames from a script string (5 s / slide at 30fps). */
+function estimateTotalFrames(script: string): number {
+  const FRAMES_PER_SLIDE = 150;
+  // 1 title + content slides (~200 chars each) + 1 outro
+  const contentSlides = Math.max(1, Math.ceil(script.length / 200));
+  return (1 + contentSlides + 1) * FRAMES_PER_SLIDE;
+}
+
+/** Build LessonVideoProps for in-editor preview from a lesson. */
 function buildPreviewProps(
   title: string,
   script: string | null,
-  durationSeconds: number | null,
-  primaryColor: string,
-  companyName: string
 ): LessonVideoProps {
-  const fps = 30;
-  const scriptSeconds = Math.max(30, durationSeconds ?? 120);
-
-  const slides: LessonVideoProps["slides"] = [
-    {
-      type: "title",
-      title,
-      durationInFrames: 90,
-    },
-  ];
-
-  if (script) {
-    // Show up to 300 chars as body; the rest as a second content slide
-    const first = script.slice(0, 300);
-    const rest = script.length > 300 ? script.slice(300, 600) : null;
-
-    slides.push({
-      type: "content",
-      heading: title,
-      body: first,
-      durationInFrames: Math.round((scriptSeconds * fps) / (rest ? 2 : 1)),
-    });
-
-    if (rest) {
-      slides.push({
-        type: "content",
-        heading: "Continued",
-        body: rest,
-        durationInFrames: Math.round((scriptSeconds * fps) / 2),
-      });
-    }
-  } else {
-    slides.push({
-      type: "content",
-      heading: title,
-      body: "No script yet — write one in the Script panel.",
-      durationInFrames: 120,
-    });
-  }
-
-  const totalFrames = slides.reduce((s, sl) => s + sl.durationInFrames, 0);
-
   return {
     title,
-    slides,
-    brandSettings: {
-      primaryColor,
-      backgroundColor: "#0d0d1a",
-      companyName,
-    },
-    totalFrames,
-  } as LessonVideoProps & { totalFrames: number };
+    script: script ?? "",
+    modules: "",
+  };
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -105,21 +63,12 @@ export function LessonPreview() {
     );
   }
 
-  const primaryColor =
-    (project?.brandSettings as { colors?: { primary?: string } } | null)
-      ?.colors?.primary ?? "#6366f1";
-  const companyName = project?.title ?? "NuWav Studio";
-
   const previewProps = buildPreviewProps(
     selectedLesson.title,
     selectedLesson.script,
-    selectedLesson.durationSeconds,
-    primaryColor,
-    companyName
   );
 
-  const totalFrames =
-    (previewProps as LessonVideoProps & { totalFrames: number }).totalFrames;
+  const totalFrames = estimateTotalFrames(previewProps.script);
 
   const scriptPreview = selectedLesson.script
     ? selectedLesson.script.slice(0, 200) +
