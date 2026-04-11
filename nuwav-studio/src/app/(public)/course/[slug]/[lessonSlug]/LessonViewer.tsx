@@ -209,6 +209,97 @@ function useAnalytics(projectId: string, courseSlug: string, lessonId: string) {
 }
 
 /* ------------------------------------------------------------------ */
+/* Enrollment check hook (localStorage + API)                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Returns `true` once we know the student is enrolled, `false` once we
+ * know they are not, and `null` while the check is still in flight.
+ * The first lesson (index 0) is always considered "enrolled" (free preview).
+ */
+function useEnrollmentCheck(
+  courseSlug: string,
+  currentIndex: number,
+  isPaidCourse: boolean
+): boolean | null {
+  // Not a paid course or free preview lesson → always accessible
+  if (!isPaidCourse || currentIndex === 0) return true;
+
+  const [enrolled, setEnrolled] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function check() {
+      // 1. Read stored email from localStorage
+      let email: string | null = null;
+      try {
+        email = localStorage.getItem("soniq:student-email");
+      } catch {
+        // ignore
+      }
+
+      if (!email) {
+        if (!cancelled) setEnrolled(false);
+        return;
+      }
+
+      // 2. Verify against the API
+      try {
+        const res = await fetch(
+          `/api/enroll/check?courseSlug=${encodeURIComponent(courseSlug)}&email=${encodeURIComponent(email)}`
+        );
+        if (!cancelled) {
+          const data = await res.json();
+          setEnrolled(!!data.enrolled);
+        }
+      } catch {
+        // On network error, fall back to "not enrolled" to be safe
+        if (!cancelled) setEnrolled(false);
+      }
+    }
+
+    check();
+    return () => {
+      cancelled = true;
+    };
+  }, [courseSlug, currentIndex]);
+
+  return enrolled;
+}
+
+/* ------------------------------------------------------------------ */
+/* Paywall overlay component                                           */
+/* ------------------------------------------------------------------ */
+
+function PaywallOverlay({ checkoutSlug }: { checkoutSlug: string }) {
+  return (
+    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-xl bg-background/80 backdrop-blur-md">
+      <div className="flex flex-col items-center gap-4 p-8 text-center max-w-sm">
+        <div className="h-16 w-16 rounded-full bg-violet-100 dark:bg-violet-950/60 flex items-center justify-center">
+          <Lock className="h-8 w-8 text-violet-600" />
+        </div>
+        <h2 className="text-xl font-bold">This lesson is locked</h2>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          Enroll in this course to access all lessons and unlock your full
+          learning experience.
+        </p>
+        <Button
+          asChild
+          size="lg"
+          className="bg-violet-600 hover:bg-violet-700 text-white font-semibold w-full"
+        >
+          <Link href={`/checkout/${checkoutSlug}`}>
+            Enroll Now
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Link>
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
 /* Main component                                                       */
 /* ------------------------------------------------------------------ */
 
@@ -224,10 +315,16 @@ export function LessonViewer({
   nextLesson,
   currentIndex,
   totalCount,
+  isPaidCourse = false,
+  checkoutSlug = null,
 }: LessonViewerProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { completed, markComplete, unmarkComplete } = useProgress(courseSlug);
   const { trackComplete } = useAnalytics(projectId, courseSlug, lesson.id);
+
+  // Enrollment / paywall check — null = loading, true = enrolled, false = locked
+  const enrollmentStatus = useEnrollmentCheck(courseSlug, currentIndex, isPaidCourse);
+  const isLocked = isPaidCourse && currentIndex > 0 && enrollmentStatus === false;
 
   const isDone = completed.has(lesson.id);
 
@@ -296,6 +393,9 @@ export function LessonViewer({
             currentLessonId={lesson.id}
             lessonsByModule={lessonsByModule}
             completed={completed}
+            allLessonsOrdered={allLessons}
+            isPaidCourse={isPaidCourse}
+            isEnrolled={enrollmentStatus === true}
           />
         </aside>
 
@@ -324,6 +424,9 @@ export function LessonViewer({
                 currentLessonId={lesson.id}
                 lessonsByModule={lessonsByModule}
                 completed={completed}
+                allLessonsOrdered={allLessons}
+                isPaidCourse={isPaidCourse}
+                isEnrolled={enrollmentStatus === true}
               />
             </aside>
           </div>
@@ -332,6 +435,14 @@ export function LessonViewer({
         {/* ── Main content ─────────────────────────────────────────── */}
         <main className="flex-1 min-w-0 px-4 sm:px-0 py-6 sm:py-0">
           <h1 className="text-2xl font-bold mb-5">{lesson.title}</h1>
+
+          {/* ── Paywall wrapper — blurs content and shows overlay when locked ── */}
+          <div className={cn("relative", isLocked && "pointer-events-none select-none")}>
+            {isLocked && checkoutSlug && (
+              <PaywallOverlay checkoutSlug={checkoutSlug} />
+            )}
+
+            <div className={cn(isLocked && "blur-sm")}>
 
           {/* ── Video player ─────────────────────────────────────────── */}
           {lesson.videoUrl ? (
@@ -403,6 +514,9 @@ export function LessonViewer({
               <p className="text-muted-foreground text-sm">Video not yet rendered</p>
             </div>
           )}
+
+            </div>{/* end blur wrapper */}
+          </div>{/* end paywall wrapper */}
 
           {/* Progress + Navigation row */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-2">
@@ -482,6 +596,10 @@ interface SidebarContentProps {
   currentLessonId: string;
   lessonsByModule: (ModuleItem & { lessons: LessonItem[] })[];
   completed: Set<string>;
+  /** Flat ordered list of all lessons (used to compute global index for paywall) */
+  allLessonsOrdered?: LessonItem[];
+  isPaidCourse?: boolean;
+  isEnrolled?: boolean;
 }
 
 function SidebarContent({
@@ -489,6 +607,9 @@ function SidebarContent({
   currentLessonId,
   lessonsByModule,
   completed,
+  allLessonsOrdered = [],
+  isPaidCourse = false,
+  isEnrolled = true,
 }: SidebarContentProps) {
   return (
     <div className="py-2">
@@ -506,6 +627,8 @@ function SidebarContent({
             .map((lesson) => {
               const isCurrent = lesson.id === currentLessonId;
               const isDone = completed.has(lesson.id);
+              const globalIdx = allLessonsOrdered.findIndex((l) => l.id === lesson.id);
+              const isLessonLocked = isPaidCourse && !isEnrolled && globalIdx > 0;
               return (
                 <Link
                   key={lesson.id}
@@ -521,6 +644,8 @@ function SidebarContent({
                     <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
                   ) : isCurrent ? (
                     <PlayCircle className="h-4 w-4 text-violet-500 shrink-0" />
+                  ) : isLessonLocked ? (
+                    <Lock className="h-4 w-4 text-muted-foreground/60 shrink-0" />
                   ) : (
                     <Circle className="h-4 w-4 text-muted-foreground shrink-0" />
                   )}

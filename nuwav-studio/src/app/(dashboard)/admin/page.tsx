@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -15,7 +15,13 @@ import {
   FolderOpen,
   BookOpen,
   ShieldCheck,
+  Copy,
+  Check,
+  AlertTriangle,
+  XCircle,
+  CheckCircle2,
 } from "lucide-react";
+import type { EnvCheckResponse, EnvCheckGroup } from "@/app/api/admin/env-check/route";
 
 interface AdminStats {
   userCount: number;
@@ -56,19 +62,28 @@ const PLAN_COLORS: Record<string, string> = {
   "—": "bg-muted text-muted-foreground",
 };
 
-interface EnvCheck {
-  label: string;
-  vars: string[];
+/** Determine the overall health of a group */
+function groupStatus(group: EnvCheckGroup): "ok" | "warn" | "error" {
+  const requiredMissing = group.checks.some((c) => c.required && !c.present);
+  if (requiredMissing) return "error";
+  const optionalMissing = group.checks.some((c) => !c.required && !c.present);
+  if (optionalMissing) return "warn";
+  return "ok";
 }
 
-const ENV_CHECKS: EnvCheck[] = [
-  { label: "Stripe", vars: ["STRIPE_SECRET_KEY", "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY"] },
-  { label: "ElevenLabs", vars: ["ELEVENLABS_API_KEY"] },
-  { label: "R2 Storage", vars: ["R2_ACCOUNT_ID", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY", "R2_BUCKET_NAME"] },
-  { label: "Database", vars: ["DATABASE_URL"] },
-  { label: "Auth Secret", vars: ["NEXTAUTH_SECRET", "AUTH_SECRET"] },
-  { label: "OpenAI / Anthropic", vars: ["ANTHROPIC_API_KEY", "OPENAI_API_KEY"] },
-];
+function GroupStatusIcon({ status }: { status: "ok" | "warn" | "error" }) {
+  if (status === "ok")
+    return <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />;
+  if (status === "warn")
+    return <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />;
+  return <XCircle className="h-4 w-4 shrink-0 text-red-500" />;
+}
+
+function groupBorder(status: "ok" | "warn" | "error") {
+  if (status === "ok") return "border-green-200 bg-green-50/40";
+  if (status === "warn") return "border-amber-200 bg-amber-50/40";
+  return "border-red-200 bg-red-50/40";
+}
 
 function fmt(dateStr: string | null): string {
   if (!dateStr) return "—";
@@ -101,13 +116,151 @@ function PlanBadge({ plan }: { plan: string }) {
   );
 }
 
+// ── Env status section ───────────────────────────────────────────────────────
+
+function EnvStatusSection({ groups }: { groups: EnvCheckGroup[] }) {
+  const [copied, setCopied] = useState(false);
+
+  const missingKeys = groups
+    .flatMap((g) => g.checks)
+    .filter((c) => !c.present)
+    .map((c) => `${c.key}=`);
+
+  const handleCopyMissing = useCallback(async () => {
+    if (missingKeys.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(missingKeys.join("\n"));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard access may be blocked in some contexts
+    }
+  }, [missingKeys]);
+
+  const overallStatus: "ok" | "warn" | "error" = (() => {
+    const hasError = groups.some((g) => groupStatus(g) === "error");
+    if (hasError) return "error";
+    const hasWarn = groups.some((g) => groupStatus(g) === "warn");
+    if (hasWarn) return "warn";
+    return "ok";
+  })();
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <CardTitle className="text-base">Environment Variables</CardTitle>
+            <CardDescription className="mt-0.5">
+              Checks whether required service credentials are configured.
+            </CardDescription>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            {overallStatus === "ok" && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                <CheckCircle2 className="h-3.5 w-3.5" />
+                All required vars set
+              </span>
+            )}
+            {overallStatus === "warn" && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Some optional vars missing
+              </span>
+            )}
+            {overallStatus === "error" && (
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700">
+                <XCircle className="h-3.5 w-3.5" />
+                Required vars missing
+              </span>
+            )}
+            {missingKeys.length > 0 && (
+              <button
+                onClick={handleCopyMissing}
+                className="inline-flex items-center gap-1.5 rounded-md border border-border bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground shadow-sm transition hover:bg-muted hover:text-foreground"
+                title="Copy missing var names to clipboard"
+              >
+                {copied ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-green-500" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5" />
+                    Copy missing ({missingKeys.length})
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {groups.map((group) => {
+            const status = groupStatus(group);
+            return (
+              <div
+                key={group.name}
+                className={`rounded-lg border p-3 ${groupBorder(status)}`}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <GroupStatusIcon status={status} />
+                  <span className="text-sm font-semibold">{group.name}</span>
+                </div>
+                <ul className="space-y-1">
+                  {group.checks.map((check) => (
+                    <li key={check.key} className="flex items-center gap-2">
+                      <span
+                        className={`h-2 w-2 shrink-0 rounded-full ${
+                          check.present
+                            ? "bg-green-500"
+                            : check.required
+                            ? "bg-red-400"
+                            : "bg-amber-400"
+                        }`}
+                      />
+                      <span
+                        className={`font-mono text-xs ${
+                          check.present
+                            ? "text-foreground"
+                            : check.required
+                            ? "text-red-600 font-medium"
+                            : "text-amber-600"
+                        }`}
+                      >
+                        {check.key}
+                      </span>
+                      {!check.present && !check.required && (
+                        <span className="ml-auto text-[10px] text-muted-foreground italic">
+                          optional
+                        </span>
+                      )}
+                      {!check.present && check.required && (
+                        <span className="ml-auto text-[10px] text-red-500 font-semibold uppercase tracking-wide">
+                          missing
+                        </span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ── Main page ────────────────────────────────────────────────────────────────
+
 export default function AdminPage() {
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // System status — checked client-side via a small API helper
-  const [envStatus, setEnvStatus] = useState<Record<string, boolean>>({});
+  const [envGroups, setEnvGroups] = useState<EnvCheckGroup[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -131,8 +284,10 @@ export default function AdminPage() {
       try {
         const res = await fetch("/api/admin/env-check");
         if (res.ok) {
-          const data = (await res.json()) as Record<string, boolean>;
-          setEnvStatus(data);
+          const data = (await res.json()) as EnvCheckResponse;
+          if (data.groups) {
+            setEnvGroups(data.groups);
+          }
         }
       } catch {
         // env check is best-effort
@@ -289,44 +444,15 @@ export default function AdminPage() {
       {/* ── System Status ────────────────────────────────────────────── */}
       <section>
         <h2 className="text-lg font-semibold mb-4">System Status</h2>
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-base">Environment Variables</CardTitle>
-            <CardDescription>
-              Checks whether required service credentials are configured.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-3">
-              {ENV_CHECKS.map((check) => {
-                // A service is "configured" when at least one of its vars is present
-                const configured = check.vars.some(
-                  (v) => envStatus[v] === true
-                );
-                return (
-                  <div
-                    key={check.label}
-                    className="flex items-center gap-2 rounded-md border px-3 py-2"
-                  >
-                    <span
-                      className={`h-2.5 w-2.5 rounded-full ${
-                        configured ? "bg-green-500" : "bg-red-400"
-                      }`}
-                    />
-                    <span className="text-sm font-medium">{check.label}</span>
-                    <span
-                      className={`text-xs ${
-                        configured ? "text-green-600" : "text-red-500"
-                      }`}
-                    >
-                      {configured ? "configured" : "missing"}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
+        {envGroups.length > 0 ? (
+          <EnvStatusSection groups={envGroups} />
+        ) : (
+          <Card>
+            <CardContent className="py-8 text-center text-sm text-muted-foreground">
+              Loading environment check…
+            </CardContent>
+          </Card>
+        )}
       </section>
     </div>
   );
