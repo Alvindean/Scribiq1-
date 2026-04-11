@@ -21,7 +21,9 @@ import {
   XCircle,
   CheckCircle2,
 } from "lucide-react";
-import type { EnvCheckResponse, EnvCheckGroup } from "@/app/api/admin/env-check/route";
+interface EnvCheckItem { key: string; present: boolean; required: boolean }
+interface EnvCheckGroup { name: string; checks: EnvCheckItem[] }
+interface EnvCheckResponse { groups: EnvCheckGroup[] }
 
 interface AdminStats {
   userCount: number;
