@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -82,7 +82,7 @@ export default function SignupPage() {
                 type="text"
                 placeholder="Jane Smith"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => { setName(e.target.value); setError(null); }}
                 required
                 autoComplete="name"
               />
@@ -94,7 +94,7 @@ export default function SignupPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setError(null); }}
                 required
                 autoComplete="email"
                 autoCapitalize="none"
@@ -111,7 +111,7 @@ export default function SignupPage() {
                   type={showPassword ? "text" : "password"}
                   placeholder="At least 8 characters"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => { setPassword(e.target.value); setError(null); }}
                   required
                   minLength={8}
                   maxLength={128}
@@ -138,9 +138,10 @@ export default function SignupPage() {
             </div>
 
             {error && (
-              <p className="text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2">
-                {error}
-              </p>
+              <div className="flex items-center gap-2 text-sm text-destructive bg-destructive/10 rounded-md px-3 py-2 transition-all duration-300">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
             )}
 
             <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
