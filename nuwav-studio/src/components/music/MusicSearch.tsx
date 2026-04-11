@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Search, Play, Pause, ExternalLink, Music2, Loader2 } from "lucide-react";
+import { Search, Play, Pause, ExternalLink, Music2, Loader2, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import type { MusicTrack } from "@/app/api/music/search/route";
@@ -108,6 +108,15 @@ export function MusicSearch() {
         {loading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
         )}
+        {!loading && query.length > 0 && (
+          <button
+            onClick={() => setQuery("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Clear search"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        )}
       </div>
 
       {/* Source filter */}
@@ -150,10 +159,21 @@ export function MusicSearch() {
       {!loading && tracks.length === 0 && !error && (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-20 text-center text-muted-foreground">
           <Music2 className="mb-3 h-10 w-10 opacity-30" />
-          <p className="font-medium">Search for music</p>
-          <p className="mt-1 text-sm">
-            Try "upbeat corporate", "lo-fi study", or an artist name
-          </p>
+          {query.length > 0 ? (
+            <>
+              <p className="font-medium">No results</p>
+              <p className="mt-1 text-sm">
+                No tracks found for &ldquo;{query}&rdquo; — try a different search.
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="font-medium">Search for music</p>
+              <p className="mt-1 text-sm">
+                Try &ldquo;upbeat corporate&rdquo;, &ldquo;lo-fi study&rdquo;, or an artist name
+              </p>
+            </>
+          )}
         </div>
       )}
 
