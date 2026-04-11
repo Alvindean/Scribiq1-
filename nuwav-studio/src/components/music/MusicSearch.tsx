@@ -97,13 +97,13 @@ export function MusicSearch() {
   return (
     <div className="space-y-6">
       {/* Search bar */}
-      <div className="relative flex-1">
+      <div className="relative w-full">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder="Search by song title, artist, mood, or genre…"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="pl-9 pr-9"
+          className="pl-9 pr-9 w-full"
         />
         {loading && (
           <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground animate-spin" />
@@ -120,23 +120,25 @@ export function MusicSearch() {
       </div>
 
       {/* Source filter */}
-      <div className="flex flex-wrap gap-2">
-        {(Object.keys(SOURCE_LABELS) as Source[]).map((s) => (
-          <button
-            key={s}
-            onClick={() => setSource(s)}
-            className={`rounded-full px-3 py-1 text-xs font-medium transition-colors border ${
-              source === s
-                ? "bg-violet-600 text-white border-violet-600"
-                : "bg-background text-muted-foreground border-border hover:border-violet-400 hover:text-violet-600"
-            }`}
-          >
-            {SOURCE_LABELS[s]}
-            {s !== "all" && sourceCounts[s] !== undefined && (
-              <span className="ml-1.5 opacity-70">({sourceCounts[s]})</span>
-            )}
-          </button>
-        ))}
+      <div className="overflow-x-auto pb-1 -mb-1">
+        <div className="flex gap-2 w-max">
+          {(Object.keys(SOURCE_LABELS) as Source[]).map((s) => (
+            <button
+              key={s}
+              onClick={() => setSource(s)}
+              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors border whitespace-nowrap ${
+                source === s
+                  ? "bg-violet-600 text-white border-violet-600"
+                  : "bg-background text-muted-foreground border-border hover:border-violet-400 hover:text-violet-600"
+              }`}
+            >
+              {SOURCE_LABELS[s]}
+              {s !== "all" && sourceCounts[s] !== undefined && (
+                <span className="ml-1.5 opacity-70">({sourceCounts[s]})</span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* License legend */}
@@ -186,7 +188,7 @@ export function MusicSearch() {
               className="group relative flex gap-3 rounded-xl border bg-card p-3 transition-shadow hover:shadow-md"
             >
               {/* Artwork / play button */}
-              <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
+              <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 overflow-hidden rounded-lg bg-muted">
                 {track.artworkUrl ? (
                   <img
                     src={track.artworkUrl}
@@ -201,7 +203,7 @@ export function MusicSearch() {
                 {track.previewUrl && (
                   <button
                     onClick={() => togglePlay(track)}
-                    className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 rounded-lg"
+                    className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-lg opacity-100 sm:opacity-0 sm:transition-opacity sm:group-hover:opacity-100"
                   >
                     {playingId === track.id ? (
                       <Pause className="h-5 w-5 text-white" />

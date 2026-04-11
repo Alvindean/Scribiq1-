@@ -242,7 +242,7 @@ export function SongAnalyzer() {
       {result && (
         <div className="space-y-6">
           {/* Track card */}
-          <div className="flex gap-4 rounded-xl border bg-card p-4">
+          <div className="flex flex-col gap-3 rounded-xl border bg-card p-4 sm:flex-row sm:gap-4">
             {result.track.artworkUrl ? (
               <img
                 src={result.track.artworkUrl}
@@ -354,7 +354,7 @@ export function SongAnalyzer() {
               type="button"
               variant="outline"
               onClick={handleStartLyrics}
-              className="gap-2"
+              className="gap-2 w-full sm:w-auto"
             >
               <PenLine className="h-4 w-4" />
               Start Lyrics from This Song

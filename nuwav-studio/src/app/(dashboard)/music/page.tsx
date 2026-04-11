@@ -31,47 +31,49 @@ export default async function MusicPage({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 rounded-lg border bg-muted/40 p-1 w-fit">
-        <Link
-          href="/music?tab=library"
-          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-            activeTab === "library"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Music Library
-        </Link>
-        <Link
-          href="/music?tab=analyzer"
-          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-            activeTab === "analyzer"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Song Analyzer
-        </Link>
-        <Link
-          href="/music?tab=images"
-          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-            activeTab === "images"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Visual Assets
-        </Link>
-        <Link
-          href="/music?tab=lyrics"
-          className={`rounded-md px-4 py-1.5 text-sm font-medium transition-colors ${
-            activeTab === "lyrics"
-              ? "bg-background shadow-sm text-foreground"
-              : "text-muted-foreground hover:text-foreground"
-          }`}
-        >
-          Lyric Editor
-        </Link>
+      <div className="overflow-x-auto pb-1 -mb-1">
+        <div className="flex gap-1 rounded-lg border bg-muted/40 p-1 w-max min-w-full sm:w-fit sm:min-w-0">
+          <Link
+            href="/music?tab=library"
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+              activeTab === "library"
+                ? "bg-background shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Music Library
+          </Link>
+          <Link
+            href="/music?tab=analyzer"
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+              activeTab === "analyzer"
+                ? "bg-background shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Song Analyzer
+          </Link>
+          <Link
+            href="/music?tab=images"
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+              activeTab === "images"
+                ? "bg-background shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Visual Assets
+          </Link>
+          <Link
+            href="/music?tab=lyrics"
+            className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors whitespace-nowrap ${
+              activeTab === "lyrics"
+                ? "bg-background shadow-sm text-foreground"
+                : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Lyric Editor
+          </Link>
+        </div>
       </div>
 
       {/* Tab content */}

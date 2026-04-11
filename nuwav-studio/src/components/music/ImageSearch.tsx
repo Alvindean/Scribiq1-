@@ -233,8 +233,8 @@ export function ImageSearch() {
                 className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
                 loading="lazy"
               />
-              {/* Hover overlay */}
-              <div className="absolute inset-0 flex flex-col justify-between bg-black/60 p-2 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              {/* Overlay: always visible on mobile, hover-only on sm+ */}
+              <div className="absolute inset-0 flex flex-col justify-between bg-black/60 p-2 opacity-100 sm:opacity-0 sm:transition-opacity sm:duration-200 sm:group-hover:opacity-100">
                 {/* Photographer name */}
                 <p className="truncate text-xs font-medium text-white drop-shadow">
                   {image.user}
@@ -245,7 +245,7 @@ export function ImageSearch() {
                     <Heart className="h-3 w-3" />
                     {image.likes.toLocaleString()}
                   </span>
-                  <span className="flex items-center gap-1 text-[11px] text-white/90">
+                  <span className="hidden sm:flex items-center gap-1 text-[11px] text-white/90">
                     <Download className="h-3 w-3" />
                     {image.downloads.toLocaleString()}
                   </span>
