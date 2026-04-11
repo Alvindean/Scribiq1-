@@ -36,16 +36,19 @@ export function EditorLayout({ project, modules }: EditorLayoutProps) {
               className="text-zinc-400 hover:text-white gap-1.5"
             >
               <ArrowLeft className="w-4 h-4" />
-              Back
+              <span className="hidden sm:inline">Back</span>
             </Button>
           </Link>
           <span className="text-zinc-600 select-none">/</span>
-          <h1 className="text-sm font-semibold text-white truncate max-w-xs">
+          <h1
+            className="text-sm font-semibold text-white truncate max-w-[150px] sm:max-w-xs"
+            title={project.title}
+          >
             {project.title}
           </h1>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-shrink-0">
           <span
             className={`text-xs px-2 py-0.5 rounded-full font-medium ${
               project.status === "published"
