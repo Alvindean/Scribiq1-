@@ -14,6 +14,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { COURSE_TEMPLATES, templateLessonCount } from "@/lib/templates";
 import type { ProjectType } from "@/types/project";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -31,15 +32,6 @@ interface FormData {
   duration_target: DurationTarget;
 }
 
-interface Template {
-  id: string;
-  name: string;
-  type: "course" | "vsl" | "hybrid";
-  description: string | null;
-  thumbnail_url: string | null;
-  niche_category: string | null;
-}
-
 interface StepErrors {
   type?: string;
   niche?: string;
@@ -47,7 +39,7 @@ interface StepErrors {
   target_audience?: string;
 }
 
-const STEPS = ["Type", "Details", "Template", "Settings", "Review"] as const;
+const STEPS = ["Type", "Template", "Details", "Settings", "Review"] as const;
 type Step = 0 | 1 | 2 | 3 | 4;
 
 // ─── Progress indicator ───────────────────────────────────────────────────────
@@ -213,7 +205,114 @@ function TypeStep({
   );
 }
 
-// ─── Step 2 — Details ─────────────────────────────────────────────────────────
+// ─── Step 2 — Template ────────────────────────────────────────────────────────
+
+function TemplateStep({
+  projectType,
+  selected,
+  onSelect,
+  onSkip,
+}: {
+  projectType: ProjectType | null;
+  selected: string | null;
+  onSelect: (id: string) => void;
+  onSkip: () => void;
+}) {
+  // Filter to templates that match the chosen project type (or all if not set),
+  // excluding the "blank" sentinel (handled by the Skip button).
+  const visibleTemplates = COURSE_TEMPLATES.filter(
+    (t) =>
+      t.id !== "blank" &&
+      (!projectType || t.type === projectType)
+  );
+
+  return (
+    <div className="space-y-4">
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold">Choose a template</h2>
+        <p className="text-muted-foreground mt-1">
+          Pick a ready-made structure to get started faster, or skip to build from scratch.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {visibleTemplates.map((t) => {
+          const lessonCount = templateLessonCount(t);
+          const moduleCount = t.modules.length;
+          const isSelected = selected === t.id;
+
+          return (
+            <Card
+              key={t.id}
+              className={`relative flex flex-col border-2 transition-all hover:shadow-md ${
+                isSelected
+                  ? "border-primary bg-primary/5 shadow-sm"
+                  : "border-border hover:border-primary/50"
+              }`}
+            >
+              {t.badge && (
+                <div className="absolute -top-2.5 right-3">
+                  <Badge variant="default" className="text-[10px] px-2 py-0.5">
+                    {t.badge}
+                  </Badge>
+                </div>
+              )}
+
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between gap-2">
+                  <CardTitle className="text-base leading-snug">{t.name}</CardTitle>
+                  {isSelected && (
+                    <span className="text-primary text-sm font-semibold shrink-0">✓</span>
+                  )}
+                </div>
+                {/* Module / lesson count badges */}
+                <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full">
+                    {moduleCount} {moduleCount === 1 ? "module" : "modules"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full">
+                    {lessonCount} {lessonCount === 1 ? "lesson" : "lessons"}
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium bg-secondary text-secondary-foreground px-2 py-0.5 rounded-full capitalize">
+                    {t.type}
+                  </span>
+                </div>
+              </CardHeader>
+
+              <CardContent className="pt-0 flex-1 flex flex-col justify-between gap-3">
+                <CardDescription className="text-xs leading-relaxed">
+                  {t.description}
+                </CardDescription>
+
+                <Button
+                  size="sm"
+                  variant={isSelected ? "default" : "outline"}
+                  className="w-full mt-1"
+                  onClick={() => onSelect(t.id)}
+                >
+                  {isSelected ? "Selected" : "Use Template"}
+                </Button>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Skip link */}
+      <div className="pt-2 text-center">
+        <button
+          type="button"
+          onClick={onSkip}
+          className="text-sm text-muted-foreground hover:text-foreground underline underline-offset-4 transition-colors"
+        >
+          Skip — Start Blank
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Step 3 — Details ─────────────────────────────────────────────────────────
 
 const CHAR_LIMITS = {
   product_name: 80,
@@ -224,6 +323,8 @@ const CHAR_LIMITS = {
 function CharCounter({ value, max }: { value: string; max: number }) {
   const remaining = max - value.length;
   const pct = value.length / max;
+  // Suppress unused variable lint warning
+  void remaining;
   return (
     <span
       className={`text-xs tabular-nums ${
@@ -337,97 +438,6 @@ function DetailsStep({
   );
 }
 
-// ─── Step 3 — Template ────────────────────────────────────────────────────────
-
-function TemplateStep({
-  templates,
-  selected,
-  onSelect,
-  loading,
-}: {
-  templates: Template[];
-  selected: string | null;
-  onSelect: (id: string | null) => void;
-  loading: boolean;
-}) {
-  return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold">Choose a template</h2>
-        <p className="text-muted-foreground mt-1">
-          Start from a template or build from scratch.
-        </p>
-      </div>
-      {loading ? (
-        <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
-          <div className="animate-spin h-8 w-8 rounded-full border-4 border-primary border-t-transparent" />
-          <p className="text-sm">Loading templates…</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {/* Blank option */}
-          <Card
-            className={`cursor-pointer border-2 transition-all hover:shadow-md ${
-              selected === null
-                ? "border-primary bg-primary/5 shadow-sm"
-                : "border-border hover:border-primary/50"
-            }`}
-            onClick={() => onSelect(null)}
-          >
-            <CardHeader>
-              <div className="text-3xl mb-1">📄</div>
-              <CardTitle className="text-base">Blank</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <CardDescription>
-                Start from scratch with a fully custom structure.
-              </CardDescription>
-            </CardContent>
-          </Card>
-
-          {templates.map((t) => (
-            <Card
-              key={t.id}
-              className={`cursor-pointer border-2 transition-all hover:shadow-md ${
-                selected === t.id
-                  ? "border-primary bg-primary/5 shadow-sm"
-                  : "border-border hover:border-primary/50"
-              }`}
-              onClick={() => onSelect(t.id)}
-            >
-              {t.thumbnail_url && (
-                <div className="overflow-hidden rounded-t-lg">
-                  <img
-                    src={t.thumbnail_url}
-                    alt={t.name}
-                    className="h-32 w-full object-cover"
-                  />
-                </div>
-              )}
-              <CardHeader>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <CardTitle className="text-base">{t.name}</CardTitle>
-                  <span className="text-xs bg-secondary px-2 py-0.5 rounded-full capitalize">
-                    {t.type}
-                  </span>
-                </div>
-                {t.niche_category && (
-                  <p className="text-xs text-muted-foreground">{t.niche_category}</p>
-                )}
-              </CardHeader>
-              <CardContent>
-                <CardDescription>
-                  {t.description ?? "No description available."}
-                </CardDescription>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Step 4 — Settings ────────────────────────────────────────────────────────
 
 const TONES: { value: Tone; label: string; description: string }[] = [
@@ -537,18 +547,19 @@ const TONE_LABELS: Record<Tone, string> = {
 
 function ReviewStep({
   data,
-  templates,
   submitting,
   error,
   onSubmit,
 }: {
   data: FormData;
-  templates: Template[];
   submitting: boolean;
   error: string | null;
   onSubmit: () => void;
 }) {
-  const selectedTemplate = templates.find((t) => t.id === data.template_id);
+  const selectedTemplate =
+    data.template_id
+      ? COURSE_TEMPLATES.find((t) => t.id === data.template_id)
+      : null;
   const typeMeta = data.type ? TYPE_META[data.type] : null;
 
   const summaryItems: { icon: string; label: string; value: string }[] = [
@@ -648,21 +659,13 @@ function ReviewStep({
 
 // ─── Loading overlay ──────────────────────────────────────────────────────────
 
-const LOADING_MESSAGES = [
-  "AI is planning your course structure…",
-  "Drafting your module outlines…",
-  "Crafting lesson scripts…",
-  "Optimising for your audience…",
-  "Almost ready…",
-] as const;
-
 function LoadingOverlay({ type }: { type: ProjectType | null }) {
   const baseMessage =
     type === "vsl"
       ? "AI is crafting your sales script…"
       : type === "hybrid"
         ? "AI is building your hybrid framework…"
-        : LOADING_MESSAGES[0];
+        : "AI is planning your course structure…";
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-6 bg-background/95 backdrop-blur-sm">
@@ -702,7 +705,7 @@ function validateStep(step: Step, data: FormData): StepErrors {
     if (!data.type) errors.type = "Please select a project type to continue.";
   }
 
-  if (step === 1) {
+  if (step === 2) {
     if (!data.product_name.trim())
       errors.product_name = "Product name is required.";
     if (!data.niche.trim())
@@ -721,8 +724,6 @@ export default function NewProjectPage() {
   const [step, setStep] = useState<Step>(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [templates, setTemplates] = useState<Template[]>([]);
-  const [templatesLoading, setTemplatesLoading] = useState(false);
   const [stepErrors, setStepErrors] = useState<StepErrors>({});
 
   const [formData, setFormData] = useState<FormData>({
@@ -743,20 +744,6 @@ export default function NewProjectPage() {
     }
   }
 
-  async function fetchTemplates() {
-    if (templates.length > 0) return;
-    setTemplatesLoading(true);
-    try {
-      const res = await fetch("/api/templates");
-      if (res.ok) {
-        const data = (await res.json()) as Template[];
-        setTemplates(data);
-      }
-    } finally {
-      setTemplatesLoading(false);
-    }
-  }
-
   async function goNext() {
     const errors = validateStep(step, formData);
     if (Object.keys(errors).length > 0) {
@@ -765,7 +752,6 @@ export default function NewProjectPage() {
     }
     setStepErrors({});
 
-    if (step === 1) await fetchTemplates();
     if (step < 4) setStep(((step + 1) as Step));
   }
 
@@ -774,6 +760,12 @@ export default function NewProjectPage() {
       setStepErrors({});
       setStep(((step - 1) as Step));
     }
+  }
+
+  /** Called when user clicks "Skip — Start Blank" on the template step. */
+  function skipTemplate() {
+    update("template_id", null);
+    setStep(2);
   }
 
   async function handleSubmit() {
@@ -830,6 +822,14 @@ export default function NewProjectPage() {
             />
           )}
           {step === 1 && (
+            <TemplateStep
+              projectType={formData.type}
+              selected={formData.template_id}
+              onSelect={(id) => update("template_id", id)}
+              onSkip={skipTemplate}
+            />
+          )}
+          {step === 2 && (
             <DetailsStep
               data={{
                 niche: formData.niche,
@@ -838,14 +838,6 @@ export default function NewProjectPage() {
               }}
               onChange={(field, value) => update(field, value)}
               errors={stepErrors}
-            />
-          )}
-          {step === 2 && (
-            <TemplateStep
-              templates={templates}
-              selected={formData.template_id}
-              onSelect={(id) => update("template_id", id)}
-              loading={templatesLoading}
             />
           )}
           {step === 3 && (
@@ -859,7 +851,6 @@ export default function NewProjectPage() {
           {step === 4 && (
             <ReviewStep
               data={formData}
-              templates={templates}
               submitting={submitting}
               error={error}
               onSubmit={handleSubmit}
