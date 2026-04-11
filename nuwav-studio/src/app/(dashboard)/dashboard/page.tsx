@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus, BookOpen } from "lucide-react";
+import { Plus } from "lucide-react";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { profiles, projects, lessons, renderJobs } from "@/lib/db/schema";
@@ -7,7 +7,8 @@ import { eq, count, and, gte } from "drizzle-orm";
 import { Button } from "@/components/ui/button";
 import { ProjectCard } from "@/components/dashboard/ProjectCard";
 import { UsageStats } from "@/components/dashboard/UsageStats";
-import { EmptyState } from "@/components/shared/EmptyState";
+import { DashboardEmptyState } from "@/components/onboarding/DashboardEmptyState";
+import { WelcomeModal } from "@/components/onboarding/WelcomeModal";
 import type { Project } from "@/types/project";
 
 export default async function DashboardPage() {
@@ -111,15 +112,7 @@ export default async function DashboardPage() {
           </div>
 
           {projectList.length === 0 ? (
-            <EmptyState
-              icon={BookOpen}
-              title="No projects yet"
-              description="Create your first AI-powered course or VSL to get started."
-              action={{
-                label: "Create Project",
-                href: "/projects/new",
-              }}
-            />
+            <DashboardEmptyState />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
               {(projectList as Project[]).map((project) => (
@@ -155,6 +148,9 @@ export default async function DashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Onboarding welcome modal — self-shows on first visit via localStorage */}
+      <WelcomeModal />
     </div>
   );
 }
