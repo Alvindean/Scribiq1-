@@ -27,73 +27,78 @@ export async function GET(request: NextRequest): Promise<Response> {
     return Response.json({ error: "Missing email parameter" }, { status: 400 });
   }
 
-  // 1. Fetch all enrollments for this student
-  const studentEnrollments = await db
-    .select()
-    .from(enrollments)
-    .where(eq(enrollments.studentEmail, email));
+  try {
+    // 1. Fetch all enrollments for this student
+    const studentEnrollments = await db
+      .select()
+      .from(enrollments)
+      .where(eq(enrollments.studentEmail, email));
 
-  if (studentEnrollments.length === 0) {
-    return Response.json({ courses: [] });
-  }
+    if (studentEnrollments.length === 0) {
+      return Response.json({ courses: [] });
+    }
 
-  // 2. For each enrollment, look up the published course_portal page + project
-  const courses = await Promise.all(
-    studentEnrollments.map(async (enrollment) => {
-      // Find the published page for this course slug & project
-      const [page] = await db
-        .select()
-        .from(publishedPages)
-        .where(
-          and(
-            eq(publishedPages.slug, enrollment.courseSlug),
-            eq(publishedPages.projectId, enrollment.projectId),
-            eq(publishedPages.pageType, "course_portal"),
-            eq(publishedPages.isLive, true)
+    // 2. For each enrollment, look up the published course_portal page + project
+    const courses = await Promise.all(
+      studentEnrollments.map(async (enrollment) => {
+        // Find the published page for this course slug & project
+        const [page] = await db
+          .select()
+          .from(publishedPages)
+          .where(
+            and(
+              eq(publishedPages.slug, enrollment.courseSlug),
+              eq(publishedPages.projectId, enrollment.projectId),
+              eq(publishedPages.pageType, "course_portal"),
+              eq(publishedPages.isLive, true)
+            )
           )
-        )
-        .limit(1);
+          .limit(1);
 
-      if (!page) return null;
+        if (!page) return null;
 
-      // Fetch the project title
-      const [project] = await db
-        .select({ title: projects.title, niche: projects.niche })
-        .from(projects)
-        .where(eq(projects.id, enrollment.projectId))
-        .limit(1);
+        // Fetch the project title
+        const [project] = await db
+          .select({ title: projects.title, niche: projects.niche })
+          .from(projects)
+          .where(eq(projects.id, enrollment.projectId))
+          .limit(1);
 
-      if (!project) return null;
+        if (!project) return null;
 
-      // Count lessons in this project
-      const projectLessons = await db
-        .select({ id: lessons.id, thumbnailUrl: lessons.thumbnailUrl })
-        .from(lessons)
-        .where(eq(lessons.projectId, enrollment.projectId));
+        // Count lessons in this project
+        const projectLessons = await db
+          .select({ id: lessons.id, thumbnailUrl: lessons.thumbnailUrl })
+          .from(lessons)
+          .where(eq(lessons.projectId, enrollment.projectId));
 
-      const lessonCount = projectLessons.length;
+        const lessonCount = projectLessons.length;
 
-      // Pick the first available thumbnail as the course thumbnail
-      const thumbnail =
-        (page.content as CoursePortalContent).hero_image ??
-        projectLessons.find((l) => l.thumbnailUrl)?.thumbnailUrl ??
-        null;
+        // Pick the first available thumbnail as the course thumbnail
+        const thumbnail =
+          (page.content as CoursePortalContent).hero_image ??
+          projectLessons.find((l) => l.thumbnailUrl)?.thumbnailUrl ??
+          null;
 
-      return {
-        courseSlug: enrollment.courseSlug,
-        projectId: enrollment.projectId,
-        projectTitle: project.title,
-        niche: project.niche,
-        content: page.content,
-        enrolledAt: enrollment.enrolledAt,
-        lessonCount,
-        thumbnail,
-      };
-    })
-  );
+        return {
+          courseSlug: enrollment.courseSlug,
+          projectId: enrollment.projectId,
+          projectTitle: project.title,
+          niche: project.niche,
+          content: page.content,
+          enrolledAt: enrollment.enrolledAt,
+          lessonCount,
+          thumbnail,
+        };
+      })
+    );
 
-  // Filter nulls (pages that are no longer live, etc.)
-  const liveCourses = courses.filter(Boolean);
+    // Filter nulls (pages that are no longer live, etc.)
+    const liveCourses = courses.filter(Boolean);
 
-  return Response.json({ courses: liveCourses });
+    return Response.json({ courses: liveCourses });
+  } catch (err) {
+    console.error("[GET /api/my-learning]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

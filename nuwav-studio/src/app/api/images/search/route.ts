@@ -56,53 +56,61 @@ export async function GET(request: NextRequest): Promise<Response> {
   url.searchParams.set("per_page", String(perPage));
   url.searchParams.set("safesearch", "true");
 
-  const res = await fetch(url.toString(), { next: { revalidate: 300 } });
+  try {
+    const res = await fetch(url.toString(), { next: { revalidate: 300 } });
 
-  if (!res.ok) {
+    if (!res.ok) {
+      return Response.json(
+        { error: "Pixabay API request failed", images: [], total: 0, page, hasMore: false },
+        { status: 200 }
+      );
+    }
+
+    const data = await res.json() as {
+      totalHits: number;
+      total: number;
+      hits: Array<{
+        id: number;
+        previewURL: string;
+        webformatURL: string;
+        largeImageURL: string;
+        pageURL: string;
+        user: string;
+        tags: string;
+        views: number;
+        downloads: number;
+        likes: number;
+        imageWidth: number;
+        imageHeight: number;
+      }>;
+    };
+
+    const images: PixabayImage[] = (data.hits ?? []).map((hit) => ({
+      id: hit.id,
+      previewUrl: hit.previewURL,
+      webUrl: hit.webformatURL,
+      largeUrl: hit.largeImageURL,
+      pageUrl: hit.pageURL,
+      user: hit.user,
+      tags: hit.tags
+        ? hit.tags.split(",").map((t) => t.trim()).filter(Boolean)
+        : [],
+      views: hit.views,
+      downloads: hit.downloads,
+      likes: hit.likes,
+      width: hit.imageWidth,
+      height: hit.imageHeight,
+    }));
+
+    const total = data.totalHits ?? 0;
+    const hasMore = page * perPage < total;
+
+    return Response.json({ images, total, page, hasMore });
+  } catch (err) {
+    console.error("[GET /api/images/search]", err);
     return Response.json(
-      { error: "Pixabay API request failed", images: [], total: 0, page, hasMore: false },
-      { status: 200 }
+      { error: "Image search failed", images: [], total: 0, page, hasMore: false },
+      { status: 500 }
     );
   }
-
-  const data = await res.json() as {
-    totalHits: number;
-    total: number;
-    hits: Array<{
-      id: number;
-      previewURL: string;
-      webformatURL: string;
-      largeImageURL: string;
-      pageURL: string;
-      user: string;
-      tags: string;
-      views: number;
-      downloads: number;
-      likes: number;
-      imageWidth: number;
-      imageHeight: number;
-    }>;
-  };
-
-  const images: PixabayImage[] = (data.hits ?? []).map((hit) => ({
-    id: hit.id,
-    previewUrl: hit.previewURL,
-    webUrl: hit.webformatURL,
-    largeUrl: hit.largeImageURL,
-    pageUrl: hit.pageURL,
-    user: hit.user,
-    tags: hit.tags
-      ? hit.tags.split(",").map((t) => t.trim()).filter(Boolean)
-      : [],
-    views: hit.views,
-    downloads: hit.downloads,
-    likes: hit.likes,
-    width: hit.imageWidth,
-    height: hit.imageHeight,
-  }));
-
-  const total = data.totalHits ?? 0;
-  const hasMore = page * perPage < total;
-
-  return Response.json({ images, total, page, hasMore });
 }

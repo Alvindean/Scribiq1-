@@ -155,33 +155,38 @@ export async function GET(request: NextRequest): Promise<Response> {
     return Response.json({ error: "Query must be at least 2 characters" }, { status: 400 });
   }
 
-  const perSource = source === "all" ? Math.ceil(limit / 3) : limit;
+  try {
+    const perSource = source === "all" ? Math.ceil(limit / 3) : limit;
 
-  const [itunesResults, pixabayResults, freesoundResults] = await Promise.allSettled([
-    source === "all" || source === "itunes" ? searchItunes(q, perSource) : Promise.resolve([]),
-    source === "all" || source === "pixabay" ? searchPixabay(q, perSource) : Promise.resolve([]),
-    source === "all" || source === "freesound" ? searchFreesound(q, perSource) : Promise.resolve([]),
-  ]);
+    const [itunesResults, pixabayResults, freesoundResults] = await Promise.allSettled([
+      source === "all" || source === "itunes" ? searchItunes(q, perSource) : Promise.resolve([]),
+      source === "all" || source === "pixabay" ? searchPixabay(q, perSource) : Promise.resolve([]),
+      source === "all" || source === "freesound" ? searchFreesound(q, perSource) : Promise.resolve([]),
+    ]);
 
-  // Interleave results so no single source dominates the list
-  const itunes = itunesResults.status === "fulfilled" ? itunesResults.value : [];
-  const pixabay = pixabayResults.status === "fulfilled" ? pixabayResults.value : [];
-  const freesound = freesoundResults.status === "fulfilled" ? freesoundResults.value : [];
+    // Interleave results so no single source dominates the list
+    const itunes = itunesResults.status === "fulfilled" ? itunesResults.value : [];
+    const pixabay = pixabayResults.status === "fulfilled" ? pixabayResults.value : [];
+    const freesound = freesoundResults.status === "fulfilled" ? freesoundResults.value : [];
 
-  const interleaved: MusicTrack[] = [];
-  const maxLen = Math.max(itunes.length, pixabay.length, freesound.length);
-  for (let i = 0; i < maxLen && interleaved.length < limit; i++) {
-    if (i < itunes.length) interleaved.push(itunes[i]);
-    if (i < pixabay.length) interleaved.push(pixabay[i]);
-    if (i < freesound.length) interleaved.push(freesound[i]);
+    const interleaved: MusicTrack[] = [];
+    const maxLen = Math.max(itunes.length, pixabay.length, freesound.length);
+    for (let i = 0; i < maxLen && interleaved.length < limit; i++) {
+      if (i < itunes.length) interleaved.push(itunes[i]);
+      if (i < pixabay.length) interleaved.push(pixabay[i]);
+      if (i < freesound.length) interleaved.push(freesound[i]);
+    }
+
+    return Response.json({
+      tracks: interleaved.slice(0, limit),
+      sources: {
+        itunes: itunes.length,
+        pixabay: pixabay.length,
+        freesound: freesound.length,
+      },
+    });
+  } catch (err) {
+    console.error("[GET /api/music/search]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  return Response.json({
-    tracks: interleaved.slice(0, limit),
-    sources: {
-      itunes: itunes.length,
-      pixabay: pixabay.length,
-      freesound: freesound.length,
-    },
-  });
 }

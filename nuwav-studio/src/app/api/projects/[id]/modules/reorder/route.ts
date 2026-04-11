@@ -28,36 +28,41 @@ export async function PATCH(
     );
   }
 
-  // Verify the project belongs to the caller's org
-  const [profile] = await db
-    .select({ orgId: profiles.orgId })
-    .from(profiles)
-    .where(eq(profiles.id, session.user.id))
-    .limit(1);
+  try {
+    // Verify the project belongs to the caller's org
+    const [profile] = await db
+      .select({ orgId: profiles.orgId })
+      .from(profiles)
+      .where(eq(profiles.id, session.user.id))
+      .limit(1);
 
-  if (!profile?.orgId) {
-    return Response.json({ error: "No organisation found" }, { status: 400 });
+    if (!profile?.orgId) {
+      return Response.json({ error: "No organisation found" }, { status: 400 });
+    }
+
+    const [project] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(eq(projects.id, projectId))
+      .limit(1);
+
+    if (!project) {
+      return Response.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // Update each module's order in parallel
+    await Promise.all(
+      (orderedIds as string[]).map((moduleId, index) =>
+        db
+          .update(modules)
+          .set({ order: index })
+          .where(eq(modules.id, moduleId))
+      )
+    );
+
+    return Response.json({ ok: true });
+  } catch (err) {
+    console.error("[PATCH /api/projects/[id]/modules/reorder]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const [project] = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(eq(projects.id, projectId))
-    .limit(1);
-
-  if (!project) {
-    return Response.json({ error: "Project not found" }, { status: 404 });
-  }
-
-  // Update each module's order in parallel
-  await Promise.all(
-    (orderedIds as string[]).map((moduleId, index) =>
-      db
-        .update(modules)
-        .set({ order: index })
-        .where(eq(modules.id, moduleId))
-    )
-  );
-
-  return Response.json({ ok: true });
 }

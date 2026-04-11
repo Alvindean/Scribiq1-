@@ -15,16 +15,21 @@ export async function GET(request: NextRequest): Promise<Response> {
     );
   }
 
-  const [existing] = await db
-    .select({ id: enrollments.id })
-    .from(enrollments)
-    .where(
-      and(
-        eq(enrollments.courseSlug, courseSlug),
-        eq(enrollments.studentEmail, email.toLowerCase().trim())
+  try {
+    const [existing] = await db
+      .select({ id: enrollments.id })
+      .from(enrollments)
+      .where(
+        and(
+          eq(enrollments.courseSlug, courseSlug),
+          eq(enrollments.studentEmail, email.toLowerCase().trim())
+        )
       )
-    )
-    .limit(1);
+      .limit(1);
 
-  return Response.json({ enrolled: !!existing });
+    return Response.json({ enrolled: !!existing });
+  } catch (err) {
+    console.error("[GET /api/enroll/check]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
+  }
 }

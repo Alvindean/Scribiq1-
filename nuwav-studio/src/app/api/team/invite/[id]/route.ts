@@ -34,15 +34,20 @@ export async function DELETE(
     return Response.json({ error: "You are not part of an organization" }, { status: 400 });
   }
 
-  // Only delete invitations that belong to the caller's org
-  const result = await db
-    .delete(invitations)
-    .where(and(eq(invitations.id, id), eq(invitations.orgId, profile.orgId)))
-    .returning({ id: invitations.id });
+  try {
+    // Only delete invitations that belong to the caller's org
+    const result = await db
+      .delete(invitations)
+      .where(and(eq(invitations.id, id), eq(invitations.orgId, profile.orgId)))
+      .returning({ id: invitations.id });
 
-  if (result.length === 0) {
-    return Response.json({ error: "Invitation not found" }, { status: 404 });
+    if (result.length === 0) {
+      return Response.json({ error: "Invitation not found" }, { status: 404 });
+    }
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error("[DELETE /api/team/invite/[id]]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  return Response.json({ success: true });
 }
