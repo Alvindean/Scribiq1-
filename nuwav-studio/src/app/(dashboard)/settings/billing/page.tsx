@@ -14,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { PLANS } from "@/lib/stripe/plans";
 import type { Plan } from "@/lib/stripe/plans";
 import { ManageSubscriptionButton } from "@/components/billing/ManageSubscriptionButton";
+import { UpgradePlanButton } from "@/components/billing/UpgradePlanButton";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -86,18 +87,11 @@ function PlanCard({
             </li>
           ))}
         </ul>
-        <form action="/api/stripe/checkout" method="POST">
-          <input type="hidden" name="priceId" value={plan.priceId} />
-          <input type="hidden" name="planId" value={plan.id} />
-          <Button
-            type="submit"
-            className="w-full"
-            variant={isCurrent ? "outline" : "default"}
-            disabled={isCurrent}
-          >
-            {isCurrent ? "Current Plan" : `Upgrade to ${plan.name}`}
-          </Button>
-        </form>
+        <UpgradePlanButton
+          priceId={plan.priceId}
+          planName={plan.name}
+          isCurrent={isCurrent}
+        />
       </CardContent>
     </Card>
   );
