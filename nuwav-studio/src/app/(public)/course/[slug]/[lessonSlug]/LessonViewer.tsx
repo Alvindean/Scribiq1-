@@ -11,6 +11,8 @@ import {
   Menu,
   X,
   PlayCircle,
+  Lock,
+  ArrowRight,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +51,10 @@ export interface LessonViewerProps {
   nextLesson: LessonItem | null;
   currentIndex: number;
   totalCount: number;
+  /** Whether this course requires payment */
+  isPaidCourse?: boolean;
+  /** The checkout page slug (used for the paywall CTA link) */
+  checkoutSlug?: string | null;
 }
 
 /* ------------------------------------------------------------------ */

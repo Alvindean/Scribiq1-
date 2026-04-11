@@ -5,6 +5,10 @@ import { publishedPages, projects, modules, lessons } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
 import { LessonViewer } from "./LessonViewer";
 
+interface CoursePortalContent {
+  checkout_slug?: string;
+}
+
 interface Props {
   params: Promise<{ slug: string; lessonSlug: string }>;
 }
@@ -112,6 +116,24 @@ export default async function LessonPage({ params }: Props) {
   // 7. Resolve module for breadcrumb
   const currentModule = projectModules.find((m) => m.id === lesson.moduleId);
 
+  // 8. Determine if this is a paid course by looking up the checkout page
+  const [checkoutPage] = await db
+    .select({ slug: publishedPages.slug })
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.projectId, project.id),
+        eq(publishedPages.pageType, "checkout"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
+
+  // Also check content.checkout_slug as fallback
+  const portalContent = (page.content ?? {}) as CoursePortalContent;
+  const checkoutSlug = checkoutPage?.slug ?? portalContent.checkout_slug ?? null;
+  const isPaidCourse = !!checkoutSlug;
+
   return (
     <LessonViewer
       projectId={project.id}
@@ -158,6 +180,8 @@ export default async function LessonPage({ params }: Props) {
       }
       currentIndex={currentIdx}
       totalCount={allLessons.length}
+      isPaidCourse={isPaidCourse}
+      checkoutSlug={checkoutSlug}
     />
   );
 }
