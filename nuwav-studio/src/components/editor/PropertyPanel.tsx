@@ -18,6 +18,7 @@ import {
   X,
   ChevronDown,
   ChevronUp,
+  Trash2,
 } from "lucide-react";
 
 // ── Chip input ───────────────────────────────────────────────────────────────
@@ -162,6 +163,12 @@ export function PropertyPanel() {
     setScriptDirty(false);
   };
 
+  const handleClearScript = () => {
+    if (!window.confirm("Clear all script content? This cannot be undone.")) return;
+    setScriptDraft("");
+    setScriptDirty((selectedLesson.script ?? "") !== "");
+  };
+
   const handleApplyQuickEdit = async () => {
     if (!scriptDraft.trim() || editPrompts.length === 0) return;
     setIsRewriting(true);
@@ -279,27 +286,39 @@ export function PropertyPanel() {
             style={{ WebkitUserSelect: "text", userSelect: "text" }}
           />
 
-          {/* Save / Discard */}
-          {scriptDirty && (
-            <div className="flex gap-2 shrink-0">
-              <Button
-                onClick={handleSaveScript}
-                size="sm"
-                className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5 min-h-[44px]"
-              >
-                <Save className="w-3.5 h-3.5" />
-                Save
-              </Button>
-              <Button
-                onClick={handleDiscardScript}
-                size="sm"
-                variant="outline"
-                className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5 min-h-[44px]"
-              >
-                Discard
-              </Button>
-            </div>
-          )}
+          {/* Save / Discard / Clear */}
+          <div className="flex gap-2 shrink-0">
+            {scriptDirty && (
+              <>
+                <Button
+                  onClick={handleSaveScript}
+                  size="sm"
+                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5 min-h-[44px]"
+                >
+                  <Save className="w-3.5 h-3.5" />
+                  Save
+                </Button>
+                <Button
+                  onClick={handleDiscardScript}
+                  size="sm"
+                  variant="outline"
+                  className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5 min-h-[44px]"
+                >
+                  Discard
+                </Button>
+              </>
+            )}
+            <Button
+              onClick={handleClearScript}
+              disabled={!scriptDraft}
+              size="sm"
+              variant="outline"
+              className="flex-1 gap-1.5 border-red-900/60 text-red-400 hover:bg-red-950/40 hover:text-red-300 disabled:opacity-40 min-h-[44px]"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              Clear All
+            </Button>
+          </div>
 
           {/* ── Quick Edit ── */}
           <div className="shrink-0 rounded-lg border border-zinc-700/60 bg-zinc-900/60 overflow-hidden">

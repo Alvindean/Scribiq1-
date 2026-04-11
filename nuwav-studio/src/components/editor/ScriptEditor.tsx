@@ -3,7 +3,7 @@ import { useState, useRef, useCallback } from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Save, RotateCcw, Copy, Check, ClipboardPaste } from "lucide-react";
+import { Save, RotateCcw, Copy, Check, ClipboardPaste, Trash2 } from "lucide-react";
 import { copyToClipboard } from "@/lib/clipboard";
 
 interface ScriptEditorProps {
@@ -45,6 +45,12 @@ export function ScriptEditor({
   const handleDiscard = () => {
     setScript(initialScript);
     setDirty(false);
+  };
+
+  const handleClearAll = () => {
+    if (!window.confirm("Clear all script content? This cannot be undone.")) return;
+    setScript("");
+    setDirty("" !== initialScript);
   };
 
   async function handleCopy() {
@@ -193,7 +199,7 @@ export function ScriptEditor({
         />
       </div>
 
-      {/* Save / Discard row */}
+      {/* Save / Discard / Clear row */}
       <div className="flex gap-2 shrink-0">
         <Button
           onClick={handleSave}
@@ -213,6 +219,16 @@ export function ScriptEditor({
         >
           <RotateCcw className="w-3.5 h-3.5" />
           Discard
+        </Button>
+        <Button
+          onClick={handleClearAll}
+          disabled={!script || disabled}
+          size="sm"
+          variant="outline"
+          className="flex-1 gap-1.5 border-red-900/60 text-red-400 hover:bg-red-950/40 hover:text-red-300 disabled:opacity-40 min-h-[44px]"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+          Clear All
         </Button>
       </div>
     </div>
