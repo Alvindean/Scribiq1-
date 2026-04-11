@@ -68,21 +68,34 @@ export function UsageStats({ stats }: UsageStatsProps) {
           const pct = item.limit === -1 ? 0 : Math.round((item.used / item.limit) * 100);
           const isUnlimited = item.limit === -1;
 
+          const isAtLimit = !isUnlimited && item.used >= item.limit;
+          const isNearLimit = !isUnlimited && !isAtLimit && item.used >= item.limit * 0.8;
+          const usedColorClass = isAtLimit
+            ? "text-destructive"
+            : isNearLimit
+            ? "text-amber-500"
+            : "";
+
           return (
-            <div key={item.label} className="space-y-1.5">
+            <div
+              key={item.label}
+              className="space-y-1.5 hover:bg-muted/60 transition-colors rounded-lg px-1 py-0.5"
+            >
               <div className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-1.5 text-muted-foreground">
                   <Icon className="h-3.5 w-3.5" />
                   <span>{item.label}</span>
                 </div>
-                <span className="font-medium tabular-nums">
+                <span className={`font-medium tabular-nums ${usedColorClass}`}>
                   {item.used}
                   {isUnlimited ? "" : ` / ${item.limit}`}
                   {item.unit ? ` ${item.unit}` : ""}
                 </span>
               </div>
-              {!isUnlimited && (
-                <Progress value={pct} className="h-1.5" />
+              {isUnlimited ? (
+                <span className="text-muted-foreground/60 text-xs">Unlimited</span>
+              ) : (
+                <Progress value={pct} className="h-1.5 rounded-full [&>div]:rounded-full" />
               )}
             </div>
           );
