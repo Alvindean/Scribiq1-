@@ -56,10 +56,10 @@ function SortableLesson({
       <button
         type="button"
         onClick={() => onSelect(lesson)}
-        className={`w-full flex items-center gap-2 pl-7 pr-3 py-2 text-left transition-colors group ${
+        className={`w-full flex items-center gap-2 pl-7 pr-3 py-2 text-left transition-colors cursor-pointer group ${
           isSelected
-            ? "bg-violet-600/20 text-white"
-            : "hover:bg-zinc-800/50 text-zinc-400 hover:text-zinc-200"
+            ? "border-l-2 border-violet-500 bg-violet-600/20 text-white"
+            : "border-l-2 border-transparent hover:bg-zinc-800/60 text-zinc-400 hover:text-zinc-200"
         }`}
       >
         {/* Drag handle */}
@@ -71,11 +71,11 @@ function SortableLesson({
         >
           <GripVertical className="w-3 h-3 text-zinc-700 group-hover:text-zinc-500" />
         </span>
+        <span className="flex-1 text-xs truncate">{lesson.title}</span>
         <span
-          className={`w-2 h-2 rounded-full shrink-0 ${STATUS_COLORS[lesson.status]}`}
+          className={`w-2 h-2 rounded-full shrink-0 ml-auto ${STATUS_COLORS[lesson.status]}`}
           title={lesson.status}
         />
-        <span className="flex-1 text-xs truncate">{lesson.title}</span>
         {isSelected && (
           <span className="w-1.5 h-1.5 rounded-full bg-violet-400 shrink-0" />
         )}
@@ -134,7 +134,7 @@ export function ModuleTree() {
                 <button
                   type="button"
                   onClick={() => toggleModule(mod.id)}
-                  className="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-zinc-800/60 transition-colors group"
+                  className="w-full flex items-center gap-2 px-3 py-2 text-left cursor-pointer hover:bg-zinc-800/40 transition-colors group"
                 >
                   <span className="text-zinc-500 group-hover:text-zinc-300 transition-colors">
                     {isCollapsed ? (
