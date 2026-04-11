@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Search, Music2, Play, Pause, Zap, Heart, Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,6 +42,7 @@ export function SongAnalyzer() {
   const [result, setResult] = useState<SongAnalysis | null>(null);
   const [playing, setPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   async function handleAnalyze(e: React.FormEvent) {
     e.preventDefault();
@@ -50,20 +51,31 @@ export function SongAnalyzer() {
     setError(null);
     setResult(null);
 
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     try {
       const res = await fetch("/api/music/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ song: song.trim(), artist: artist.trim() }),
+        signal: controller.signal,
       });
       const data = await res.json() as SongAnalysis & { error?: string };
       if (!res.ok) throw new Error(data.error ?? "Analysis failed");
       setResult(data);
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") return;
       setError(err instanceof Error ? err.message : "Analysis failed");
     } finally {
       setLoading(false);
+      abortRef.current = null;
     }
+  }
+
+  function handleCancel() {
+    abortRef.current?.abort();
+    setLoading(false);
   }
 
   function togglePreview() {
@@ -143,6 +155,7 @@ export function SongAnalyzer() {
             ))}
           </div>
           <p className="text-sm">Pulling data from iTunes, Spotify, and AI…</p>
+          <button onClick={handleCancel} className="text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground">Cancel</button>
         </div>
       )}
 
