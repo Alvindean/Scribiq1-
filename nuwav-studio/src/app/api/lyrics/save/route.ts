@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { lessons, projects, profiles } from "@/lib/db/schema";
+import { lessons, projects, profiles, lyrics } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function POST(request: NextRequest): Promise<Response> {
@@ -11,19 +11,22 @@ export async function POST(request: NextRequest): Promise<Response> {
   }
 
   let lessonId: string;
-  let lyrics: string;
+  let lyricsContent: string;
+  let projectId: string | undefined;
 
   try {
     const body = (await request.json()) as {
       lessonId?: string;
       lyrics?: string;
+      projectId?: string;
     };
 
     lessonId = body.lessonId?.trim() ?? "";
-    lyrics = body.lyrics?.trim() ?? "";
+    lyricsContent = body.lyrics?.trim() ?? "";
+    projectId = body.projectId?.trim() || undefined;
 
     if (!lessonId) throw new Error("lessonId is required");
-    if (!lyrics) throw new Error("lyrics is required");
+    if (!lyricsContent) throw new Error("lyrics is required");
   } catch (err) {
     return Response.json(
       { error: err instanceof Error ? err.message : "Invalid request" },
@@ -63,11 +66,45 @@ export async function POST(request: NextRequest): Promise<Response> {
     return Response.json({ error: "Lesson not found" }, { status: 404 });
   }
 
-  // Save lyrics to the lesson's script field
+  // Save lyrics to the lesson's script field (backward compat)
   await db
     .update(lessons)
-    .set({ script: lyrics })
+    .set({ script: lyricsContent })
     .where(eq(lessons.id, lessonId));
 
-  return Response.json({ success: true });
+  // Upsert into the lyrics table
+  const resolvedProjectId = projectId ?? lesson.projectId;
+
+  const [existingLyric] = await db
+    .select({ id: lyrics.id, version: lyrics.version })
+    .from(lyrics)
+    .where(eq(lyrics.lessonId, lessonId))
+    .limit(1);
+
+  let lyricId: string;
+
+  if (existingLyric) {
+    await db
+      .update(lyrics)
+      .set({
+        content: lyricsContent,
+        version: existingLyric.version + 1,
+        updatedAt: new Date(),
+      })
+      .where(eq(lyrics.id, existingLyric.id));
+    lyricId = existingLyric.id;
+  } else {
+    const [inserted] = await db
+      .insert(lyrics)
+      .values({
+        projectId: resolvedProjectId,
+        lessonId,
+        content: lyricsContent,
+        source: "manual",
+      })
+      .returning({ id: lyrics.id });
+    lyricId = inserted.id;
+  }
+
+  return Response.json({ success: true, lyricId });
 }

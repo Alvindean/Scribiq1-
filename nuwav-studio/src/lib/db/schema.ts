@@ -99,6 +99,20 @@ export const lessons = pgTable("lessons", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow(),
 });
 
+export const lyrics = pgTable("lyrics", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  projectId: uuid("project_id").references(() => projects.id, { onDelete: "cascade" }).notNull(),
+  lessonId: uuid("lesson_id").references(() => lessons.id, { onDelete: "set null" }),
+  content: text("content").notNull().default(""),
+  version: integer("version").notNull().default(1),
+  source: text("source").notNull().default("manual"), // "manual" | "ai" | "analyzer"
+  aiPrompt: text("ai_prompt"),
+  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type Lyric = typeof lyrics.$inferSelect;
+
 export const mediaAssets = pgTable("media_assets", {
   id: uuid("id").primaryKey().defaultRandom(),
   projectId: uuid("project_id"),
