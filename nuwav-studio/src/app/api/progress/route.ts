@@ -68,16 +68,21 @@ export async function GET(request: NextRequest): Promise<Response> {
     return Response.json({ error: "Missing courseSlug" }, { status: 400 });
   }
 
-  const org = await getOrgForUser(session.user.id);
-  if (!org) {
-    // No org — return empty progress; client uses localStorage
-    return Response.json({ courseSlug, completedLessons: [] });
+  try {
+    const org = await getOrgForUser(session.user.id);
+    if (!org) {
+      // No org — return empty progress; client uses localStorage
+      return Response.json({ courseSlug, completedLessons: [] });
+    }
+
+    const progressMap = getProgressMap(org.settings);
+    const completedLessons = progressMap[courseSlug] ?? [];
+
+    return Response.json({ courseSlug, completedLessons });
+  } catch (err) {
+    console.error("[GET /api/progress]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const progressMap = getProgressMap(org.settings);
-  const completedLessons = progressMap[courseSlug] ?? [];
-
-  return Response.json({ courseSlug, completedLessons });
 }
 
 // ---------------------------------------------------------------------------
@@ -91,58 +96,63 @@ export async function POST(request: NextRequest): Promise<Response> {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const body = (await request.json()) as {
-    courseSlug?: string;
-    lessonSlug?: string;
-    completed?: boolean;
-  };
+  try {
+    const body = (await request.json()) as {
+      courseSlug?: string;
+      lessonSlug?: string;
+      completed?: boolean;
+    };
 
-  const { courseSlug, lessonSlug, completed } = body;
+    const { courseSlug, lessonSlug, completed } = body;
 
-  if (!courseSlug || !lessonSlug || typeof completed !== "boolean") {
-    return Response.json(
-      { error: "Missing required fields: courseSlug, lessonSlug, completed" },
-      { status: 400 }
-    );
+    if (!courseSlug || !lessonSlug || typeof completed !== "boolean") {
+      return Response.json(
+        { error: "Missing required fields: courseSlug, lessonSlug, completed" },
+        { status: 400 }
+      );
+    }
+
+    const org = await getOrgForUser(session.user.id);
+    if (!org) {
+      // No org found — echo the request back (client continues with localStorage)
+      return Response.json({ courseSlug, lessonSlug, completed });
+    }
+
+    const existingSettings =
+      typeof org.settings === "object" && org.settings !== null
+        ? (org.settings as Record<string, unknown>)
+        : {};
+
+    const progressMap = getProgressMap(org.settings);
+    const current = progressMap[courseSlug] ?? [];
+
+    const next = completed
+      ? current.includes(lessonSlug)
+        ? current
+        : [...current, lessonSlug]
+      : current.filter((s) => s !== lessonSlug);
+
+    const updatedSettings = {
+      ...existingSettings,
+      progress: {
+        ...progressMap,
+        [courseSlug]: next,
+      },
+    };
+
+    await db
+      .update(organizations)
+      .set({ settings: updatedSettings })
+      .where(eq(organizations.id, org.id));
+
+    return Response.json({
+      courseSlug,
+      lessonSlug,
+      completed,
+      completedLessons: next,
+    });
+  } catch (err) {
+    console.error("[POST /api/progress]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  const org = await getOrgForUser(session.user.id);
-  if (!org) {
-    // No org found — echo the request back (client continues with localStorage)
-    return Response.json({ courseSlug, lessonSlug, completed });
-  }
-
-  const existingSettings =
-    typeof org.settings === "object" && org.settings !== null
-      ? (org.settings as Record<string, unknown>)
-      : {};
-
-  const progressMap = getProgressMap(org.settings);
-  const current = progressMap[courseSlug] ?? [];
-
-  const next = completed
-    ? current.includes(lessonSlug)
-      ? current
-      : [...current, lessonSlug]
-    : current.filter((s) => s !== lessonSlug);
-
-  const updatedSettings = {
-    ...existingSettings,
-    progress: {
-      ...progressMap,
-      [courseSlug]: next,
-    },
-  };
-
-  await db
-    .update(organizations)
-    .set({ settings: updatedSettings })
-    .where(eq(organizations.id, org.id));
-
-  return Response.json({
-    courseSlug,
-    lessonSlug,
-    completed,
-    completedLessons: next,
-  });
 }

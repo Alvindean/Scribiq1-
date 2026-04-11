@@ -33,15 +33,56 @@ export async function GET(): Promise<Response> {
     );
   }
 
-  // Fetch live voices from ElevenLabs
-  const elevenRes = await fetch("https://api.elevenlabs.io/v1/voices", {
-    headers: {
-      "xi-api-key": process.env.ELEVENLABS_API_KEY,
-    },
-  });
+  try {
+    // Fetch live voices from ElevenLabs
+    const elevenRes = await fetch("https://api.elevenlabs.io/v1/voices", {
+      headers: {
+        "xi-api-key": process.env.ELEVENLABS_API_KEY,
+      },
+    });
 
-  if (!elevenRes.ok) {
-    // Degrade gracefully to fallback
+    if (!elevenRes.ok) {
+      // Degrade gracefully to fallback
+      return Response.json(
+        { voices: FALLBACK_VOICES },
+        {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "max-age=600",
+          },
+        }
+      );
+    }
+
+    const data = (await elevenRes.json()) as {
+      voices: Array<{
+        voice_id: string;
+        name: string;
+        category: string;
+        labels?: Record<string, string>;
+      }>;
+    };
+
+    const voices = (data.voices ?? []).map(({ voice_id, name, category, labels }) => ({
+      voice_id,
+      name,
+      category,
+      labels,
+    }));
+
+    return Response.json(
+      { voices },
+      {
+        status: 200,
+        headers: {
+          "Content-Type": "application/json",
+          "Cache-Control": "max-age=600",
+        },
+      }
+    );
+  } catch (err) {
+    console.error("[GET /api/voiceover/voices]", err);
     return Response.json(
       { voices: FALLBACK_VOICES },
       {
@@ -53,31 +94,4 @@ export async function GET(): Promise<Response> {
       }
     );
   }
-
-  const data = (await elevenRes.json()) as {
-    voices: Array<{
-      voice_id: string;
-      name: string;
-      category: string;
-      labels?: Record<string, string>;
-    }>;
-  };
-
-  const voices = (data.voices ?? []).map(({ voice_id, name, category, labels }) => ({
-    voice_id,
-    name,
-    category,
-    labels,
-  }));
-
-  return Response.json(
-    { voices },
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/json",
-        "Cache-Control": "max-age=600",
-      },
-    }
-  );
 }

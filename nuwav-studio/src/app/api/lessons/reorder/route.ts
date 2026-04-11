@@ -31,46 +31,51 @@ export async function PATCH(request: NextRequest): Promise<Response> {
     );
   }
 
-  // Resolve the org from the caller's profile
-  const [profile] = await db
-    .select({ orgId: profiles.orgId })
-    .from(profiles)
-    .where(eq(profiles.id, session.user.id))
-    .limit(1);
+  try {
+    // Resolve the org from the caller's profile
+    const [profile] = await db
+      .select({ orgId: profiles.orgId })
+      .from(profiles)
+      .where(eq(profiles.id, session.user.id))
+      .limit(1);
 
-  if (!profile?.orgId) {
-    return Response.json({ error: "No organisation found" }, { status: 400 });
+    if (!profile?.orgId) {
+      return Response.json({ error: "No organisation found" }, { status: 400 });
+    }
+
+    // Verify the module exists and its project belongs to the caller's org
+    const [mod] = await db
+      .select({ projectId: modules.projectId })
+      .from(modules)
+      .where(eq(modules.id, moduleId))
+      .limit(1);
+
+    if (!mod) {
+      return Response.json({ error: "Module not found" }, { status: 404 });
+    }
+
+    const [project] = await db
+      .select({ id: projects.id })
+      .from(projects)
+      .where(
+        and(eq(projects.id, mod.projectId), eq(projects.orgId, profile.orgId))
+      )
+      .limit(1);
+
+    if (!project) {
+      return Response.json({ error: "Project not found" }, { status: 404 });
+    }
+
+    // Update each lesson's order in parallel
+    await Promise.all(
+      (orderedIds as string[]).map((id, index) =>
+        db.update(lessons).set({ order: index }).where(eq(lessons.id, id))
+      )
+    );
+
+    return Response.json({ success: true });
+  } catch (err) {
+    console.error("[PATCH /api/lessons/reorder]", err);
+    return Response.json({ error: "Internal server error" }, { status: 500 });
   }
-
-  // Verify the module exists and its project belongs to the caller's org
-  const [mod] = await db
-    .select({ projectId: modules.projectId })
-    .from(modules)
-    .where(eq(modules.id, moduleId))
-    .limit(1);
-
-  if (!mod) {
-    return Response.json({ error: "Module not found" }, { status: 404 });
-  }
-
-  const [project] = await db
-    .select({ id: projects.id })
-    .from(projects)
-    .where(
-      and(eq(projects.id, mod.projectId), eq(projects.orgId, profile.orgId))
-    )
-    .limit(1);
-
-  if (!project) {
-    return Response.json({ error: "Project not found" }, { status: 404 });
-  }
-
-  // Update each lesson's order in parallel
-  await Promise.all(
-    (orderedIds as string[]).map((id, index) =>
-      db.update(lessons).set({ order: index }).where(eq(lessons.id, id))
-    )
-  );
-
-  return Response.json({ success: true });
 }

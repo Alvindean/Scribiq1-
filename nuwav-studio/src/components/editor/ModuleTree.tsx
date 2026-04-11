@@ -376,6 +376,109 @@ function ModuleDragOverlay({
   );
 }
 
+// ─── Empty-state template picker ─────────────────────────────────────────────
+
+// 4 quick-start templates shown when the project has no modules yet.
+const QUICK_START_IDS = [
+  "how-to-course",
+  "mini-course",
+  "vsl-course-combo",
+  "7-day-challenge",
+];
+const QUICK_START_TEMPLATES = COURSE_TEMPLATES.filter((t) =>
+  QUICK_START_IDS.includes(t.id)
+);
+
+function EmptyStateTemplatePicker({ projectId }: { projectId: string }) {
+  const router = useRouter();
+  const [applying, setApplying] = useState<string | null>(null);
+  const [applyError, setApplyError] = useState<string | null>(null);
+
+  const handleApply = useCallback(
+    async (templateId: string) => {
+      setApplying(templateId);
+      setApplyError(null);
+      try {
+        const res = await fetch(
+          `/api/projects/${projectId}/apply-template`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ templateId }),
+          }
+        );
+        if (!res.ok) {
+          const data = (await res.json()) as { error?: string };
+          throw new Error(data.error ?? "Failed to apply template");
+        }
+        // Refresh the page so the server component re-fetches the modules.
+        router.refresh();
+      } catch (err) {
+        setApplyError(
+          err instanceof Error ? err.message : "Something went wrong"
+        );
+        setApplying(null);
+      }
+    },
+    [projectId, router]
+  );
+
+  return (
+    <div className="px-3 py-4 space-y-3">
+      <div className="flex items-center gap-1.5 text-zinc-400">
+        <LayoutTemplate className="w-3.5 h-3.5 shrink-0" />
+        <p className="text-[11px] font-semibold uppercase tracking-wider">
+          Choose a template
+        </p>
+      </div>
+      <p className="text-[10px] text-zinc-500 leading-relaxed">
+        Get started faster with a ready-made structure.
+      </p>
+
+      <div className="space-y-2">
+        {QUICK_START_TEMPLATES.map((t) => {
+          const lessonCount = templateLessonCount(t);
+          const isApplying = applying === t.id;
+
+          return (
+            <button
+              key={t.id}
+              type="button"
+              disabled={applying !== null}
+              onClick={() => void handleApply(t.id)}
+              className="w-full text-left rounded-md border border-zinc-700 bg-zinc-900 hover:border-violet-500 hover:bg-violet-900/10 transition-colors px-3 py-2 disabled:opacity-50 disabled:cursor-not-allowed group"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-medium text-zinc-300 group-hover:text-white transition-colors leading-snug truncate">
+                  {t.name}
+                </span>
+                {isApplying ? (
+                  <Loader2 className="w-3 h-3 text-violet-400 animate-spin shrink-0" />
+                ) : (
+                  <span className="text-[10px] text-zinc-600 shrink-0 tabular-nums">
+                    {t.modules.length}m&nbsp;&middot;&nbsp;{lessonCount}l
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-zinc-600 mt-0.5 line-clamp-2 leading-relaxed">
+                {t.description}
+              </p>
+            </button>
+          );
+        })}
+      </div>
+
+      {applyError && (
+        <p className="text-[10px] text-red-400 leading-snug">{applyError}</p>
+      )}
+
+      <p className="text-[10px] text-zinc-600 text-center pt-1">
+        or add a module manually with the button below
+      </p>
+    </div>
+  );
+}
+
 // ─── Main tree ────────────────────────────────────────────────────────────────
 
 export function ModuleTree() {
@@ -866,11 +969,8 @@ export function ModuleTree() {
             </DragOverlay>
           </DndContext>
 
-          {modules.length === 0 && !addingModuleInput && (
-            <p className="text-xs text-zinc-600 text-center py-8 px-4">
-              No modules yet. Add one below or generate content to get
-              started.
-            </p>
+          {modules.length === 0 && !addingModuleInput && project?.id && (
+            <EmptyStateTemplatePicker projectId={project.id} />
           )}
 
           {/* Add module input or button */}
