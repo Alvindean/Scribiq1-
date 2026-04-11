@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Search, Music2, Play, Pause, Zap, Heart, Activity } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Music2, Play, Pause, Zap, Heart, Activity, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,6 +36,7 @@ function FeatureBar({
 }
 
 export function SongAnalyzer() {
+  const router = useRouter();
   const [song, setSong] = useState("");
   const [artist, setArtist] = useState("");
   const [loading, setLoading] = useState(false);
@@ -43,6 +45,28 @@ export function SongAnalyzer() {
   const [playing, setPlaying] = useState(false);
   const [audio, setAudio] = useState<HTMLAudioElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
+
+  function handleStartLyrics() {
+    if (!result) return;
+    const scaffold = [
+      result.aiAnalysis.structure ? `# Structure: ${result.aiAnalysis.structure}` : "",
+      result.aiAnalysis.mood ? `# Mood: ${result.aiAnalysis.mood}` : "",
+      "",
+      "[Verse 1]",
+      "",
+      "[Chorus]",
+      "",
+      "[Verse 2]",
+      "",
+      "[Chorus]",
+      "",
+      "[Bridge]",
+      "",
+      "[Outro]",
+    ].filter(Boolean).join("\n");
+    localStorage.setItem("soniq:lyric-editor-draft", scaffold);
+    router.push("/music?tab=lyrics");
+  }
 
   async function handleAnalyze(e: React.FormEvent) {
     e.preventDefault();
@@ -266,6 +290,19 @@ export function SongAnalyzer() {
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Start Lyrics button */}
+          <div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleStartLyrics}
+              className="gap-2"
+            >
+              <PenLine className="h-4 w-4" />
+              Start Lyrics from This Song
+            </Button>
           </div>
 
           {/* Teaching insights */}
