@@ -13,7 +13,7 @@ import {
   Music2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const navItems = [
@@ -28,6 +28,11 @@ const navItems = [
 export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { data: session } = useSession();
+  const userName = session?.user?.name ?? "";
+  const userEmail = session?.user?.email ?? "";
+  const initials = userName.charAt(0).toUpperCase() || "?";
+
   async function handleSignOut() {
     await signOut({ redirect: false });
     router.push("/login");
@@ -71,15 +76,27 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Sign out */}
-      <div className="border-t p-3">
-        <button
-          onClick={handleSignOut}
-          className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
-        >
-          <LogOut className="h-4 w-4" />
-          Sign Out
-        </button>
+      {/* User profile + sign out */}
+      <div className="border-t">
+        <div className="px-3 py-2 flex items-center gap-3">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-violet-100 text-violet-700 text-sm font-semibold select-none">
+            {initials}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium leading-none truncate">{userName}</p>
+            <p className="text-xs text-muted-foreground truncate mt-0.5">{userEmail}</p>
+          </div>
+        </div>
+        <div className="border-t mx-3" />
+        <div className="p-3">
+          <button
+            onClick={handleSignOut}
+            className="flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-destructive"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign Out
+          </button>
+        </div>
       </div>
     </aside>
   );
