@@ -175,8 +175,10 @@ export default async function BillingPage() {
       const { getStripe } = await import("@/lib/stripe/client");
       const stripe = getStripe();
       const sub = await stripe.subscriptions.retrieve(org.stripeSubscriptionId);
-      if (sub.current_period_end) {
-        renewalDate = new Date(sub.current_period_end * 1000).toISOString();
+      // In Stripe SDK v22, current_period_end moved to SubscriptionItem
+      const periodEnd = sub.items?.data?.[0]?.current_period_end;
+      if (periodEnd) {
+        renewalDate = new Date(periodEnd * 1000).toISOString();
       }
     } catch {
       // Non-fatal: Stripe may not be configured in all environments

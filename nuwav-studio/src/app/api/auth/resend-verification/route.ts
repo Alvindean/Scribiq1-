@@ -40,7 +40,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       .orderBy(desc(emailVerificationTokens.createdAt))
       .limit(1);
 
-    if (recentToken && recentToken.createdAt > twoMinutesAgo) {
+    if (recentToken && recentToken.createdAt != null && recentToken.createdAt > twoMinutesAgo) {
       // Silently throttle
       return new Response(null, { status: 200 });
     }
