@@ -120,7 +120,6 @@ export function LyricEditor() {
     const insert = `${prefix}[${marker}]\n`;
     const next = lyrics.slice(0, pos) + insert + lyrics.slice(pos);
     setLyrics(next);
-    // Restore cursor after inserted text
     const newPos = pos + insert.length;
     requestAnimationFrame(() => {
       if (!el) return;
@@ -296,6 +295,7 @@ export function LyricEditor() {
           </div>
         )}
       </div>
+
 
       {/* AI Generate panel */}
       <div className="rounded-lg border border-zinc-700/60 bg-zinc-900/60 overflow-hidden">
