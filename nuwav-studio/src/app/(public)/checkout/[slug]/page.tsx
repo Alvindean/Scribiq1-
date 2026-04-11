@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { redirect } from "next/navigation";
+import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { publishedPages, projects } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -19,6 +20,40 @@ interface CheckoutContent {
   /** Numeric price in cents for Stripe, e.g. 9700 = $97 */
   price_cents?: number;
   currency?: string;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const [page] = await db
+    .select()
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.slug, slug),
+        eq(publishedPages.pageType, "checkout"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
+
+  if (!page) {
+    return { title: "Checkout", robots: { index: false } };
+  }
+
+  const [project] = await db
+    .select({ title: projects.title })
+    .from(projects)
+    .where(eq(projects.id, page.projectId))
+    .limit(1);
+
+  const content = page.content as CheckoutContent;
+  const productName = content.product_name ?? project?.title ?? "Online Course";
+
+  return {
+    title: `Checkout — ${productName}`,
+    robots: { index: false, follow: false },
+  };
 }
 
 async function createStripeSession(formData: FormData) {

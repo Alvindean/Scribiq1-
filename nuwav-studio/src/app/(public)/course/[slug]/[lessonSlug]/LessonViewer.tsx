@@ -183,10 +183,10 @@ export function LessonViewer({
       <header className="border-b bg-background sticky top-0 z-20">
         <div className="container mx-auto px-4 h-14 flex items-center justify-between gap-4">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-1 text-sm min-w-0" aria-label="breadcrumb">
+          <nav className="flex items-center gap-1 text-sm min-w-0" aria-label="Breadcrumb">
             <Link
               href={`/course/${courseSlug}`}
-              className="text-muted-foreground hover:text-foreground shrink-0"
+              className="text-muted-foreground hover:text-foreground shrink-0 transition-colors"
             >
               {courseTitle}
             </Link>
@@ -271,35 +271,59 @@ export function LessonViewer({
         <main className="flex-1 min-w-0 px-4 sm:px-0 py-6 sm:py-0">
           <h1 className="text-2xl font-bold mb-5">{lesson.title}</h1>
 
-          {/* Video player or script placeholder */}
+          {/* ── Video player ─────────────────────────────────────────── */}
           {lesson.videoUrl ? (
-            <div className="mb-6 rounded-xl overflow-hidden bg-black aspect-video shadow">
-              <video
-                src={lesson.videoUrl}
-                controls
-                poster={lesson.thumbnailUrl ?? undefined}
-                className="w-full h-full"
-                preload="metadata"
-              />
-            </div>
-          ) : (
-            <div className="mb-6 rounded-xl bg-muted/50 border border-dashed aspect-video flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">Video not yet rendered</p>
-            </div>
-          )}
+            <>
+              <div className="mb-6 rounded-xl overflow-hidden bg-black aspect-video shadow-lg">
+                <video
+                  src={lesson.videoUrl}
+                  controls
+                  playsInline
+                  poster={lesson.thumbnailUrl ?? undefined}
+                  className="w-full h-full object-contain"
+                  preload="metadata"
+                >
+                  Your browser does not support HTML5 video.
+                </video>
+              </div>
 
-          {/* Script display (always shown when present; as "notes" if video exists, as main content if not) */}
-          {scriptBlocks.length > 0 && (
-            <section className="rounded-xl border p-6 mb-6">
-              <h2 className="font-semibold text-sm mb-4">
-                {lesson.videoUrl ? "Lesson Notes" : "Lesson Script"}
+              {/* Script shown as supplementary notes when a video is present */}
+              {scriptBlocks.length > 0 && (
+                <section className="rounded-xl border p-6 mb-6">
+                  <h2 className="font-semibold text-sm mb-4 text-foreground">
+                    Lesson Notes
+                  </h2>
+                  <div className="space-y-3">
+                    {scriptBlocks.map((block, i) =>
+                      block.type === "heading" ? (
+                        <h3
+                          key={i}
+                          className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mt-6 first:mt-0"
+                        >
+                          {block.text}
+                        </h3>
+                      ) : (
+                        <p key={i} className="text-sm text-muted-foreground leading-relaxed">
+                          {block.text}
+                        </p>
+                      )
+                    )}
+                  </div>
+                </section>
+              )}
+            </>
+          ) : scriptBlocks.length > 0 ? (
+            /* ── No video: script is the primary content ──────────── */
+            <section className="rounded-xl border bg-muted/20 p-6 mb-6">
+              <h2 className="font-semibold text-sm mb-4 text-foreground">
+                Lesson Script
               </h2>
               <div className="space-y-3">
                 {scriptBlocks.map((block, i) =>
                   block.type === "heading" ? (
                     <h3
                       key={i}
-                      className="text-xs font-semibold uppercase tracking-widest text-violet-600 mt-5 first:mt-0"
+                      className="text-xs font-semibold uppercase tracking-widest text-violet-600 dark:text-violet-400 mt-6 first:mt-0"
                     >
                       {block.text}
                     </h3>
@@ -311,6 +335,11 @@ export function LessonViewer({
                 )}
               </div>
             </section>
+          ) : (
+            /* ── No video AND no script: placeholder ──────────────── */
+            <div className="mb-6 rounded-xl bg-muted/50 border border-dashed aspect-video flex items-center justify-center">
+              <p className="text-muted-foreground text-sm">Video not yet rendered</p>
+            </div>
           )}
 
           {/* Progress + Navigation row */}
@@ -337,7 +366,10 @@ export function LessonViewer({
 
             {/* Previous */}
             {prevLesson ? (
-              <Link href={`/course/${courseSlug}/${prevLesson.id}`}>
+              <Link
+                href={`/course/${courseSlug}/${prevLesson.id}`}
+                title={prevLesson.title}
+              >
                 <Button variant="outline" className="w-full sm:w-auto gap-1">
                   <ChevronLeft className="h-4 w-4" />
                   Previous Lesson
@@ -349,7 +381,10 @@ export function LessonViewer({
 
             {/* Next */}
             {nextLesson ? (
-              <Link href={`/course/${courseSlug}/${nextLesson.id}`}>
+              <Link
+                href={`/course/${courseSlug}/${nextLesson.id}`}
+                title={nextLesson.title}
+              >
                 <Button className="bg-violet-600 hover:bg-violet-700 w-full sm:w-auto gap-1">
                   Next Lesson
                   <ChevronRight className="h-4 w-4" />
@@ -391,7 +426,7 @@ function SidebarContent({
       {lessonsByModule.map((mod) => (
         <div key={mod.id}>
           {/* Module header */}
-          <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-muted/40 sticky top-0">
+          <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground bg-muted/40 sticky top-0 z-10">
             {mod.title}
           </div>
 

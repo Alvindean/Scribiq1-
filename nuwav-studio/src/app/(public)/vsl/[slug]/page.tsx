@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import type { Metadata } from "next";
 import { db } from "@/lib/db";
 import { publishedPages, projects } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
@@ -29,6 +30,46 @@ interface SalesPageContent {
   faq?: Array<{ question: string; answer: string }>;
   vsl_video_url?: string;
   checkout_slug?: string;
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const [page] = await db
+    .select()
+    .from(publishedPages)
+    .where(
+      and(
+        eq(publishedPages.slug, slug),
+        eq(publishedPages.pageType, "sales"),
+        eq(publishedPages.isLive, true)
+      )
+    )
+    .limit(1);
+
+  if (!page) {
+    return { title: "Page Not Found" };
+  }
+
+  const [project] = await db
+    .select({ title: projects.title })
+    .from(projects)
+    .where(eq(projects.id, page.projectId))
+    .limit(1);
+
+  const content = page.content as SalesPageContent;
+  const title = content.headline ?? project?.title ?? "Online Course";
+  const description = content.subheadline ?? `Discover ${title}`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      type: "website",
+    },
+  };
 }
 
 export default async function VSLPage({ params }: Props) {

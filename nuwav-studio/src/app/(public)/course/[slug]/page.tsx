@@ -34,6 +34,8 @@ interface CoursePortalContent {
   checkout_slug?: string;
   instructor_name?: string;
   description?: string;
+  /** Optional OG / hero image URL set by the course publisher */
+  hero_image?: string;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -72,13 +74,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `Free course on ${project.niche}${project.targetAudience ? ` for ${project.targetAudience}` : ""}.`
       : `Enroll in ${project.title} — a free online course.`);
 
+  // Prefer an explicit hero_image set in the page content, then fall back to
+  // the thumbnail of the first lesson in this project.
+  let ogImage: string | undefined = content.hero_image;
+  if (!ogImage) {
+    const [firstLesson] = await db
+      .select({ thumbnailUrl: lessons.thumbnailUrl })
+      .from(lessons)
+      .where(eq(lessons.projectId, project.id))
+      .orderBy(lessons.order)
+      .limit(1);
+    ogImage = firstLesson?.thumbnailUrl ?? undefined;
+  }
+
+  const title = `${project.title} — Free Course`;
+
   return {
-    title: `${project.title} — Free Course`,
+    title,
     description,
     openGraph: {
-      title: `${project.title} — Free Course`,
+      title,
       description,
       type: "website",
+      ...(ogImage && {
+        images: [{ url: ogImage, width: 1200, height: 630, alt: project.title }],
+      }),
     },
   };
 }
