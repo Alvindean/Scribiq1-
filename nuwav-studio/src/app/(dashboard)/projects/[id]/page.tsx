@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { ProjectWithModules, ProjectStatus, LessonStatus } from "@/types/project";
+import { ProjectActions } from "./ProjectActions";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -113,23 +114,7 @@ export default async function ProjectPage({
         </div>
 
         {/* Action buttons */}
-        <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${id}/editor`}>Edit</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${id}/preview`}>Preview</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${id}/publish`}>Publish</Link>
-          </Button>
-          <Button asChild variant="outline" size="sm">
-            <Link href={`/projects/${id}/export`}>Export</Link>
-          </Button>
-          <Button asChild size="sm">
-            <Link href={`/projects/${id}/generate`}>Generate</Link>
-          </Button>
-        </div>
+        <ProjectActions id={id} />
       </div>
 
       {/* Stats */}
