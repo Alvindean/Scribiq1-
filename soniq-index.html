@@ -2932,6 +2932,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="btn btn-sm" onclick="printBrief('lres')" title="Print song brief">🖨 Print</button>
         <button class="btn btn-sm" onclick="shareLink('lres')" title="Copy share link">🔗 Share</button>
         <button class="btn btn-sm" onclick="shareOnX('lres')" title="Share on X / Twitter" style="background:#000;color:#fff;border-color:#333">𝕏 Post</button>
+        <button class="var-btn" id="lres-var-btn" onclick="generateVariations('lres')" disabled title="Generate variations after creating a song">✨ Variations</button>
+        <button class="btn btn-teal" onclick="openShareModal('lres')" id="lres-comm-share-btn" style="display:none" title="Share to SONIQ Community">🌐 Share</button>
+        <button class="btn" onclick="openSocialKit('lres')" id="lres-skit-btn" style="display:none;background:linear-gradient(135deg,#1a0a2e,var(--s3));border-color:var(--violetline);color:var(--violet)" title="Generate cover art prompt, lyric video, social copy &amp; hashtags">📦 Kit</button>
       </div>
     </div>
     <!-- COPYRIGHT STRIP -->
@@ -2958,7 +2961,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="hook-iso-body" id="lres-hook-iso-text"></div>
     </div>
     <div class="otabs">
+      <div class="otab on" onclick="goOtab('lres','lyrics',this)">📝 Lyrics</div>
       <div class="otab" onclick="goOtab('lres','brief',this)">🎛 Brief</div>
+      <div class="otab" onclick="goOtab('lres','chords',this)">🎸 Chords</div>
       <div class="otab" onclick="goOtab('lres','structure',this)">🗺 Structure</div>
       <div class="otab" onclick="goOtab('lres','titles',this);loadTitles('lres')">🏷 Titles</div>
       <div class="otab otab-more" id="lres-more-tab">
@@ -2966,6 +2971,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="otab-more-menu" id="lres-more-menu">
           <div class="otab-more-item" onclick="goOtabMore('lres','dopamine','⚡ Dopamine')">⚡ Dopamine</div>
           <div class="otab-more-item" onclick="goOtabMore('lres','notes','💡 Director Notes')">💡 Director Notes</div>
+          <div class="otab-more-item" onclick="goOtabMore('lres','moodboard','🎨 Mood');loadMoodBoard('lres')">🎨 Mood</div>
           <div class="otab-more-item" onclick="tryOpenVisual('lres')">🎬 Visual</div>
           <div class="otab-more-item" onclick="tryOpenSync('lres')">📋 Sync</div>
         </div>
@@ -2987,7 +2993,13 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <span class="rev-pill" onclick="revise('lres','Cut the song shorter — remove the least essential section, tighten every line')">Shorter</span>
         <span class="rev-pill" onclick="revise('lres','Make it radio-ready — polish the hook, smooth rough edges, maximise replay')">Radio Edit</span>
       </div>
+      <!-- VARIATIONS -->
+      <div class="var-results" id="lres-var-results">
+        <div style="font-size:11px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">✨ Song Variations</div>
+        <div class="var-grid" id="lres-var-grid"></div>
+      </div>
     </div>
+    <div id="lres-opane-chords" class="opane"><div id="lres-chords-text" class="chords-output"></div></div>
     <div id="lres-opane-brief" class="opane">
       <div id="lres-brief-content" class="brief-output"></div>
     </div>
@@ -2997,6 +3009,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
     <div id="lres-opane-titles" class="opane"><div id="lres-titles-content"></div></div>
     <div id="lres-opane-visual" class="opane"><div id="lres-visual-content"></div></div>
     <div id="lres-opane-sync" class="opane"><div id="lres-sync-content"></div></div>
+    <div id="lres-opane-moodboard" class="opane"><div id="lres-moodboard-content" class="moodboard"></div></div>
   </div>
 
   <div id="lucky-history" class="lucky-hist-section" style="display:none">
@@ -6474,6 +6487,12 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   const lrevBar = document.getElementById('lres-revision-bar');
   if (lrevBar) lrevBar.style.display = 'flex';
   calcHookScore('lres');
+  const lVarBtn = document.getElementById('lres-var-btn');
+  if (lVarBtn) lVarBtn.disabled = false;
+  const lCommShareBtn = document.getElementById('lres-comm-share-btn');
+  if (lCommShareBtn) lCommShareBtn.style.display = '';
+  const lSkitBtn = document.getElementById('lres-skit-btn');
+  if (lSkitBtn) lSkitBtn.style.display = '';
   setTimeout(() => loadPromptIntelligence('lres'), 400);
   S.luckyHistory.unshift({...S.luckyCurrentSong});
   if(S.luckyHistory.length>20)S.luckyHistory=S.luckyHistory.slice(0,20);
