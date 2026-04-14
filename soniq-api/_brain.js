@@ -2774,8 +2774,18 @@ function buildSongPrompt(params) {
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
-    edgeMode = 'off', edgeTopics = [], freestyleMode = false
+    edgeMode = 'off', edgeTopics = [], freestyleMode = false,
+    craftDimensions = null
   } = params;
+
+  // Per-genre Craft Dimensions note — routed to the right builder.
+  // Each builder returns '' if dims are null/missing, so this is safe for any genre.
+  let craftDimNote = '';
+  if (craftDimensions && typeof craftDimensions === 'object') {
+    if      (genre === 'blues')    craftDimNote = buildBluesDimBlock(craftDimensions);
+    else if (genre === 'bossa')    craftDimNote = buildBossaDimBlock(craftDimensions);
+    else if (genre === 'ss')       craftDimNote = buildSSDimBlock(craftDimensions);
+  }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
   const edgeNote = buildEdgeNote({ edgeMode, edgeTopics, ageGroup });
@@ -3033,7 +3043,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${edgeNote}${freestyleNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${edgeNote}${freestyleNote}${genreSpecificNote}${craftDimNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -3886,6 +3896,166 @@ After the 9 dimensions, give:
 FORMAT: Use the exact dimension labels above as headers. Be direct. Be specific. Name the actual lines. A songwriter should be able to act on every note you give.`;
 
   return { prompt, system };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CRAFT DIMENSIONS — per-genre builders
+// Called from buildSongPrompt() with dims = params.craftDimensions[genre]
+// Each builder returns a string (prefixed with \n\n) or '' if no dims.
+// ═══════════════════════════════════════════════════════════════════════════
+
+function buildBluesDimBlock(dims) {
+  if (!dims) return '';
+  const subMap = {
+    'delta':       'Delta Blues — acoustic slide, open D/G tuning, dry room sound (Robert Johnson / Son House lineage).',
+    'chicago':     'Chicago Blues — electric band, shuffle snare, harp fills, Chess Records sound (Muddy Waters / Howlin\' Wolf).',
+    'texas':       'Texas Blues — Stratocaster into clean-to-crunch amp, swing-sixteenth groove (SRV / Jimmie Vaughan).',
+    'soul-blues':  'Soul Blues — horns, Hammond B3, vocal-forward urban feel (Bobby Bland / Little Milton).',
+    'piedmont':    'Piedmont — fingerpicked thumb-bass + melody, light swing, Carolinas warmth (Blind Blake).',
+    'blues-rock':  'Blues-Rock — overdriven electric, arena dynamics, modern production (Gary Clark Jr. / Bonamassa).'
+  };
+  const tempoMap = {
+    'slow-drag':         '45–55 BPM slow drag — near-dirge weight; the tempo creates dread and reverence.',
+    'slow-blues':        '55–70 BPM with 12/8 triplet feel — every note has room to breathe.',
+    'medium-shuffle':    '90–108 BPM swung eighths — classic Chicago/Texas shuffle groove.',
+    'texas-shuffle':     '108–120 BPM SRV swing-sixteenth — urgent but elastic.',
+    'uptempo-boogaloo':  '130–145 BPM jump blues — lyrics punch shorter and harder.'
+  };
+  const guitarMap = {
+    'lead-call-response': 'Guitar answers every vocal phrase with a melodic lick — the core blues conversation.',
+    'slide-lead':         'Bottleneck/dobro slide in open tuning — mournful, vocal-like fills.',
+    'rhythm-dominant':    'Guitar locks into groove riff; vocal carries the melodic weight.',
+    'harmonica-feature':  'Harmonica takes the call-response role; guitar comps rhythm — Chicago two-piece voicing.',
+    'horn-feature':       'Brass section answers the vocal; guitar comps — soul-blues arrangement.'
+  };
+  const lyricMap = {
+    'strict-aab':           'Classic AAB: state line, repeat with variation, resolve.',
+    'loose-blues-verse':    'AAB skeleton preserved but the repeat is embellished — singer works the line.',
+    'aab-plus-turnaround':  'AAB + 2-bar guitar turnaround (bars 11–12) before next verse cycle.',
+    'call-response-lyric':  'Lyric built around the gaps: vocal phrase / silence / guitar answer / continue.',
+    'modern-structured':    'Verse-chorus architecture over blues harmonic bed — AAB discipline held inside verses.'
+  };
+  const emotionMap = {
+    'lament-loss':          'Grief with dignity — present tense, specific detail; the guitar carries what the voice cannot.',
+    'defiant-survival':     'Stubborn exhausted survival — the B-line delivers refusal to fold, not a victory.',
+    'romantic':             'Desire and its complications — want, loss, jealousy; never pure sweetness.',
+    'spiritual-redemption': 'Suffering that points somewhere higher — religious language earned, not decorative.',
+    'celebratory':          'Joy that has scar tissue — the party was survived to; blues joy, not pop joy.'
+  };
+
+  const guitarArr  = Array.isArray(dims.guitarRole)         ? dims.guitarRole         : [dims.guitarRole].filter(Boolean);
+  const emotionArr = Array.isArray(dims.emotionalTerritory) ? dims.emotionalTerritory : [dims.emotionalTerritory].filter(Boolean);
+
+  const parts = [];
+  if (subMap[dims.subStyle])       parts.push(`• SUB-STYLE: ${subMap[dims.subStyle]}`);
+  if (tempoMap[dims.tempoFeel])    parts.push(`• TEMPO / FEEL: ${tempoMap[dims.tempoFeel]}`);
+  if (guitarArr.length)            parts.push(`• GUITAR ROLE: ${guitarArr.map(v => guitarMap[v]).filter(Boolean).join(' / ')}`);
+  if (lyricMap[dims.lyricStructure]) parts.push(`• LYRIC STRUCTURE: ${lyricMap[dims.lyricStructure]}`);
+  if (emotionArr.length)           parts.push(`• EMOTIONAL TERRITORY: ${emotionArr.map(v => emotionMap[v]).filter(Boolean).join(' / ')}`);
+
+  return parts.length ? `\n\nBLUES CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildBossaDimBlock(dims) {
+  if (!dims) return '';
+  const feelMap = {
+    'classic-intimate':  'Classic intimate bossa — soft brushed kit, single nylon-string guitar, close-mic vocal whisper.',
+    'jazz-swung':        'Jazz-swung bossa — slight triplet lean on the syncopation; more saxophone/piano comping room.',
+    'samba-pulse':       'Samba pulse underneath — stronger surdo bass, more dance-floor propulsion than café bossa.',
+    'lounge-slow':       'Lounge slow — extreme restraint, wide space between notes, Astrud Gilberto-era cool detachment.',
+    'nu-bossa-float':    'Nu-bossa float — electronic percussion, vinyl-dust texture, modern downtempo bossa fusion.'
+  };
+  const harmonyMap = {
+    'classic-bossa-ii-v':  'Classic bossa ii–V–I voice-leading — Jobim harmonic fingerprint, chromatic inner-voice motion.',
+    'jazz-extended':       'Jazz-extended chords — maj7#11, min9, alt dominants; harmony is its own narrative layer.',
+    'modal-color':         'Modal vamps — Dorian or Phrygian static harmony as a mood-color field, not functional progression.',
+    'samba-root':          'Samba-root harmony — I–IV–V and minor blues lineage; simpler than classic bossa, more carnival.'
+  };
+  const langMap = {
+    'portuguese':  'Lyrics in Brazilian Portuguese — honor the softness of Portuguese vowels; no forced English phrasing.',
+    'bilingual':   'Bilingual — Portuguese verse, English chorus (or vice versa). The language shift IS a melodic event.',
+    'english':     'English lyrics — write with Portuguese phrasing sensibility: open vowels, trailing syllables, soft consonants.'
+  };
+  const moodMap = {
+    'saudade-longing':     'Saudade — the untranslatable Brazilian longing; presence of what is absent. The song mourns without bitterness.',
+    'romantic-tender':     'Tender romance — quiet gratitude and specific adoration; no grand declarations.',
+    'nostalgic-memory':    'Nostalgic memory — a specific café, a specific beach, a specific year; the song is already in past tense.',
+    'sensual-present':     'Sensual present — body-aware, low-stakes eroticism; the heat lives in restraint, not display.',
+    'bittersweet-irony':   'Bittersweet irony — Vinícius-style literary wit; smile through the hurt, shrug at the gods.'
+  };
+  const instMap = {
+    'solo-guitar-voice':      'Solo nylon guitar + voice only — the entire record is two instruments. Maximum intimacy.',
+    'guitar-bass-percussion': 'Guitar + upright bass + brushed kit/shaker — the canonical small-combo bossa trio.',
+    'jobim-ensemble':         'Jobim ensemble — piano, guitar, upright bass, brushed drums, optional string pad; full Rio sophistication.',
+    'sax-crossover':          'Sax crossover — Stan Getz / cool-jazz flavor; the sax counter-line answers the vocal in every verse.',
+    'nu-bossa-electronic':    'Nu-bossa electronic — programmed percussion, synth pads, sampled Rhodes; bossa DNA over downtempo beats.'
+  };
+
+  const feelArr    = Array.isArray(dims.feel)    ? dims.feel    : [dims.feel].filter(Boolean);
+  const harmonyArr = Array.isArray(dims.harmony) ? dims.harmony : [dims.harmony].filter(Boolean);
+
+  const parts = [];
+  if (feelArr.length)                parts.push(`• FEEL: ${feelArr.map(v => feelMap[v]).filter(Boolean).join(' / ')}`);
+  if (harmonyArr.length)             parts.push(`• HARMONY: ${harmonyArr.map(v => harmonyMap[v]).filter(Boolean).join(' / ')}`);
+  if (langMap[dims.language])        parts.push(`• LANGUAGE: ${langMap[dims.language]}`);
+  if (moodMap[dims.emotionalTone])   parts.push(`• MOOD: ${moodMap[dims.emotionalTone]}`);
+  if (instMap[dims.instrumentation]) parts.push(`• ENSEMBLE: ${instMap[dims.instrumentation]}`);
+
+  return parts.length ? `\n\nBOSSA NOVA CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildSSDimBlock(dims) {
+  if (!dims) return '';
+  const arrangeMap = {
+    'solo-acoustic':    'Solo acoustic — one voice, one acoustic guitar. Every imperfection audible. The room is the production.',
+    'voice-piano':      'Voice + piano — intimate, close-mic; piano carries both harmony and counter-melody.',
+    'sparse-band':      'Sparse band — acoustic guitar, brushed drums, upright bass, occasional pedal steel or fiddle.',
+    'layered-folk':     'Layered folk — stacked harmonies, banjo/mandolin/fiddle textures, large room ambience.',
+    'chamber-strings':  'Chamber strings — string quartet integrated with voice/guitar; Sufjan/Nick Drake textural world.',
+    'bedroom-lo-fi':    'Bedroom lo-fi — tape hiss, mic bleed, performance imperfection left in; the fragility IS the sound.'
+  };
+  const modeMap = {
+    'confessional':     'Confessional — first-person, diary voice. Name specific shames, specific tenderness; reader feels intruding and welcome at once.',
+    'cinematic-scene':  'Cinematic scene — every verse opens in a specific room, a specific hour; the song is shot-listed, not felt.',
+    'abstract-image':   'Abstract imagery — surreal juxtapositions (Joanna Newsom / Elliott Smith). Meaning is felt before it is parsed.',
+    'character-study':  'Character study — the narrator is NOT the songwriter; a specific invented person tells their own story in their own voice.',
+    'observational':    'Observational — narrator reports without editorializing; the restraint is the emotion (Joni Mitchell cool-eye mode).'
+  };
+  const formMap = {
+    'verse-chorus':     'Verse-chorus with a single bridge — conventional pop architecture served at singer-songwriter depth.',
+    'vcvcbc':           'VCVCBC — two verse/chorus cycles, a bridge, a final chorus; classic craft-first SS structure.',
+    'verse-only':       'Verse-only — no chorus returns; the song advances linearly. Each verse must earn its place (Dylan / Tracy Chapman "Fast Car").',
+    'through-composed': 'Through-composed — no repeating sections; the song is a melodic narrative that never returns home.',
+    'circular':         'Circular — the song ends where it began, but the meaning has changed; the repetition IS the revelation.'
+  };
+  const melMap = {
+    'speech-melody':    'Speech-melody — pitch follows natural speech inflection; minimal melodic range, maximum textual clarity.',
+    'stepwise-lyric':   'Stepwise lyric — melody moves by small intervals, mostly scalar; emphasis lives in rhythm not leap.',
+    'leap-driven':      'Leap-driven — wide octave/sixth leaps as emotional punctuation; Joni / Joan Baez / Jeff Buckley territory.',
+    'melismatic':       'Melismatic — emotional words stretch across multiple notes; ornamental runs carry what the word alone cannot.',
+    'monotone-drone':   'Monotone/drone — repeated single-pitch delivery against shifting harmony; the stillness IS the voice.',
+    'call-response':    'Call-and-response — the vocal trades with a second voice or instrumental answer; dialogue structure.'
+  };
+  const texMap = {
+    'tender-fragile':   'Tender/fragile — soft dynamic, breath audible, consonants light; every line about to break.',
+    'burning-ache':     'Burning ache — slow-simmering undercurrent of grief or want that never resolves; controlled intensity.',
+    'wry-ironic':       'Wry/ironic — Fiona Apple / Father John Misty tone; humor as survival, self-aware without cynicism.',
+    'defiant-resolve':  'Defiant resolve — quiet refusal; lines land like a door closing gently but permanently.',
+    'quiet-wonder':     'Quiet wonder — Sufjan Stevens / Nick Drake mode; attention as prayer, small things rendered sacred.',
+    'numb-distance':    'Numb/distance — emotional flatness as the real subject; the listener fills in what the narrator cannot feel.'
+  };
+
+  const melArr = Array.isArray(dims.melodicDelivery)  ? dims.melodicDelivery  : [dims.melodicDelivery].filter(Boolean);
+  const texArr = Array.isArray(dims.emotionalTexture) ? dims.emotionalTexture : [dims.emotionalTexture].filter(Boolean);
+
+  const parts = [];
+  if (arrangeMap[dims.arrangement]) parts.push(`• ARRANGEMENT: ${arrangeMap[dims.arrangement]}`);
+  if (modeMap[dims.lyricMode])      parts.push(`• LYRIC MODE: ${modeMap[dims.lyricMode]}`);
+  if (formMap[dims.songForm])       parts.push(`• SONG FORM: ${formMap[dims.songForm]}`);
+  if (melArr.length)                parts.push(`• MELODIC DELIVERY: ${melArr.map(v => melMap[v]).filter(Boolean).join(' / ')}`);
+  if (texArr.length)                parts.push(`• EMOTIONAL TEXTURE: ${texArr.map(v => texMap[v]).filter(Boolean).join(' / ')}`);
+
+  return parts.length ? `\n\nSINGER-SONGWRITER CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
