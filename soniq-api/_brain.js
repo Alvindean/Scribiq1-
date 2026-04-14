@@ -3309,7 +3309,29 @@ function buildRapLabPrompt(params) {
   const mood = sanitizeInput(rawMood);
   const vocal = sanitizeInput(rawVocal);
 
-  const style = RAP_STYLES[rapStyle] || RAP_STYLES.trap;
+  // Frontend sends underscore keys (g_funk, boom_bap); backend uses hyphen keys (g-funk, boom-bap).
+  // Normalize + map special cases where names differ between client and server.
+  const RAP_STYLE_MAP = {
+    'lyrical-conscious': 'conscious',
+    'melodic-rap':       'mumble',
+    'old-school':        'boom-bap',
+    'midwest':           'conscious',
+    'drill-uk':          'drill',
+    'afro-rap':          'afro-trap',
+    'post-algorithm':    'cyber-rap',
+    'neo-phonetic':      'mumble',
+    'climate-rap':       'conscious',
+    'ai-native':         'cyber-rap',
+    'mosaic-flow':       'alt-rap',
+    'golden-era-2':      'neo-boom-bap',
+    'analog-melodic':    'trap-soul',
+    'conscious-trap':    'trap-soul',
+    'afro-boom-bap':     'neo-boom-bap',
+    'jazz-rap-revival':  'jazz-rap'
+  };
+  const normalizedId = (rapStyle || 'trap').replace(/_/g, '-');
+  const backendId    = RAP_STYLE_MAP[normalizedId] || normalizedId;
+  const style = RAP_STYLES[backendId] || RAP_STYLES.trap;
 
   const flowArr = Array.isArray(rapDimensions.flow)
     ? rapDimensions.flow
