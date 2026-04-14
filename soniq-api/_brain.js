@@ -3339,11 +3339,14 @@ function buildRapLabPrompt(params) {
   const rhymeArr = Array.isArray(rapDimensions.rhymeArch)
     ? rapDimensions.rhymeArch
     : [rapDimensions.rhymeArch || style.defaults.rhymeArch];
+  const densityArr = Array.isArray(rapDimensions.density)
+    ? rapDimensions.density
+    : [rapDimensions.density || style.defaults.density];
 
   const dims = {
     flow:          flowArr,
     rhymeArch:     rhymeArr,
-    density:       rapDimensions.density       || style.defaults.density,
+    density:       densityArr,
     vocabRegister: rapDimensions.vocabRegister || style.defaults.vocabRegister,
     persona:       rapDimensions.persona       || style.defaults.persona
   };
@@ -3373,7 +3376,7 @@ Quality target: ${quality}
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 • FLOW STYLE: ${dims.flow.join(' + ')} — ${dims.flow.map(f => FLOW_NOTES[f]).filter(Boolean).join(' / ')}${dims.flow.length > 1 ? `\n  ↳ FLOW BLEND: Primary flow [${dims.flow[0]}] drives VERSE bars — this is the workhorse delivery. Secondary flow [${dims.flow.slice(1).join(' + ')}] enters in HOOK and/or BRIDGE. The contrast between them creates the dynamic arc: verse attacks differently than hook. Do NOT alternate flows randomly bar-by-bar — assign them structurally by section.` : ''}
 • RHYME ARCHITECTURE: ${dims.rhymeArch.join(' + ')} — ${dims.rhymeArch.map(r => RHYME_NOTES[r]).filter(Boolean).join(' / ')}${dims.rhymeArch.length > 1 ? `\n  ↳ RHYME BLEND: [${dims.rhymeArch[0]}] anchors the HOOK — accessible, memorable, easy to catch on repeat listens. [${dims.rhymeArch.slice(1).join(' + ')}] deepens the VERSE — where craft and complexity live. Don't mix schemes randomly within a section; assign them intentionally by function.` : ''}
-• SYLLABIC DENSITY: ${dims.density} — ${DENSITY_NOTES[dims.density]}
+• SYLLABIC DENSITY: ${dims.density.join(' + ')} — ${dims.density.map(d => DENSITY_NOTES[d]).filter(Boolean).join(' / ')}${dims.density.length > 1 ? `\n  ↳ DENSITY BLEND: Primary density [${dims.density[0]}] drives VERSE — controls space, breath, and weight per word. Secondary density [${dims.density.slice(1).join(' + ')}] activates in HOOK/CHORUS — delivering syllabic compression or technical showcase. Verse breathes; hook unleashes.` : ''}
 • VOCABULARY REGISTER: ${dims.vocabRegister} — ${VOCAB_NOTES[dims.vocabRegister]}
 • PERSONA: ${dims.persona} — ${PERSONA_NOTES[dims.persona]}
 ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}

@@ -1520,6 +1520,8 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .rl-dpill{font-size:10px;font-weight:600;padding:4px 10px;border-radius:99px;border:1px solid var(--b2);background:var(--s3);color:var(--tx3);cursor:pointer;transition:all 0.12s}
 .rl-dpill:hover{color:var(--tx2);border-color:var(--b3)}
 .rl-dpill.on{background:var(--cyanbg);border-color:var(--cyanline);color:var(--cyan)}
+.rl-dpill[data-priority="1"]{border-color:#f59e0b;color:#f59e0b;background:rgba(245,158,11,.12)}
+.rl-dpill[data-priority="2"]{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,.1)}
 .rl-agent-badge{font-size:10px;color:var(--tx4);padding:6px 0;font-style:italic}
 
 /* ── SCROLL HINTS ── */
@@ -2177,7 +2179,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             </div>
           </div>
           <div class="rl-dim-row">
-            <span class="rl-dim-label">Density</span>
+            <span class="rl-dim-label">Density <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
             <div class="rl-dim-pills" id="rld-density">
               <span class="rl-dpill" onclick="setRapDim(this,'density','sparse')">Sparse 1–4/bar</span>
               <span class="rl-dpill on" onclick="setRapDim(this,'density','medium')">Medium 5–8/bar</span>
@@ -5300,7 +5302,7 @@ const MOOD_COLORS = {
 const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
   rapStyle: 'trap',
-  rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
+  rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:['medium'], vocabRegister:'street-coded', persona:'first-person-raw' },
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
@@ -5901,7 +5903,8 @@ function onRapStyleSelect(styleId) {
   S.rapDimensions = {
     ...defaults,
     flow: [defaults.flow || 'syncopated'],
-    rhymeArch: [defaults.rhymeArch || 'end-only']
+    rhymeArch: [defaults.rhymeArch || 'end-only'],
+    density: [defaults.density || 'medium']
   };
   // Update card selection
   document.querySelectorAll('.rl-style-card').forEach(c => c.classList.toggle('on', c.dataset.style === styleId));
@@ -5917,30 +5920,49 @@ function onRapStyleSelect(styleId) {
 
 function syncRapDimPills() {
   const dims = S.rapDimensions;
+  const multiDims = ['flow', 'rhymeArch', 'density'];
   const dimMap = { flow:'rld-flow', rhymeArch:'rld-rhyme', density:'rld-density', vocabRegister:'rld-vocab', persona:'rld-persona' };
   Object.entries(dimMap).forEach(([key, elId]) => {
     const container = document.getElementById(elId);
     if (!container) return;
     const val = dims[key];
     container.querySelectorAll('.rl-dpill').forEach(p => {
+      p.removeAttribute('data-priority');
+      p.classList.remove('on');
       const m = p.getAttribute('onclick').match(/'([^']+)'\s*\)$/);
       const pillVal = m ? m[1] : null;
-      p.classList.toggle('on', Array.isArray(val) ? val.includes(pillVal) : pillVal === val);
+      if (multiDims.includes(key) && Array.isArray(val)) {
+        const i = val.indexOf(pillVal);
+        if (i === 0) { p.setAttribute('data-priority','1'); p.classList.add('on'); }
+        else if (i > 0) { p.setAttribute('data-priority','2'); p.classList.add('on'); }
+      } else {
+        p.classList.toggle('on', Array.isArray(val) ? val.includes(pillVal) : pillVal === val);
+      }
     });
   });
 }
 
 function setRapDim(el, dim, value) {
-  if (dim === 'flow' || dim === 'rhymeArch') {
+  const multiDims = ['flow', 'rhymeArch', 'density'];
+  if (multiDims.includes(dim)) {
     if (!Array.isArray(S.rapDimensions[dim])) S.rapDimensions[dim] = [S.rapDimensions[dim]];
     const arr = S.rapDimensions[dim];
     const idx = arr.indexOf(value);
     if (idx >= 0) {
       if (arr.length > 1) arr.splice(idx, 1);
     } else {
-      arr.push(value);
+      if (arr.length < 2) arr.push(value);
     }
-    el.classList.toggle('on', S.rapDimensions[dim].includes(value));
+    const elId = dim === 'rhymeArch' ? 'rld-rhyme' : `rld-${dim}`;
+    document.querySelectorAll(`#${elId} .rl-dpill`).forEach(p => {
+      p.removeAttribute('data-priority');
+      p.classList.remove('on');
+      const m = p.getAttribute('onclick').match(/'([^']+)'\s*\)$/);
+      const pillVal = m ? m[1] : null;
+      const i = S.rapDimensions[dim].indexOf(pillVal);
+      if (i === 0) { p.setAttribute('data-priority','1'); p.classList.add('on'); }
+      else if (i > 0) { p.setAttribute('data-priority','2'); p.classList.add('on'); }
+    });
   } else {
     S.rapDimensions[dim] = value;
     document.querySelectorAll(`#rld-${dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
