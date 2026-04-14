@@ -1524,6 +1524,27 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .rl-dpill[data-priority="2"]{border-color:#22c55e;color:#22c55e;background:rgba(34,197,94,.1)}
 .rl-agent-badge{font-size:10px;color:var(--tx4);padding:6px 0;font-style:italic}
 
+/* ── CRAFT DIMS — genre accent overrides ── */
+#craft-dims-bossa .rl-dpill.on,#craft-dims-neosoul .rl-dpill.on{background:var(--violetbg);border-color:var(--violetline);color:var(--violet)}
+#craft-dims-reggae .rl-dpill.on{background:rgba(120,200,80,.12);border-color:#78c850;color:#78c850}
+#craft-dims-dancehall .rl-dpill.on{background:rgba(245,166,35,.12);border-color:#f5a623;color:#f5a623}
+#craft-dims-latin .rl-dpill.on{background:rgba(248,113,113,.12);border-color:#f87171;color:#f87171}
+/* critical / structural dim rows */
+#craft-dims-reggae [data-struct] .rl-dim-label::after{content:" ♦";color:#78c850;font-size:8px;vertical-align:super}
+#craft-dims-dancehall [data-struct] .rl-dim-label::after{content:" ♦";color:#f5a623;font-size:8px;vertical-align:super}
+/* slack caution tint */
+#craft-dims-dancehall [data-slack].rl-dpill.on{background:rgba(245,158,11,.1);border-color:rgba(245,158,11,.5);color:#f59e0b}
+/* craft-dims wrapper — hidden by default */
+.craft-dims-wrapper{width:100%;margin-top:12px;animation:pgIn 0.2s ease}
+/* reggae rhythm-pattern row highlight */
+.crd-rga-rhythm-wrap{background:rgba(120,200,80,.05);border:1px solid rgba(120,200,80,.26);border-radius:10px;padding:8px 10px;margin-bottom:6px;position:relative}
+.crd-rga-rhythm-wrap::before{content:"HEARTBEAT";position:absolute;top:-8px;left:12px;font-size:8px;font-weight:700;letter-spacing:.12em;color:#78c850;background:var(--s1);padding:0 5px;opacity:.7}
+.crd-rga-rhythm-wrap .rl-dim-label{color:#78c850}
+#craft-dims-reggae .rl-dpill[data-jah="1"].on{background:rgba(212,160,32,.1);border-color:rgba(212,160,32,.3);color:#d4a020}
+#craft-dims-reggae .rl-dim-note{font-size:9px;color:var(--tx4);font-style:italic;margin-top:3px;padding-left:90px;line-height:1.4}
+/* kpop accent — existing cyan is fine */
+/* gospel accent — existing cyan is fine */
+
 /* ── SCROLL HINTS ── */
 .nav,.otabs,.album-tabs,.hist-items{
   -webkit-overflow-scrolling:touch;
@@ -5304,6 +5325,20 @@ const S={selectedGenre:'pop',
   rapStyle: 'trap',
   rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:['medium'], vocabRegister:'street-coded', persona:'first-person-raw' },
   rapLabActive: false,
+  craftDimensions: {
+    blues:     { subStyle:'delta',         tempoFeel:'slow-blues',       guitarRole:['lead-call-response'], lyricStructure:'aab-plus-turnaround', emotionalTerritory:['lament-loss'] },
+    bossa:     { feel:['classic-intimate'], harmony:['classic-bossa-ii-v'], language:'portuguese',   emotionalTone:'saudade-longing',     instrumentation:'guitar-bass-percussion' },
+    ss:        { arrangement:'solo-acoustic', lyricMode:'confessional',    songForm:'verse-chorus',  melodicDelivery:['speech-melody'],   emotionalTexture:['tender-fragile'] },
+    kpop:      { energyTier:'dance-ready',   rapPresence:'light',          conceptTheme:['cute-youthful'], groupDynamic:'unit-3-4',        eraStyle:'gen-4-current',   vocalDelivery:'precision-clean' },
+    altrock:   { dynamicArc:'quiet-loud',    guitarTexture:['distorted-crunch'], lyricMode:['direct-emotion'], songStructureApproach:'vcpcvc-classic', subgenreVoice:'indie-rock' },
+    afrobeats: { afroRegion:'nigerian-lagos', afroGroove:'vibing-medium', afroLang:['english-clean'], afroVocal:['melodic-lead'],          afroEra:'contemporary-afropop' },
+    reggae:    { eraStyle:'roots',            consciousness:['spiritual-rastafari'], rhythmPattern:'one-drop', vocalApproach:['melodic-lead'], outroTreatment:'extended-vamp' },
+    neosoul:   { groove:['deep-pocket'],      vocal:'understated',         harmony:'simple-soul',    territory:['romantic-sensual'],      arrange:'bare-bones' },
+    reggaeton: { dembowWeight:'polished-pop', tempoFeel:'classic-90',      vibe:['party'],           flowStyle:'conversational',          language:'pure-spanish', arrangement:'solo' },
+    latin:     { rhythm_style:'salsa',        romantic_intensity:'declarative-passionate', language_approach:'spanish-only', instrumentation_lead:['piano-montuno'], dance_energy:'medium-sensual' },
+    dancehall: { vocalStyle:'singjay',        energyLevel:'party-hype',    productionEra:['modern-2010s'], patoisDensity:'mixed-patois-english', riddimTreatment:['original-riddim'] },
+    gospel:    { energyArc:'devotional',      choir:['solo-lead'],         production:'traditional', lyricFocus:['testimony'],            vocalIntensity:'full-voice' },
+  },
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
   plan: 'free',
@@ -5968,6 +6003,88 @@ function setRapDim(el, dim, value) {
     document.querySelectorAll(`#rld-${dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
     el.classList.add('on');
   }
+}
+
+// ── CRAFT DIMENSIONS — universal multi-genre handler ──────────────────────────
+// Each genre's dims are stored in S.craftDimensions[genre]
+// Multi-select dims cap at 2; priority-1 = amber, priority-2 = green
+
+const CRAFT_MULTI_DIMS = {
+  neosoul:   ['groove', 'territory'],
+  altrock:   ['guitarTexture', 'lyricMode'],
+  kpop:      ['conceptTheme'],
+  blues:     ['guitarRole', 'emotionalTerritory'],
+  bossa:     ['feel', 'harmony'],
+  ss:        ['melodicDelivery', 'emotionalTexture'],
+  reggae:    ['consciousness', 'vocalApproach'],
+  afrobeats: ['afroLang', 'afroVocal'],
+  reggaeton: ['vibe'],
+  latin:     ['instrumentation_lead'],
+  dancehall: ['productionEra', 'riddimTreatment'],
+  gospel:    ['choir', 'lyricFocus'],
+};
+
+function setCraftDim(el, genre, dim, value) {
+  if (!S.craftDimensions) S.craftDimensions = {};
+  if (!S.craftDimensions[genre]) S.craftDimensions[genre] = {};
+  const isMulti = (CRAFT_MULTI_DIMS[genre] || []).includes(dim);
+  const containerId = `crd-${genre}-${dim}`;
+  const container = document.getElementById(containerId);
+
+  if (isMulti) {
+    if (!Array.isArray(S.craftDimensions[genre][dim])) {
+      S.craftDimensions[genre][dim] = S.craftDimensions[genre][dim]
+        ? [S.craftDimensions[genre][dim]] : [];
+    }
+    const arr = S.craftDimensions[genre][dim];
+    const idx = arr.indexOf(value);
+    if (idx >= 0) {
+      if (arr.length > 1) arr.splice(idx, 1);   // deselect only if not last
+    } else {
+      if (arr.length < 2) arr.push(value);        // cap at 2
+    }
+    if (container) {
+      container.querySelectorAll('.rl-dpill').forEach(p => {
+        p.removeAttribute('data-priority');
+        p.classList.remove('on');
+        const m  = p.getAttribute('onclick').match(/,\s*'([^']+)'\s*\)\s*$/);
+        const pv = m ? m[1] : null;
+        const i  = arr.indexOf(pv);
+        if (i === 0) { p.setAttribute('data-priority', '1'); p.classList.add('on'); }
+        else if (i > 0) { p.setAttribute('data-priority', '2'); p.classList.add('on'); }
+      });
+    }
+  } else {
+    S.craftDimensions[genre][dim] = value;
+    if (container) container.querySelectorAll('.rl-dpill').forEach(p => p.classList.remove('on'));
+    el.classList.add('on');
+  }
+}
+
+function syncCraftDimPills(genre) {
+  if (!S.craftDimensions || !S.craftDimensions[genre]) return;
+  const dims = S.craftDimensions[genre];
+  const multiDims = CRAFT_MULTI_DIMS[genre] || [];
+  Object.keys(dims).forEach(dim => {
+    const container = document.getElementById(`crd-${genre}-${dim}`);
+    if (!container) return;
+    const val = dims[dim];
+    container.querySelectorAll('.rl-dpill').forEach(p => {
+      p.removeAttribute('data-priority');
+      p.classList.remove('on');
+      const m  = p.getAttribute('onclick').match(/,\s*'([^']+)'\s*\)\s*$/);
+      const pv = m ? m[1] : null;
+      if (multiDims.includes(dim) && Array.isArray(val)) {
+        const i = val.indexOf(pv);
+        if (i === 0) { p.setAttribute('data-priority', '1'); p.classList.add('on'); }
+        else if (i > 0) { p.setAttribute('data-priority', '2'); p.classList.add('on'); }
+      } else {
+        if (pv === val || (Array.isArray(val) && val.includes(pv))) {
+          p.classList.add('on');
+        }
+      }
+    });
+  });
 }
 
 function setRapLabTab(el, cat) {
