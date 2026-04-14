@@ -594,6 +594,54 @@ const SUBSTYLE_NOTES={
   'Prestige Drama Theme': 'Prestige Drama Theme DNA: Atmospheric, sparse, foreboding or melancholic. Establishes stakes and tone. Minor key or modal. Often instrumental or near-instrumental. Suno style: "prestige TV theme, cinematic, atmospheric, [mood: dark/cold/intense], strings, piano, sparse, HBO-style".',
 };
 
+// Substyle-specific Suno production tags — injected as a hard constraint into SONG PROMPT
+// to prevent genre drift (e.g. G-Funk defaulting to dark trap)
+const SUBSTYLE_SUNO = {
+  // Hip-Hop regional/era
+  'G-Funk':             'g-funk, moog synth whine, west coast hip-hop, slow rolling 808, 95 BPM, smooth melodic hook',
+  'Bay Area':           'bay area hip-hop, hyphy, trunk music, 808 bass, hi-energy, Oakland rap, 100 BPM',
+  'Down South':         'dirty south, slow rolling 808 bass, southern rap, deep drawl, 85 BPM',
+  'Crunk':              'crunk, distorted synth stabs, 808 bass, 145 BPM, club energy, screamed call and response',
+  'Chopped & Screwed':  'chopped and screwed, slowed houston rap, syrupy 65 BPM, pitch-lowered baritone, deep 808',
+  'Trap':               'trap, 808 bass, hard snare, rolling hi-hats, 140 BPM, dark atmospheric',
+  'Boom Bap':           'boom bap, vinyl crackle, jazz sample, hard kick, 90 BPM, new york classic',
+  'Melodic Rap':        'melodic rap, lush atmospheric production, auto-tune vocals, 120 BPM, emotional',
+  'Drill':              'uk drill, sliding 808 bass, off-beat hi-hats, dark minimal production, 140 BPM, menacing',
+  'East Coast':         'east coast hip-hop, boom bap, jazz sample, vinyl crackle, 90 BPM, new york lyrical',
+  'Midwest':            'midwest rap, chipmunk soul sample, chicago hip-hop, 95 BPM, emotional vulnerability',
+  'Cloud Rap':          'cloud rap, ethereal haze, lo-fi drum machine, deep reverb, atmospheric synth pads, 80 BPM',
+  'Lyrical/Conscious':  'conscious hip-hop, boom bap, jazz-inflected sample, cerebral, 90 BPM, lyrical density',
+  'Old School':         'old school hip-hop, boom bap, scratch DJ, vinyl sample loop, 95 BPM, classic 90s',
+  // Neo-Soul
+  'Classic Neo-Soul':   'neo-soul, Rhodes electric piano, live drums with swing, upright bass, warm vinyl warmth, head-nod groove, 90 BPM',
+  'Hip-Hop Neo-Soul':   'neo-soul, J Dilla off-beat hip-hop drums, soul vocals, vinyl warmth, 85 BPM',
+  'Neo-Soul Ballad':    'neo-soul ballad, piano, intimate close-mic vocal, vulnerable, warm, 70 BPM',
+  'Afro-Soul':          'afro-soul, talking drum, Rhodes piano, kalimba, West African rhythm, spiritual, 95 BPM',
+  'Lo-Fi Soul':         'lo-fi soul, vinyl crackle, dusty drum loop, muffled warmth, chopped soul sample, 80 BPM',
+  'Psychedelic Soul':   'psychedelic soul, funky bass, cosmic reverb, layered textures, pitch effects, 95 BPM',
+  // Gospel
+  'Traditional Gospel': 'traditional gospel, Hammond B3 organ, mass choir, hand claps, call and response, powerful soul',
+  'Contemporary Gospel':'contemporary gospel, Kirk Franklin style, 808 bass, mass choir, celebratory, hip-hop gospel production',
+  'Worship / CCM':      'worship music, piano, electric guitar, congregational singalong, soaring emotional, 75 BPM',
+  'Southern Gospel':    'southern gospel, acoustic guitar, four-part close harmony, country gospel warmth, testimony',
+  'Gospel Hip-Hop':     'gospel rap, trap beat, 808 bass, conscious faith lyrics, hip-hop gospel, street credibility',
+  // Bossa Nova substyles
+  'Classic Bossa':      'bossa nova, nylon string guitar, upright bass, brushed drums, intimate vocal, jazz harmony, 100 BPM',
+  'Jazz Bossa':         'bossa nova jazz, Stan Getz saxophone, vibraphone, cool jazz, nylon guitar, 105 BPM',
+  // Dancehall
+  'Classic Dancehall':  'dancehall, digital riddim, reggae, patois vocals, 90 BPM, Kingston Jamaica',
+  'Modern Dancehall':   'modern dancehall, trap hi-hats, 808 bass, dancehall riddim, 95 BPM, Caribbean',
+  // Bollywood
+  'Romantic Bollywood': 'bollywood romantic, lush orchestral strings, melodic vocals with ornaments, 75 BPM, cinematic',
+  'Item Number':        'bollywood item number, brass stabs, uptempo percussion, 125 BPM, dance floor, bold',
+  // C-Pop
+  'Mandopop':           'mandopop, pentatonic melody, piano, soft production, 95 BPM, Mandarin pop, sweet',
+  'Modern C-Pop':       'c-pop, pentatonic hook, modern production, 808 bass, 110 BPM, idol pop',
+  // Amapiano
+  'Classic Amapiano':   'amapiano, log drum bass, piano keys, South African house, 110 BPM, Johannesburg',
+  'Vocal Amapiano':     'amapiano, log drum, vocal chant, piano riff, South African, 112 BPM, soulful',
+};
+
 const STRUCTURES={
   // ── General ──────────────────────────────────────────────────────────────
   standard:     '[Verse 1] → [Pre-Chorus] → [Chorus] → [Verse 2] → [Pre-Chorus] → [Chorus] → [Bridge] → [Chorus] → [Outro]',
@@ -2617,6 +2665,10 @@ ${chosenOutliers.length ? `- Include these harmonic outliers:\n${chosenOutliers.
   // Substyle
   const substyleDetail = substyle && SUBSTYLE_NOTES[substyle] ? `\n${SUBSTYLE_NOTES[substyle]}` : '';
   const substyleNote = substyle ? `\nSub-style: ${substyle} — write flow, density, and aesthetic accordingly.${substyleDetail}` : '';
+  const substyleSunoTag = substyle && SUBSTYLE_SUNO[substyle] ? SUBSTYLE_SUNO[substyle] : null;
+  const substyleSunoLock = substyleSunoTag
+    ? `\n\n⚠️ PRODUCTION LOCK — ${substyle}: The SONG PROMPT Full prompt MUST contain these exact production tags: "${substyleSunoTag}" — do NOT substitute generic ${genre} production tags. This substyle overrides the default genre production.`
+    : '';
 
   // Voice profile
   const voiceNote = (voice.name || voice.influences || voice.forbidden)
@@ -2813,7 +2865,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -2851,7 +2903,7 @@ BPM: [range, e.g. 95-100]
 Vocal: [vocal descriptor]
 Texture: [production texture in 5-8 words]
 Counter-melody: [counter-melody device]
-Full prompt: [assemble all of the above into one ready-to-paste string under 440 characters — NO artist names]
+Full prompt: [${substyleSunoTag ? `MUST lead with these locked production tags: "${substyleSunoTag}" — then add vocal and texture descriptors. ` : ''}Assemble into one ready-to-paste string under 440 characters — NO artist names]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
