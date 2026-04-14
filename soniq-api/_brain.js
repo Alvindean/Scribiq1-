@@ -3310,13 +3310,26 @@ function buildRapLabPrompt(params) {
   const vocal = sanitizeInput(rawVocal);
 
   const style = RAP_STYLES[rapStyle] || RAP_STYLES.trap;
+
+  const flowArr = Array.isArray(rapDimensions.flow)
+    ? rapDimensions.flow
+    : [rapDimensions.flow || style.defaults.flow];
+  const rhymeArr = Array.isArray(rapDimensions.rhymeArch)
+    ? rapDimensions.rhymeArch
+    : [rapDimensions.rhymeArch || style.defaults.rhymeArch];
+
   const dims = {
-    flow:          rapDimensions.flow          || style.defaults.flow,
-    rhymeArch:     rapDimensions.rhymeArch     || style.defaults.rhymeArch,
+    flow:          flowArr,
+    rhymeArch:     rhymeArr,
     density:       rapDimensions.density       || style.defaults.density,
     vocabRegister: rapDimensions.vocabRegister || style.defaults.vocabRegister,
     persona:       rapDimensions.persona       || style.defaults.persona
   };
+
+  const rapSubSunoTag = SUBSTYLE_SUNO[style.label] || null;
+  const rapSubSunoLock = rapSubSunoTag
+    ? `\n\n⚠️ PRODUCTION LOCK — ${style.label}: SONG PROMPT MUST contain: "${rapSubSunoTag}" — do NOT use generic trap production tags.`
+    : '';
 
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const hookNote = HOOK_STYLE_NOTES[hookStyle] || '';
@@ -3336,15 +3349,15 @@ Structure: ${structStr}
 Quality target: ${quality}
 
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
-• FLOW STYLE: ${dims.flow} — ${FLOW_NOTES[dims.flow]}
-• RHYME ARCHITECTURE: ${dims.rhymeArch} — ${RHYME_NOTES[dims.rhymeArch]}
+• FLOW STYLE: ${dims.flow.join(' + ')} — ${dims.flow.map(f => FLOW_NOTES[f]).filter(Boolean).join(' / ')}
+• RHYME ARCHITECTURE: ${dims.rhymeArch.join(' + ')} — ${dims.rhymeArch.map(r => RHYME_NOTES[r]).filter(Boolean).join(' / ')}
 • SYLLABIC DENSITY: ${dims.density} — ${DENSITY_NOTES[dims.density]}
 • VOCABULARY REGISTER: ${dims.vocabRegister} — ${VOCAB_NOTES[dims.vocabRegister]}
 • PERSONA: ${dims.persona} — ${PERSONA_NOTES[dims.persona]}
-${hookNote ? '\n' + hookNote : ''}
+${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}
 
 BRACKET REQUIREMENTS:
-${bracketInstructionServer('hiphop', 'full', null)}
+${bracketInstructionServer('hiphop', 'full', style.label)}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
@@ -3366,7 +3379,7 @@ LYRICS:
 [Complete song lyrics only. EVERY SECTION starts with its bracket tag. Clean lyrics — no annotations, no notes, no commentary embedded in the lyrics.]
 
 SONG PROMPT:
-[Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
+[${rapSubSunoTag ? `MUST lead with: "${rapSubSunoTag}" — ` : ''}Under 440 chars. ${style.label} style, specific production elements, BPM range, vocal texture, key sonic signatures. NO artist names.]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3379,7 +3392,7 @@ FLOW BREAKDOWN:
 [3-5 lines: bar-by-bar flow pattern guide for the main verse. Where accents land, syllable density, rhythmic signature.]
 
 RAP LAB SETTINGS USED:
-Style: ${style.label} | Flow: ${dims.flow} | Rhyme: ${dims.rhymeArch} | Density: ${dims.density} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
+Style: ${style.label} | Flow: ${dims.flow.join('+')} | Rhyme: ${dims.rhymeArch.join('+')} | Density: ${dims.density} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
 
 DIRECTOR NOTES:
 1. [Production decision specific to THIS song and style]

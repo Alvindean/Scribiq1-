@@ -2154,7 +2154,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <div class="rl-dimensions" id="rl-dimensions" style="display:none">
           <div class="rl-dim-header">Fine-tune dimensions</div>
           <div class="rl-dim-row">
-            <span class="rl-dim-label">Flow</span>
+            <span class="rl-dim-label">Flow <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
             <div class="rl-dim-pills" id="rld-flow">
               <span class="rl-dpill on" onclick="setRapDim(this,'flow','syncopated')">Syncopated</span>
               <span class="rl-dpill" onclick="setRapDim(this,'flow','on-beat')">On-Beat</span>
@@ -2165,7 +2165,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             </div>
           </div>
           <div class="rl-dim-row">
-            <span class="rl-dim-label">Rhyme</span>
+            <span class="rl-dim-label">Rhyme <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
             <div class="rl-dim-pills" id="rld-rhyme">
               <span class="rl-dpill on" onclick="setRapDim(this,'rhymeArch','end-only')">End Only</span>
               <span class="rl-dpill" onclick="setRapDim(this,'rhymeArch','internal')">Internal</span>
@@ -5300,7 +5300,7 @@ const MOOD_COLORS = {
 const S={selectedGenre:'pop',
   quality:'viral',substyle:'',hookStyle:'auto',selectedLength:'short',
   rapStyle: 'trap',
-  rapDimensions: { flow:'syncopated', rhymeArch:'end-only', density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
+  rapDimensions: { flow:['syncopated'], rhymeArch:['end-only'], density:'medium', vocabRegister:'street-coded', persona:'first-person-raw' },
   rapLabActive: false,
   blend:{open:false,genre2:'',style2:'',ratio:70},
   library: safeParseLib(),
@@ -5898,7 +5898,11 @@ function onRapStyleSelect(styleId) {
   S.rapStyle = styleId;
   S.rapLabActive = true;
   const defaults = RAP_DIM_DEFAULTS[styleId] || {};
-  S.rapDimensions = { ...defaults };
+  S.rapDimensions = {
+    ...defaults,
+    flow: [defaults.flow || 'syncopated'],
+    rhymeArch: [defaults.rhymeArch || 'end-only']
+  };
   // Update card selection
   document.querySelectorAll('.rl-style-card').forEach(c => c.classList.toggle('on', c.dataset.style === styleId));
   // Show dimensions panel
@@ -5917,16 +5921,31 @@ function syncRapDimPills() {
   Object.entries(dimMap).forEach(([key, elId]) => {
     const container = document.getElementById(elId);
     if (!container) return;
+    const val = dims[key];
     container.querySelectorAll('.rl-dpill').forEach(p => {
-      p.classList.toggle('on', p.getAttribute('onclick').includes(`'${dims[key]}'`));
+      const m = p.getAttribute('onclick').match(/'([^']+)'\s*\)$/);
+      const pillVal = m ? m[1] : null;
+      p.classList.toggle('on', Array.isArray(val) ? val.includes(pillVal) : pillVal === val);
     });
   });
 }
 
 function setRapDim(el, dim, value) {
-  S.rapDimensions[dim] = value;
-  document.querySelectorAll(`#rld-${dim==='rhymeArch'?'rhyme':dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
-  el.classList.add('on');
+  if (dim === 'flow' || dim === 'rhymeArch') {
+    if (!Array.isArray(S.rapDimensions[dim])) S.rapDimensions[dim] = [S.rapDimensions[dim]];
+    const arr = S.rapDimensions[dim];
+    const idx = arr.indexOf(value);
+    if (idx >= 0) {
+      if (arr.length > 1) arr.splice(idx, 1);
+    } else {
+      arr.push(value);
+    }
+    el.classList.toggle('on', S.rapDimensions[dim].includes(value));
+  } else {
+    S.rapDimensions[dim] = value;
+    document.querySelectorAll(`#rld-${dim==='vocabRegister'?'vocab':dim} .rl-dpill`).forEach(p => p.classList.remove('on'));
+    el.classList.add('on');
+  }
 }
 
 function setRapLabTab(el, cat) {
