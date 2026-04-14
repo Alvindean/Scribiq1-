@@ -1057,6 +1057,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .comm-filter-btn:hover{background:var(--s3);color:var(--tx2)}
 .comm-filter-btn.on{background:var(--s4);color:var(--tx1);font-weight:700}
 .comm-filter-select{width:100%;background:var(--s3);border:1px solid var(--b2);border-radius:var(--r2);color:var(--tx2);font-size:12px;padding:7px 10px;outline:none;cursor:pointer}
+/* ─── Discover tab ─── */
+.comm-tab-btn{background:none;border:none;color:var(--tx3);font-size:13px;font-weight:600;padding:8px 14px;cursor:pointer;border-bottom:2px solid transparent;font-family:var(--font);transition:all .15s;margin-bottom:-1px}
+.comm-tab-btn.on{color:var(--amber);border-bottom-color:var(--amber)}
+.disc-platform-btn{background:var(--s2);border:1px solid var(--b2);color:var(--tx2);font-size:11px;padding:5px 11px;border-radius:6px;cursor:pointer;font-family:var(--font);transition:all .15s}
+.disc-platform-btn:hover{border-color:var(--amber);color:var(--amber)}
+.disc-stat-box{background:var(--s2);border:1px solid var(--b2);border-radius:7px;padding:8px 10px}
+.disc-stat-label{font-size:9px;font-weight:700;color:var(--tx4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px}
+.disc-stat-val{font-size:12px;color:var(--tx1);font-weight:600;line-height:1.3;word-break:break-word}
+.disc-technique-tag{font-size:10px;background:rgba(168,146,255,.12);color:var(--violet);border:1px solid rgba(168,146,255,.25);border-radius:5px;padding:3px 8px;line-height:1.8}
+.disc-theme-tag{font-size:10px;background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2);border-radius:5px;padding:3px 8px;line-height:1.8}
 @media(max-width:1100px){
   .comm-layout{grid-template-columns:180px 1fr}
   .comm-right{display:none}
@@ -4163,13 +4173,122 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 
     <!-- CENTER: MAIN FEED -->
     <div class="comm-main">
-      <!-- Header -->
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:10px">
-        <div>
-          <div style="font-size:18px;font-weight:800;color:var(--tx1)">🌐 Community</div>
-          <div style="font-size:11px;color:var(--tx3);margin-top:1px">Songs · Thoughts · Collabs · Tips — from writers worldwide</div>
+      <!-- Header + Tab switcher -->
+      <div style="margin-bottom:16px">
+        <div style="font-size:18px;font-weight:800;color:var(--tx1);margin-bottom:10px">Soniq Hub</div>
+        <div style="display:flex;gap:0;border-bottom:1px solid var(--brd)">
+          <button class="comm-tab-btn on" id="comm-tab-feed" onclick="switchCommTab('feed',this)">🌐 Community</button>
+          <button class="comm-tab-btn" id="comm-tab-discover" onclick="switchCommTab('discover',this)">🔍 Discover</button>
         </div>
       </div>
+
+      <!-- ═══ DISCOVER PANEL ═══ -->
+      <div id="comm-discover-panel" style="display:none">
+        <!-- URL input card -->
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-size:14px;font-weight:800;color:var(--tx1);margin-bottom:3px">🔍 Discover &amp; Analyze</div>
+          <div style="font-size:11px;color:var(--tx3);margin-bottom:14px;line-height:1.5">Paste any YouTube, SoundCloud, Spotify, TikTok, or Instagram link — we'll pull it in, transcribe it, and break it down so you can repurpose it in Soniq.</div>
+
+          <!-- URL input row -->
+          <div style="display:flex;gap:8px;margin-bottom:10px">
+            <input id="disc-url" type="url" placeholder="Paste link — YouTube, SoundCloud, Spotify, TikTok…" style="flex:1;padding:9px 12px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:13px;box-sizing:border-box;min-width:0" oninput="discPreviewURL(this.value)">
+            <button class="btn btn-amber" onclick="analyzeDiscoverURL()" id="disc-analyze-btn" style="white-space:nowrap;padding:9px 18px;font-weight:700">Analyze</button>
+          </div>
+
+          <!-- Live embed preview -->
+          <div id="disc-embed-preview" style="margin-bottom:10px"></div>
+
+          <!-- Platform search shortcuts -->
+          <div style="margin-bottom:12px">
+            <div style="font-size:10px;color:var(--tx4);margin-bottom:7px;text-transform:uppercase;letter-spacing:.06em">Search on platform — find a freestyle, performance, or song</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:7px">
+              <button class="disc-platform-btn" onclick="discSearch('youtube')">▶ YouTube</button>
+              <button class="disc-platform-btn" onclick="discSearch('soundcloud')">☁ SoundCloud</button>
+              <button class="disc-platform-btn" onclick="discSearch('spotify')">♫ Spotify</button>
+              <button class="disc-platform-btn" onclick="discSearch('tiktok')">♩ TikTok</button>
+              <button class="disc-platform-btn" onclick="discSearch('instagram')">◈ Instagram</button>
+              <button class="disc-platform-btn" onclick="discSearch('twitter')">✕ Twitter / X</button>
+            </div>
+            <input id="disc-search-term" type="text" placeholder="Artist, song title, or @handle…" style="width:100%;padding:8px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:12px;box-sizing:border-box">
+          </div>
+
+          <!-- Manual transcript paste -->
+          <details>
+            <summary style="font-size:11px;color:var(--tx3);cursor:pointer;user-select:none;padding:4px 0">+ Paste transcript or lyrics manually (improves accuracy)</summary>
+            <textarea id="disc-transcript" rows="5" placeholder="Paste the lyrics, transcript, or any text from this performance here…" style="width:100%;margin-top:8px;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:12px;font-family:var(--font);box-sizing:border-box;resize:vertical;line-height:1.5"></textarea>
+          </details>
+        </div>
+
+        <!-- Loading -->
+        <div id="disc-loading" style="display:none;text-align:center;padding:36px 20px">
+          <div style="width:28px;height:28px;border:3px solid var(--brd);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px"></div>
+          <div style="font-size:12px;color:var(--tx3)" id="disc-loading-msg">Fetching metadata…</div>
+        </div>
+
+        <!-- Results -->
+        <div id="disc-result" style="display:none">
+          <div class="card" style="border-color:var(--amberline)">
+            <!-- Title row -->
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap">
+              <div style="min-width:0">
+                <div id="disc-res-title" style="font-size:16px;font-weight:800;color:var(--tx1);line-height:1.3"></div>
+                <div id="disc-res-artist" style="font-size:12px;color:var(--tx3);margin-top:3px"></div>
+              </div>
+              <div style="display:flex;gap:5px;flex-shrink:0;flex-wrap:wrap">
+                <span id="disc-res-genre-badge" style="font-size:10px;font-weight:700;text-transform:uppercase;background:var(--bg3);border:1px solid var(--brd);border-radius:5px;padding:3px 9px;color:var(--amber)"></span>
+                <span id="disc-res-era-badge" style="font-size:10px;background:var(--bg3);border-radius:5px;padding:3px 8px;color:var(--tx3)"></span>
+              </div>
+            </div>
+
+            <!-- Embedded player -->
+            <div id="disc-res-embed" style="margin-bottom:14px"></div>
+
+            <!-- Stats grid -->
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-bottom:14px">
+              <div class="disc-stat-box"><div class="disc-stat-label">Style / Subgenre</div><div class="disc-stat-val" id="disc-res-subgenre"></div></div>
+              <div class="disc-stat-box"><div class="disc-stat-label">Tempo Feel</div><div class="disc-stat-val" id="disc-res-tempo"></div></div>
+              <div class="disc-stat-box"><div class="disc-stat-label">BPM Estimate</div><div class="disc-stat-val" id="disc-res-bpm"></div></div>
+              <div class="disc-stat-box"><div class="disc-stat-label">Structure</div><div class="disc-stat-val" id="disc-res-structure"></div></div>
+              <div class="disc-stat-box"><div class="disc-stat-label">Flow / Delivery</div><div class="disc-stat-val" id="disc-res-flow"></div></div>
+              <div class="disc-stat-box"><div class="disc-stat-label">Rhyme Scheme</div><div class="disc-stat-val" id="disc-res-rhyme"></div></div>
+            </div>
+
+            <!-- Techniques -->
+            <div style="margin-bottom:12px">
+              <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">Key Techniques</div>
+              <div id="disc-res-techniques" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+            </div>
+
+            <!-- Themes -->
+            <div style="margin-bottom:12px">
+              <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px">Themes</div>
+              <div id="disc-res-themes" style="display:flex;flex-wrap:wrap;gap:5px"></div>
+            </div>
+
+            <!-- Text breakdown fields -->
+            <div style="display:grid;gap:10px;margin-bottom:14px">
+              <div><div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Emotional Register</div><div id="disc-res-emotion" style="font-size:12px;color:var(--tx2)"></div></div>
+              <div><div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Production Signature</div><div id="disc-res-production" style="font-size:12px;color:var(--tx2)"></div></div>
+              <div><div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Standout Moments</div><div id="disc-res-standout" style="font-size:12px;color:var(--tx2);font-style:italic;line-height:1.5"></div></div>
+            </div>
+
+            <!-- What makes it great callout -->
+            <div style="padding:10px 13px;background:linear-gradient(135deg,rgba(251,191,36,.07),transparent);border:1px solid var(--amberline);border-radius:8px;margin-bottom:14px">
+              <div style="font-size:10px;font-weight:700;color:var(--amber);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">What Makes It Great</div>
+              <div id="disc-res-great" style="font-size:12px;color:var(--tx1);line-height:1.5"></div>
+            </div>
+
+            <!-- Repurpose CTA -->
+            <div style="border-top:1px solid var(--brd);padding-top:13px">
+              <div style="font-size:10px;font-weight:700;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px">Repurpose in Soniq</div>
+              <div id="disc-repurpose-preview" style="font-size:11px;color:var(--tx3);margin-bottom:11px;line-height:1.7"></div>
+              <button class="btn btn-amber" onclick="repurposeInSoniq()" style="width:100%;padding:11px;font-size:13px;font-weight:700">🎤 Generate Something Like This</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ═══ END DISCOVER PANEL ═══ -->
+
       <!-- Compose Box -->
       <div class="comm-compose" id="comm-compose-wrap">
         <div style="display:flex;gap:10px;align-items:flex-start">
@@ -9937,6 +10056,218 @@ function setCommTypeFilter(type, btn) {
   btn.classList.add('on');
   _commOffset = 0;
   loadCommunityFeed();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DISCOVER — URL Analysis Feature
+// ─────────────────────────────────────────────────────────────────────────────
+
+let _discCurrentResult = null;
+
+function switchCommTab(tab, btn) {
+  document.querySelectorAll('.comm-tab-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  const discoverPanel = document.getElementById('comm-discover-panel');
+  const feedEls = ['comm-compose-wrap', 'comm-feed', 'comm-loading', 'comm-empty', 'comm-load-more'];
+  if (tab === 'discover') {
+    feedEls.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    if (discoverPanel) discoverPanel.style.display = 'block';
+  } else {
+    if (discoverPanel) discoverPanel.style.display = 'none';
+    const composeWrap = document.getElementById('comm-compose-wrap');
+    const feed = document.getElementById('comm-feed');
+    if (composeWrap) composeWrap.style.display = '';
+    if (feed) feed.style.display = '';
+    loadCommunityFeed();
+  }
+}
+
+function discPreviewURL(url) {
+  const preview = document.getElementById('disc-embed-preview');
+  if (!preview) return;
+  if (!url || !url.trim()) { preview.innerHTML = ''; return; }
+  try { new URL(url); } catch { preview.innerHTML = ''; return; }
+  const platform = detectAudioPlatform(url);
+  if (platform && ['youtube', 'soundcloud', 'spotify', 'suno', 'udio'].includes(platform)) {
+    preview.innerHTML = buildAudioEmbed(url, false);
+  } else if (url.startsWith('http')) {
+    preview.innerHTML = `<div style="font-size:11px;color:var(--tx3);padding:8px 10px;background:var(--bg3);border-radius:6px;word-break:break-all">🔗 ${escHtml(url)}</div>`;
+  } else {
+    preview.innerHTML = '';
+  }
+}
+
+function discSearch(platform) {
+  const term = (document.getElementById('disc-search-term')?.value || '').trim() || 'freestyle';
+  const q = encodeURIComponent(term);
+  const urls = {
+    youtube:    `https://www.youtube.com/results?search_query=${q}`,
+    soundcloud: `https://soundcloud.com/search?q=${q}`,
+    spotify:    `https://open.spotify.com/search/${q}`,
+    tiktok:     `https://www.tiktok.com/search?q=${q}`,
+    instagram:  `https://www.instagram.com/explore/tags/${q.replace(/%20/g,'')}`,
+    twitter:    `https://twitter.com/search?q=${q}`
+  };
+  if (urls[platform]) window.open(urls[platform], '_blank', 'noopener');
+}
+
+async function analyzeDiscoverURL() {
+  const url        = (document.getElementById('disc-url')?.value || '').trim();
+  const transcript = (document.getElementById('disc-transcript')?.value || '').trim();
+  const context    = (document.getElementById('disc-search-term')?.value || '').trim();
+
+  if (!url) { alert('Paste a URL to analyze first.'); return; }
+
+  const btn        = document.getElementById('disc-analyze-btn');
+  const loading    = document.getElementById('disc-loading');
+  const result     = document.getElementById('disc-result');
+  const loadingMsg = document.getElementById('disc-loading-msg');
+
+  if (btn)     { btn.disabled = true; btn.textContent = 'Analyzing…'; }
+  if (loading) loading.style.display = 'block';
+  if (result)  result.style.display  = 'none';
+
+  const steps    = ['Fetching metadata…', 'Attempting transcription…', 'Running AI analysis…', 'Building breakdown…'];
+  let   stepIdx  = 0;
+  const stepTimer = setInterval(() => {
+    stepIdx = Math.min(stepIdx + 1, steps.length - 1);
+    if (loadingMsg) loadingMsg.textContent = steps[stepIdx];
+  }, 1800);
+
+  try {
+    let fullText = '';
+    const resp = await fetch('/api/stream', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'analyze', params: { url, transcript, context } })
+    });
+    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+
+    const reader  = resp.body.getReader();
+    const decoder = new TextDecoder();
+    outer: while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      for (const line of chunk.split('\n')) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          const d = JSON.parse(line.slice(6));
+          if (d.text) fullText += d.text;
+          if (d.done) break outer;
+        } catch {}
+      }
+    }
+
+    // Parse the JSON that Claude returned
+    const jsonMatch = fullText.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('Could not parse analysis — try adding the transcript manually.');
+    const analysis = JSON.parse(jsonMatch[0]);
+
+    _discCurrentResult = { analysis, url };
+    showDiscoverResult(analysis, url);
+
+  } catch(e) {
+    if (loading) loading.style.display = 'none';
+    alert('Analysis failed: ' + e.message);
+  } finally {
+    clearInterval(stepTimer);
+    if (btn)     { btn.disabled = false; btn.textContent = 'Analyze'; }
+    if (loading) loading.style.display = 'none';
+  }
+}
+
+function showDiscoverResult(a, url) {
+  const result = document.getElementById('disc-result');
+  if (!result) return;
+
+  const setText = (id, text) => { const el = document.getElementById(id); if (el) el.textContent = text || '—'; };
+
+  setText('disc-res-title',  a.title  || 'Unknown Title');
+  setText('disc-res-artist', [a.artist, a.era].filter(Boolean).join(' · '));
+
+  const genreBadge = document.getElementById('disc-res-genre-badge');
+  if (genreBadge) genreBadge.textContent = (a.genre || '').toUpperCase();
+  setText('disc-res-era-badge', a.era || '');
+
+  // Embedded player
+  const embedEl = document.getElementById('disc-res-embed');
+  if (embedEl) {
+    const embed = buildAudioEmbed(url, false);
+    embedEl.innerHTML = embed || '';
+    embedEl.style.display = embed ? 'block' : 'none';
+  }
+
+  // Stat boxes
+  setText('disc-res-subgenre',  a.subgenre         || '—');
+  setText('disc-res-tempo',     a.tempo_feel        || '—');
+  setText('disc-res-bpm',       a.bpm_estimate      || '—');
+  setText('disc-res-structure', a.structure         || '—');
+  setText('disc-res-flow',      a.flow_or_delivery  || '—');
+  setText('disc-res-rhyme',     a.rhyme_scheme      || '—');
+
+  // Technique tags
+  const techEl = document.getElementById('disc-res-techniques');
+  if (techEl) {
+    const techs = Array.isArray(a.key_techniques) ? a.key_techniques : [];
+    techEl.innerHTML = techs.map(t => `<span class="disc-technique-tag">${escHtml(t)}</span>`).join('') || '<span style="font-size:11px;color:var(--tx4)">—</span>';
+  }
+
+  // Theme tags
+  const themeEl = document.getElementById('disc-res-themes');
+  if (themeEl) {
+    const themes = Array.isArray(a.themes) ? a.themes : [];
+    themeEl.innerHTML = themes.map(t => `<span class="disc-theme-tag">${escHtml(t)}</span>`).join('') || '<span style="font-size:11px;color:var(--tx4)">—</span>';
+  }
+
+  setText('disc-res-emotion',    a.emotional_register    || '—');
+  setText('disc-res-production', a.production_signature  || '—');
+  setText('disc-res-standout',   a.standout_moments      || '—');
+  setText('disc-res-great',      a.what_makes_it_great   || '—');
+
+  // Repurpose preview
+  const rp   = a.soniq_repurpose || {};
+  const rpEl = document.getElementById('disc-repurpose-preview');
+  if (rpEl) {
+    rpEl.innerHTML = [
+      rp.genre ? `<strong>Genre:</strong> ${escHtml(rp.genre)}`          : '',
+      rp.topic ? `<strong>Topic:</strong> ${escHtml(rp.topic)}`          : '',
+      rp.mood  ? `<strong>Mood:</strong> ${escHtml(rp.mood)}`            : '',
+      rp.style_instruction ? `<em>${escHtml(rp.style_instruction)}</em>` : ''
+    ].filter(Boolean).join(' &nbsp;·&nbsp; ');
+  }
+
+  result.style.display = 'block';
+  result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function repurposeInSoniq() {
+  if (!_discCurrentResult?.analysis?.soniq_repurpose) return;
+  const rp = _discCurrentResult.analysis.soniq_repurpose;
+
+  // Navigate to Write page
+  const writeNavBtn = document.querySelector('#main-nav .nb');
+  goPg('write', writeNavBtn);
+
+  setTimeout(() => {
+    const genreEl = document.getElementById('genre');
+    const topicEl = document.getElementById('topic');
+    const moodEl  = document.getElementById('mood');
+    const notesEl = document.getElementById('notes') || document.getElementById('style-note');
+
+    if (genreEl && rp.genre) { genreEl.value = rp.genre; genreEl.dispatchEvent(new Event('change')); }
+    if (topicEl && rp.topic) topicEl.value = rp.topic;
+    if (moodEl  && rp.mood)  moodEl.value  = rp.mood;
+    if (notesEl && rp.style_instruction) notesEl.value = rp.style_instruction;
+
+    // Pulse the generate button so user sees the next step
+    const genBtn = document.getElementById('gen-btn') || document.querySelector('.btn-amber');
+    if (genBtn) {
+      genBtn.style.transition = 'box-shadow .3s';
+      genBtn.style.boxShadow  = '0 0 0 4px var(--amber)';
+      setTimeout(() => { if (genBtn) genBtn.style.boxShadow = ''; }, 2200);
+    }
+  }, 350);
 }
 
 function setCommSort(sort, btn) {
