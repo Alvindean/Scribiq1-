@@ -4222,14 +4222,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <button class="disc-platform-btn" onclick="discSearch('tiktok')">♩ TikTok</button>
               <button class="disc-platform-btn" onclick="discSearch('instagram')">◈ Instagram</button>
               <button class="disc-platform-btn" onclick="discSearch('twitter')">✕ Twitter / X</button>
+              <button class="disc-platform-btn" onclick="discSearch('suno')" style="border-color:var(--amberline);color:var(--amber)">🎵 Suno</button>
             </div>
             <input id="disc-search-term" type="text" placeholder="Artist, song title, or @handle…" style="width:100%;padding:8px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:12px;box-sizing:border-box">
           </div>
 
           <!-- Manual transcript paste -->
+          <div id="disc-fetch-note" style="display:none;font-size:11px;color:var(--amber);background:var(--amberbg);border:1px solid var(--amberline);border-radius:6px;padding:7px 10px;margin-bottom:8px"></div>
           <details>
-            <summary style="font-size:11px;color:var(--tx3);cursor:pointer;user-select:none;padding:4px 0">+ Paste transcript or lyrics manually (improves accuracy)</summary>
-            <textarea id="disc-transcript" rows="5" placeholder="Paste the lyrics, transcript, or any text from this performance here…" style="width:100%;margin-top:8px;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:12px;font-family:var(--font);box-sizing:border-box;resize:vertical;line-height:1.5"></textarea>
+            <summary style="font-size:11px;color:var(--tx3);cursor:pointer;user-select:none;padding:4px 0">+ Transcript / lyrics — auto-filled for YouTube & Suno, or paste manually</summary>
+            <textarea id="disc-transcript" rows="5" placeholder="Auto-filled when you analyze a YouTube or Suno URL — or paste lyrics/transcript manually here…" style="width:100%;margin-top:8px;padding:9px 11px;border-radius:7px;border:1px solid var(--brd);background:var(--bg2);color:var(--tx1);font-size:12px;font-family:var(--font);box-sizing:border-box;resize:vertical;line-height:1.5"></textarea>
           </details>
         </div>
 
@@ -10135,7 +10137,8 @@ function discSearch(platform) {
     spotify:    `https://open.spotify.com/search/${q}`,
     tiktok:     `https://www.tiktok.com/search?q=${q}`,
     instagram:  `https://www.instagram.com/explore/tags/${q.replace(/%20/g,'')}`,
-    twitter:    `https://twitter.com/search?q=${q}`
+    twitter:    `https://twitter.com/search?q=${q}`,
+    suno:       `https://suno.com/explore?q=${q}`
   };
   if (urls[platform]) window.open(urls[platform], '_blank', 'noopener');
 }
@@ -10161,8 +10164,8 @@ async function analyzeDiscoverURL() {
   if (loading) loading.style.display = 'block';
   if (result)  result.style.display  = 'none';
 
-  const steps    = ['Fetching metadata…', 'Attempting transcription…', 'Running AI analysis…', 'Building breakdown…'];
-  let   stepIdx  = 0;
+  const steps = ['Fetching content from URL…', 'Transcribing…', 'Running AI analysis…', 'Building breakdown…'];
+  let stepIdx = 0;
   const stepTimer = setInterval(() => {
     stepIdx = Math.min(stepIdx + 1, steps.length - 1);
     if (loadingMsg) loadingMsg.textContent = steps[stepIdx];
@@ -10173,10 +10176,48 @@ async function analyzeDiscoverURL() {
     const headers = { 'Content-Type': 'application/json' };
     if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
 
+    // Step 1: Auto-fetch transcript/lyrics from URL if user hasn't pasted manually
+    let fetchedMeta = { title: '', author: '', platform: '', transcript: transcript };
+    if (url && !transcript) {
+      if (loadingMsg) loadingMsg.textContent = 'Fetching content from URL…';
+      try {
+        const fetchRes = await fetch('/api/analyze-url', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url })
+        });
+        if (fetchRes.ok) {
+          const fetched = await fetchRes.json();
+          fetchedMeta = fetched;
+          // Auto-fill transcript box so user can see/edit what was fetched
+          const ta = document.getElementById('disc-transcript');
+          if (ta && fetched.transcript) ta.value = fetched.transcript;
+          // Show note if platform can't provide transcript
+          if (fetched.note) {
+            const noteEl = document.getElementById('disc-fetch-note');
+            if (noteEl) { noteEl.textContent = fetched.note; noteEl.style.display = 'block'; }
+          }
+        }
+      } catch { /* continue without auto-fetch — AI analyzes from URL alone */ }
+    }
+
+    if (loadingMsg) loadingMsg.textContent = 'Running AI analysis…';
+
+    // Step 2: Stream the analysis
     const resp = await fetch('/api/stream', {
       method: 'POST',
       headers,
-      body: JSON.stringify({ action: 'analyze', params: { url, transcript, context } })
+      body: JSON.stringify({
+        action: 'analyze',
+        params: {
+          url,
+          transcript: fetchedMeta.transcript || transcript,
+          context,
+          title:  fetchedMeta.title  || '',
+          author: fetchedMeta.author || '',
+          platform: fetchedMeta.platform || ''
+        }
+      })
     });
 
     if (!resp.ok) {
