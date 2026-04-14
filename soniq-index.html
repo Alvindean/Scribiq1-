@@ -2081,6 +2081,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div id="age-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:8px;min-height:14px"></div>
 
+      <!-- EDGE MODE — lyrical permission system (adult audiences only) -->
+      <label class="topic-label" style="margin-top:10px">Edge Mode
+        <span style="font-weight:400;color:var(--tx3);font-size:10px;text-transform:none;letter-spacing:0">— 18+ · unlocks genre-authentic profanity and raw territory</span>
+      </label>
+      <div class="quality-row" id="edge-mode-pills">
+        <span class="qpill on" onclick="setEdgeMode(this,'off')" id="edge-mode-off">🚫 Clean</span>
+        <span class="qpill"    onclick="setEdgeMode(this,'authentic')" id="edge-mode-auth">🎯 Authentic</span>
+        <span class="qpill"    onclick="setEdgeMode(this,'raw')" id="edge-mode-raw">🔥 Raw</span>
+      </div>
+      <div id="edge-mode-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:8px;min-height:14px">Off by default. "Authentic" matches the genre's real canonical edge. "Raw" removes AI self-sanitization. Requires 18+ or 25+ age target.</div>
+
+      <!-- EDGE TOPICS — only visible when edgeMode !== 'off' -->
+      <div id="edge-topics-wrap" style="display:none;background:var(--s2);border:1px solid var(--b1);border-radius:var(--r2);padding:10px 12px;margin-bottom:10px">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--tx3);margin-bottom:8px">Permission Territories <span style="font-weight:400;opacity:.6;text-transform:none;letter-spacing:0">— pick what the lyrics can touch</span></div>
+        <div class="rl-dim-pills" id="edge-topic-pills">
+          <span class="rl-dpill" data-topic="profanity"        onclick="toggleEdgeTopic(this,'profanity')">🤬 Profanity</span>
+          <span class="rl-dpill" data-topic="sex_explicit"     onclick="toggleEdgeTopic(this,'sex_explicit')">🔞 Sex &amp; Desire</span>
+          <span class="rl-dpill" data-topic="violence_street"  onclick="toggleEdgeTopic(this,'violence_street')">🔫 Street / Violence</span>
+          <span class="rl-dpill" data-topic="substance"        onclick="toggleEdgeTopic(this,'substance')">🌿 Substances</span>
+          <span class="rl-dpill" data-topic="political_rage"   onclick="toggleEdgeTopic(this,'political_rage')">✊ Political Rage</span>
+          <span class="rl-dpill" data-topic="grief_raw"        onclick="toggleEdgeTopic(this,'grief_raw')">🕯 Raw Grief</span>
+          <span class="rl-dpill" data-topic="mental_health"    onclick="toggleEdgeTopic(this,'mental_health')">🧠 Mental Health</span>
+          <span class="rl-dpill" data-topic="body_raw"         onclick="toggleEdgeTopic(this,'body_raw')">🩸 Body / Taboo</span>
+          <span class="rl-dpill" data-topic="class_money"      onclick="toggleEdgeTopic(this,'class_money')">💸 Class &amp; Money</span>
+        </div>
+        <div style="font-size:10px;color:var(--tx4);font-style:italic;margin-top:8px;line-height:1.4">Only the territories you select are unlocked. Hard floors always apply: no minors, no real-world harm instructions, no hate speech, no doxxing.</div>
+      </div>
+
       <!-- PARAMS ROW (Vocal + Structure only) -->
       <div class="params" style="grid-template-columns:1fr 1fr">
         <div class="param">
@@ -2399,6 +2427,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="bpill" onclick="setHookStyle(this,'Double Hook A+B')">Double Hook A+B</span>
             <span class="bpill" onclick="setHookStyle(this,'Gospel Vamp')">Gospel Vamp</span>
             <span class="bpill" onclick="setHookStyle(this,'Post-Hook Drop')">Post-Hook Drop</span>
+          </div>
+
+          <!-- FREESTYLE MODE — no hook, bars and beats only -->
+          <div style="margin-top:10px">
+            <span class="bpill" id="freestyle-toggle" onclick="toggleFreestyle(this)" style="padding:6px 14px;font-weight:700">🎤 Freestyle Mode
+              <span style="font-size:9px;font-weight:400;opacity:.7;margin-left:4px">no hook · bars only</span>
+            </span>
+            <span style="font-size:10px;color:var(--tx4);font-style:italic;margin-left:8px">Forces verse-only structure, no chorus, no hook. Perfect for cyphers, drill openers, boom-bap verses.</span>
           </div>
 
           <!-- ARTIST VOICE PROFILE -->
@@ -5364,6 +5400,10 @@ const S={selectedGenre:'pop',
   emotionalArc: 'none',
   syllableCap: 0,
   platform: 'suno',
+  // Edge Mode — lyrical permission system (adult audiences only)
+  edgeMode: 'off',             // 'off' | 'authentic' | 'raw'
+  edgeTopics: [],              // subset of: profanity, sex_explicit, violence_street, substance, political_rage, grief_raw, mental_health, body_raw, class_money
+  freestyleMode: false,        // true = no hook, no chorus, bars/verses only
   dualPerspective: false,
   seedLine: '',
   recentOpenings: [],    // Track last 3 verse-1 opening lines for pattern avoidance
@@ -6763,7 +6803,11 @@ async function generateSong(){
     dualPerspective: S.dualPerspective || false,
     seedLine: S.seedLine || '',
     avoidPatterns: S.recentOpenings ? [...S.recentOpenings] : [],
-    platinum: _platinumOn && isPlatinumEligible()
+    platinum: _platinumOn && isPlatinumEligible(),
+    // Edge Mode (backend hard-gates these to adult audiences regardless)
+    edgeMode: S.edgeMode || 'off',
+    edgeTopics: Array.isArray(S.edgeTopics) ? [...S.edgeTopics] : [],
+    freestyleMode: !!S.freestyleMode
   };
   // Clear album context after use
   if(S.albumTrack){ document.getElementById('album-track-banner').style.display='none'; S.albumTrack=null; }
@@ -8610,6 +8654,77 @@ function setAgeGroup(el, val) {
   if ((val === 'toddler' || val === 'kids') && S.selectedGenre !== 'children') {
     const hint = document.getElementById('age-desc');
     if (hint) hint.textContent = (AGE_DESCS[val] || '') + ' · Tip: try 🌈 Children\'s genre for best results';
+  }
+  // If audience switches to a non-adult group, force-disable edge mode in UI state
+  const adultAudiences = new Set(['', 'young-adult', 'adult']);
+  if (!adultAudiences.has(val) && S.edgeMode && S.edgeMode !== 'off') {
+    const offPill = document.getElementById('edge-mode-off');
+    if (offPill) setEdgeMode(offPill, 'off');
+    toast('Edge Mode disabled — requires 18+ or 25+ audience');
+  }
+}
+
+// ─── EDGE MODE — lyrical permission system (adult audiences only) ───
+const EDGE_MODE_DESCS = {
+  off:       'Off by default. "Authentic" matches the genre\'s real canonical edge. "Raw" removes AI self-sanitization. Requires 18+ or 25+ age target.',
+  authentic: 'Authentic mode — AI writes at the genre\'s real edge. Profanity, raw imagery, and adult territory ALLOWED where the craft demands them. Self-sanitization reduced.',
+  raw:       'Raw mode — maximum authenticity. Every selected permission at full weight. No moral framing added automatically. Still honors absolute floors (no minors, no real-world harm instructions, no hate speech).'
+};
+
+function setEdgeMode(el, val) {
+  // Hard-gate: non-adult audiences can't enable edge mode
+  const adultAudiences = new Set(['', 'young-adult', 'adult']);
+  if (val !== 'off' && !adultAudiences.has(S.selectedAgeGroup)) {
+    toast('Edge Mode requires 18+ or 25+ audience');
+    return;
+  }
+  document.querySelectorAll('#edge-mode-pills .qpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.edgeMode = val;
+  const desc = document.getElementById('edge-mode-desc');
+  if (desc) desc.textContent = EDGE_MODE_DESCS[val] || '';
+  // Show/hide topic selector
+  const wrap = document.getElementById('edge-topics-wrap');
+  if (wrap) wrap.style.display = (val === 'off') ? 'none' : 'block';
+}
+
+function toggleEdgeTopic(el, topic) {
+  if (!Array.isArray(S.edgeTopics)) S.edgeTopics = [];
+  const idx = S.edgeTopics.indexOf(topic);
+  if (idx >= 0) {
+    S.edgeTopics.splice(idx, 1);
+    el.classList.remove('on');
+  } else {
+    S.edgeTopics.push(topic);
+    el.classList.add('on');
+  }
+}
+
+// ─── FREESTYLE MODE — no hook, bars and beats only ───
+// Quick-override: forces the song to be all-verse / all-bars with no chorus.
+// Works for any genre but tuned for hip-hop / rap / drill / freestyle cyphers.
+function toggleFreestyle(el) {
+  S.freestyleMode = !S.freestyleMode;
+  if (el) el.classList.toggle('on', S.freestyleMode);
+  if (S.freestyleMode) {
+    // Save current structure/hookStyle so we can restore on toggle-off
+    S._preFreestyle = { structure: document.getElementById('g-structure')?.value, hookStyle: S.hookStyle };
+    // Force verse-only structure and neutralize hook
+    const structSel = document.getElementById('g-structure');
+    if (structSel) {
+      // Prefer 'verseonly' if available, else fall back
+      const hasVerseOnly = Array.from(structSel.options).some(o => o.value === 'verseonly');
+      structSel.value = hasVerseOnly ? 'verseonly' : structSel.value;
+    }
+    S.hookStyle = 'auto';
+    toast('🎤 Freestyle mode — no hook, bars only');
+  } else if (S._preFreestyle) {
+    // Restore previous settings
+    const structSel = document.getElementById('g-structure');
+    if (structSel && S._preFreestyle.structure) structSel.value = S._preFreestyle.structure;
+    if (S._preFreestyle.hookStyle) S.hookStyle = S._preFreestyle.hookStyle;
+    delete S._preFreestyle;
+    toast('Freestyle mode off — normal structure restored');
   }
 }
 

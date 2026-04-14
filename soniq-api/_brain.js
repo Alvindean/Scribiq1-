@@ -1331,6 +1331,155 @@ function sanitizeInput(str, maxLen = 300) {
 }
 
 // ─── AGE GROUPS ────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// EDGE MODE — Lyrical permission system for adult audiences
+// ─────────────────────────────────────────────────────────────────────────
+// Off by default. When enabled, unlocks genre-authentic profanity, raw
+// imagery, and edge-topic permission so the AI stops self-sanitizing.
+// Always gated by ageGroup: any non-adult audience force-disables all
+// edge flags regardless of toggle state.
+//
+// HARD SAFETY FLOORS (never crossed, regardless of mode):
+//  • No sexual content involving minors
+//  • No actionable instructions for real-world harm (weapons, synthesis,
+//    self-harm methods, attacks on specific people/places)
+//  • No hate speech endorsing violence against protected classes
+//  • No doxxing or real-person defamation
+//
+// EDGE_TOPICS — individual permission flags (multi-select). User toggles
+// only the territories they want; unselected stay off even in raw mode.
+// ═══════════════════════════════════════════════════════════════════════════
+const EDGE_TOPICS = {
+  profanity: {
+    label: 'Profanity',
+    short: 'fuck/shit/damn/bitch — where genre-authentic',
+    permission: 'Profanity is ALLOWED where it serves the emotional truth of the song. Use curse words as emotional amplifiers not decoration: "fuck" for rage/release, "shit" for dismissal/weight, "damn" for exasperation, "bitch" only in genre-authentic context (drill, trap, punk protest). NEVER force profanity into a song where the genre does not naturally carry it (folk ballads, children-adjacent pop, devotional gospel). The rule: every curse must earn its bar — if removing it leaves the line just as powerful, remove it. Preferred placements: punchline bar, chorus release beat, bridge emotional peak.',
+    lexicon: ['fuck','fucking','shit','damn','hell','bitch','ass','goddamn','bullshit','motherfucker'],
+    bans: ['slurs targeting race, ethnicity, sexuality, gender, disability — not negotiable even in genre context']
+  },
+  sex_explicit: {
+    label: 'Sex & Desire',
+    short: 'raw sensuality / bedroom / slack territory',
+    permission: 'Explicit adult sexuality is ALLOWED. Write desire with physical specificity: body parts named, tactile detail (skin, sweat, breath, teeth, grip), the rhythm of the encounter mapped to the groove. Dancehall slack, reggaeton perreo, R&B bedroom, country outlaw — lean into the genre\'s tradition. Avoid Hallmark euphemism ("made love under stars") — replace with concrete specificity. Power dynamics and consent are adult subjects; honor complexity. Hard floor: every participant is unmistakably an adult; no ambiguous age framing.',
+    registers: ['tactile-specific','power-play','aftermath-intimate','public-flirt','slack-explicit'],
+    bans: ['any sexual content involving anyone under 18 — absolute floor, no exceptions, no ambiguity']
+  },
+  violence_street: {
+    label: 'Street / Violence',
+    short: 'drill, gangster rap, punk rage — lived experience',
+    permission: 'Street-level violence imagery is ALLOWED as lived experience and social documentation. Drill, gangster rap, punk, murder ballads, narcocorridos — these genres process real violence through art. Write the aftermath, the grief, the complicity, the adrenaline — not an instruction manual. Rule: describe the world, do not choreograph a crime. No weapon-build instructions, no tactical advice, no named targets for real people or locations. The strongest street writing is unflinching about cost (Nas "One Mic", Scarface "I Seen a Man Die") — violence without consequence is juvenile.',
+    territories: ['block-life-observation','survivor-guilt','revenge-imagined','inherited-trauma','adrenaline-aftermath'],
+    bans: ['operational detail (how to build, where to strike, how to evade) — artistic, not instructional','named living targets or specific real locations as targets']
+  },
+  substance: {
+    label: 'Substances',
+    short: 'weed / alcohol / pharma — culture, not endorsement',
+    permission: 'Substance references are ALLOWED. Weed in hip-hop/reggae, whiskey in country/blues, pharma in emo/trap, cocaine in 80s-coded disco — these are genre vocabulary. Write the ritual, the come-up, the comedown, the cost. Nuance beats glamour: the best substance writing (Amy Winehouse "Rehab", Juice WRLD "Lucid Dreams", Kendrick "Swimming Pools") names the ambivalence. Avoid "party drug checklist" without context — specificity of experience beats product placement.',
+    territories: ['ritual-wind-down','addiction-honest','social-lubricant','escape-from-pain','comedown-wreckage'],
+    bans: ['specific sourcing, dosing, or synthesis info — lyrics, not harm-reduction pamphlet']
+  },
+  political_rage: {
+    label: 'Political / Protest',
+    short: 'rage against systems — punk, rap, roots, folk',
+    permission: 'Political anger and systemic critique are ALLOWED and HONORED. Punk anti-establishment, conscious rap, roots reggae Babylon critique, protest folk — these are cornerstones of popular music. Name the system, name the harm, name the cost to a specific body. Rule: punch up (at institutions, power structures, corporations, complicit governments) never down (at individuals of less power). Avoid vague "system bad" sloganeering — the best protest writing (Rage Against the Machine, Kendrick, Peter Tosh, Woody Guthrie) grounds rage in one specific injustice seen through one specific witness.',
+    territories: ['institutional-critique','labor-exploitation','police-state','colonial-memory','climate-grief','gender-structural']
+  },
+  grief_raw: {
+    label: 'Raw Grief',
+    short: 'blues, country, emo — unflinching loss',
+    permission: 'Unflinching grief is ALLOWED and often required by genre. Blues, country, emo, Americana, torch ballads — these are built on loss written without redemptive arc. Write the mundane texture of grief: the empty side of the bed, the voicemail unchanged, the laundry that still smells, the dog who waits at the door. Avoid "they\'re in a better place" sanitization. The craft (Springsteen "Streets of Philadelphia", Mount Eerie "A Crow Looked at Me", Tracy Chapman "Fast Car") stays in the present tense of the wound.',
+    territories: ['object-permanence','ritual-broken','survivor-guilt','unresolved-last-words','absence-specific']
+  },
+  mental_health: {
+    label: 'Mental Health',
+    short: 'anxiety / depression / suicidal ideation — with care',
+    permission: 'Mental health territory including depression, anxiety, and suicidal ideation is ALLOWED when the song treats it as lived interior experience, not spectacle. Elliott Smith, Phoebe Bridgers, Linkin Park, Logic "1-800-273-8255" — these songs saved lives by naming the interior honestly. Rules: write the feeling (not the method), honor complexity (not everyone recovers cleanly, but hope belongs in the room somewhere — even as ambivalence), include a grounding image (specific sensory anchor that keeps the song human not abstract). Hard floor: no actionable self-harm methods or step-by-step ideation.',
+    territories: ['fog-depression','spiral-anxiety','dissociation-detached','rumination-loop','return-to-light','ambivalent-survival'],
+    bans: ['specific self-harm methods, medication details for overdose, or "how-to" framing']
+  },
+  body_raw: {
+    label: 'Body / Taboo',
+    short: 'bodily reality — sweat, blood, piss, shit, vomit, scars',
+    permission: 'Taboo bodily imagery is ALLOWED when it serves emotional truth. Sweat on a dance floor, blood on the sheets (menstruation, injury, intimacy), vomit after the breakdown, scars as topography — the body is a legitimate lyric instrument. Genres that lean here: blues, country, punk, Americana confessional, hip-hop street, emo. Rule: embodied specificity beats poetic abstraction. "I threw up in the kitchen sink at 3am" has more weight than "I felt sick".',
+    territories: ['sweat-labor','blood-intimate','scars-earned','body-horror-grief','illness-chronic','appetite-honest']
+  },
+  class_money: {
+    label: 'Class & Money Honest',
+    short: 'broke / overdraft / eviction — not aspirational',
+    permission: 'Specific working-class and poverty realism is ALLOWED. Rent-due Friday, pawn-shop receipts, overdraft fees, shoplifting groceries, eviction notices, payday-loan math, hand-me-down everything. Country, blues, folk, conscious rap, emo, Americana — these genres are BUILT on economic specificity. Avoid generic "struggle" signaling without material detail — the best class writing (Dolly "Coat of Many Colors", Kendrick, Tracy Chapman, Fiona Apple) names exact dollar amounts, brand names of cheap goods, the geography of scarcity.',
+    territories: ['rent-math','food-scarcity','inheritance-none','work-body-breaking','wealth-contact-shame','debt-generational']
+  }
+};
+
+// ─────────────────────────────────────────────────────────────────────────
+// EDGE MODE profiles — meta-toggle on top of per-topic flags
+//  off       = current behavior; nothing unlocked
+//  authentic = unlock the genre's own native edge; respect craft limits
+//  raw       = maximum authenticity; every selected topic at full weight
+// ─────────────────────────────────────────────────────────────────────────
+const EDGE_MODES = {
+  off: {
+    label: 'Clean',
+    weight: 0,
+    headerNote: ''
+  },
+  authentic: {
+    label: 'Authentic',
+    weight: 1,
+    headerNote: 'EDGE MODE: AUTHENTIC — You have explicit permission to write at the genre\'s native edge. Match the register of the real canonical artists in this genre: if the best songs in this tradition use profanity, raw imagery, and adult territory, you SHOULD use them where they serve the craft. Do not self-sanitize below the genre\'s real floor. Still honor the song\'s emotional truth — edge without purpose is juvenile.'
+  },
+  raw: {
+    label: 'Raw',
+    weight: 2,
+    headerNote: 'EDGE MODE: RAW — Maximum authenticity. Every selected permission is at full weight. Write as the most uncompromising artist in this tradition would. Do NOT add moral framing, disclaimer language, or redemptive arcs unless the song itself organically arrives there. The adult listener is an intelligent participant, not a vulnerable audience requiring protection. Still observe the absolute floors below.'
+  }
+};
+
+const EDGE_HARD_FLOORS = `\n
+ABSOLUTE FLOORS — never crossed regardless of edge mode:
+- No sexual content involving anyone under 18, no ambiguous age framing
+- No actionable instructions for real-world harm (weapon construction, drug synthesis, attack planning, suicide methods)
+- No hate speech endorsing violence against protected classes (race, ethnicity, religion, sexuality, gender, disability)
+- No doxxing, no targeting real living individuals with defamation or calls to harm
+- No glorification of sexual violence, child abuse, or genocide
+These floors apply inside every mode. They do not restrict craft — the greatest artists in every tradition honor them.`;
+
+function buildEdgeNote({ edgeMode = 'off', edgeTopics = [], ageGroup = '' } = {}) {
+  // Hard gate: any non-adult audience disables edge entirely
+  const adultAudiences = new Set(['', 'young-adult', 'adult']);
+  if (!adultAudiences.has(ageGroup)) return '';
+
+  const mode = EDGE_MODES[edgeMode] || EDGE_MODES.off;
+  if (mode.weight === 0) return '';
+
+  const topics = Array.isArray(edgeTopics) ? edgeTopics : [];
+  const activeTopics = topics.filter(t => EDGE_TOPICS[t]);
+  if (!activeTopics.length) {
+    // Mode on but no topics selected → just the permission banner, no specifics
+    return `\n\n${mode.headerNote}${EDGE_HARD_FLOORS}`;
+  }
+
+  const topicBlocks = activeTopics.map(t => {
+    const cfg = EDGE_TOPICS[t];
+    let block = `• ${cfg.label.toUpperCase()} — ${cfg.permission}`;
+    if (cfg.lexicon && mode.weight >= 1) {
+      block += `\n  Lexicon available: ${cfg.lexicon.join(', ')}.`;
+    }
+    if (cfg.territories) {
+      block += `\n  Territories: ${cfg.territories.join(' · ')}.`;
+    }
+    if (cfg.registers) {
+      block += `\n  Registers: ${cfg.registers.join(' · ')}.`;
+    }
+    if (cfg.bans) {
+      block += `\n  Still off-limits in this topic: ${cfg.bans.join(' | ')}.`;
+    }
+    return block;
+  }).join('\n\n');
+
+  return `\n\n${mode.headerNote}\n\nEDGE PERMISSIONS ACTIVE (${activeTopics.length} ${activeTopics.length === 1 ? 'territory' : 'territories'}):\n${topicBlocks}${EDGE_HARD_FLOORS}`;
+}
+
 const AGE_GROUPS = {
   'toddler': {
     label: 'Toddlers (1–4)',
@@ -2624,8 +2773,26 @@ function buildSongPrompt(params) {
     substyle = '', hookStyle = 'auto', voice = {}, albumTrack = null,
     blend = {}, bracketMode = 'suno', ageGroup = '',
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
-    platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false
+    platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
+    edgeMode = 'off', edgeTopics = [], freestyleMode = false
   } = params;
+
+  // EDGE MODE — lyrical permission system (gated by adult audience)
+  const edgeNote = buildEdgeNote({ edgeMode, edgeTopics, ageGroup });
+
+  // FREESTYLE MODE — verse/bar-only mode (no hook, no chorus)
+  const freestyleNote = freestyleMode
+    ? `\n\nFREESTYLE MODE ACTIVE — NO HOOK, NO CHORUS:
+- Write verses/bars ONLY — NO [Chorus], NO [Hook], NO [Pre-Chorus], NO repeated refrain section
+- Structure: [Intro Bars] → [Verse 1] → [Verse 2] → [Verse 3] → [Outro Bars] (or cypher-style stacked verses)
+- Each verse is a self-contained bar-run that develops the topic without returning to a hook refrain
+- Punchlines land on bar 4, bar 8, bar 12, bar 16 of each verse — internal structure carries the dopamine, not a chorus
+- No refrain, no singalong moment — this is pure lyrical display / bar-for-bar craft
+- For hip-hop/rap: treat as a freestyle cypher — each verse escalates in density, rhyme complexity, or subject matter
+- For rock/punk/altrock: treat as a through-composed rant with no returning section
+- The SONG PROMPT should still describe the beat/production — "beats and bars" means the track still has a beat, just no sung hook
+- Do NOT write a TITLE hook — the title can be a thematic phrase or a punchline from one of the verses`
+    : '';
 
   const topic = sanitizeInput(rawTopic);
   const mood = sanitizeInput(rawMood);
@@ -2705,7 +2872,8 @@ IMPORTANT: Tailor ALL lyrics, vocabulary, themes, and emotional content to be ag
   else if (genre === 'tvmusical') genreSpecificNote = `\n\nTV/MUSICAL RULES:\n- Every song has a DRAMATIC FUNCTION.\n- Characters sing because dialogue is insufficient.\n- "I want" structure in verse 1/chorus 1.\n- Reprise principle: same melody, changed lyrics = devastating.`;
 
   // Hook style
-  const resolvedHookStyle = (hookStyle && hookStyle !== 'auto') ? hookStyle : null;
+  // Freestyle mode overrides hook style entirely — no hook at all
+  const resolvedHookStyle = freestyleMode ? null : ((hookStyle && hookStyle !== 'auto') ? hookStyle : null);
   const hookNote = resolvedHookStyle && HOOK_STYLE_NOTES[resolvedHookStyle] ? `\n\n${HOOK_STYLE_NOTES[resolvedHookStyle]}` : '';
 
   // Blend
@@ -2865,7 +3033,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${edgeNote}${freestyleNote}${genreSpecificNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -3997,4 +4165,4 @@ Return ONLY this JSON structure (fill every field — use "unknown" only if trul
   return { system, prompt };
 }
 
-module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, buildAnalyzePrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote };
+module.exports = { buildSongPrompt, buildLuckyPrompt, buildRapLabPrompt, buildEditPrompt, buildPromptIntelligence, buildAnalyzePrompt, GENRE_LABELS, GENRE_BIBLE, MUSIC_THEORY_BIBLE, SYNC_BIBLE, VARIANT_PROMPTS, buildVariantPrompt, FEEDBACK_DIMENSIONS, buildFeedbackPrompt, RHYME_SCHEMES, GENRE_RHYME_PREF, ERA_VOCABULARY, EMOTIONAL_ARCS, GENRE_SYLLABLE_BUDGETS, GENRE_FX_PROFILES, GENRE_PLUGIN_CHAINS, MASTERING_TARGETS, PRODUCTION_ARCHETYPES, buildProductionData, GENRE_HIT_REFERENCES, buildTopTierNote, ADLIB_BIBLE, VOCAL_STACK_PROFILES, buildAdlibNote, buildVocalStackNote, EDGE_TOPICS, EDGE_MODES, buildEdgeNote };
