@@ -1067,6 +1067,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 .disc-stat-val{font-size:12px;color:var(--tx1);font-weight:600;line-height:1.3;word-break:break-word}
 .disc-technique-tag{font-size:10px;background:rgba(168,146,255,.12);color:var(--violet);border:1px solid rgba(168,146,255,.25);border-radius:5px;padding:3px 8px;line-height:1.8}
 .disc-theme-tag{font-size:10px;background:rgba(251,191,36,.1);color:var(--amber);border:1px solid rgba(251,191,36,.2);border-radius:5px;padding:3px 8px;line-height:1.8}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
 @media(max-width:1100px){
   .comm-layout{grid-template-columns:180px 1fr}
   .comm-right{display:none}
@@ -6048,11 +6049,12 @@ function apiErrHtml(msg, errCode) {
 
 // ── Genre Zone helpers ──
 const GZ_CATEGORIES = [
-  { label: 'Core',       keys: ['pop','rock','rnb','hiphop','country','folk','trap','indie'] },
-  { label: 'Electronic', keys: ['edm','altrock','punk','metal','kpop','lofi'] },
-  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae','dancehall'] },
-  { label: 'Soulful',    keys: ['jazz','blues','neosoul','gospel','ss','funk','classical'] },
-  { label: 'Special',    keys: ['parody','comedy','children','tvmusical'] },
+  { label: 'Core',       keys: ['pop','rock','rnb','hiphop','country','folk'] },
+  { label: 'Electronic', keys: ['edm','altrock','punk','metal','kpop'] },
+  { label: 'World',      keys: ['latin','reggaeton','afrobeats','reggae','dancehall','bossa','amapiano'] },
+  { label: 'Soulful',    keys: ['jazz','blues','neosoul','gospel','ss'] },
+  { label: 'Special',    keys: ['parody','comedy','children','tvmusical','bollywood','cpop'] },
+  { label: 'Street',     keys: ['drill'] },
 ];
 
 // All 30 genres with display labels (superset of the old 18)
@@ -10063,21 +10065,29 @@ function setCommTypeFilter(type, btn) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 let _discCurrentResult = null;
+let _discAnalyzing     = false;
 
 function switchCommTab(tab, btn) {
   document.querySelectorAll('.comm-tab-btn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
   const discoverPanel = document.getElementById('comm-discover-panel');
-  const feedEls = ['comm-compose-wrap', 'comm-feed', 'comm-loading', 'comm-empty', 'comm-load-more'];
   if (tab === 'discover') {
-    feedEls.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    ['comm-compose-wrap','comm-feed','comm-loading','comm-empty','comm-load-more'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.style.display = 'none';
+    });
     if (discoverPanel) discoverPanel.style.display = 'block';
   } else {
     if (discoverPanel) discoverPanel.style.display = 'none';
+    // Restore compose and feed — other state elements (loading/empty/load-more)
+    // are managed by loadCommunityFeed() itself, so reset to hidden first
     const composeWrap = document.getElementById('comm-compose-wrap');
-    const feed = document.getElementById('comm-feed');
+    const feed        = document.getElementById('comm-feed');
+    const empty       = document.getElementById('comm-empty');
+    const loadMore    = document.getElementById('comm-load-more');
     if (composeWrap) composeWrap.style.display = '';
-    if (feed) feed.style.display = '';
+    if (feed)        feed.style.display        = '';
+    if (empty)       empty.style.display       = 'none';
+    if (loadMore)    loadMore.style.display    = 'none';
     loadCommunityFeed();
   }
 }
@@ -10112,11 +10122,16 @@ function discSearch(platform) {
 }
 
 async function analyzeDiscoverURL() {
+  if (_discAnalyzing) return; // double-click guard
+
   const url        = (document.getElementById('disc-url')?.value || '').trim();
   const transcript = (document.getElementById('disc-transcript')?.value || '').trim();
   const context    = (document.getElementById('disc-search-term')?.value || '').trim();
 
   if (!url) { alert('Paste a URL to analyze first.'); return; }
+  if (!S.session?.access_token) { alert('Sign in to use Discover & Analyze.'); return; }
+
+  _discAnalyzing = true;
 
   const btn        = document.getElementById('disc-analyze-btn');
   const loading    = document.getElementById('disc-loading');
@@ -10136,12 +10151,19 @@ async function analyzeDiscoverURL() {
 
   try {
     let fullText = '';
+    const headers = { 'Content-Type': 'application/json' };
+    if (S.session?.access_token) headers['Authorization'] = 'Bearer ' + S.session.access_token;
+
     const resp = await fetch('/api/stream', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify({ action: 'analyze', params: { url, transcript, context } })
     });
-    if (!resp.ok) throw new Error(`Server error ${resp.status}`);
+
+    if (!resp.ok) {
+      const errData = await resp.json().catch(() => ({}));
+      throw new Error(errData.message || `Server error ${resp.status}`);
+    }
 
     const reader  = resp.body.getReader();
     const decoder = new TextDecoder();
@@ -10154,15 +10176,26 @@ async function analyzeDiscoverURL() {
         try {
           const d = JSON.parse(line.slice(6));
           if (d.text) fullText += d.text;
+          if (d.error) throw new Error(d.error);
           if (d.done) break outer;
-        } catch {}
+        } catch(pe) { if (pe.message !== 'pe') throw pe; }
       }
     }
 
-    // Parse the JSON that Claude returned
-    const jsonMatch = fullText.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) throw new Error('Could not parse analysis — try adding the transcript manually.');
-    const analysis = JSON.parse(jsonMatch[0]);
+    // Extract the outermost JSON object Claude returned (non-greedy safe)
+    let analysis = null;
+    try {
+      // Try direct parse first (cleanest path)
+      analysis = JSON.parse(fullText.trim());
+    } catch {
+      // Fall back to regex extraction for leading/trailing prose
+      const jsonMatch = fullText.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('Could not parse analysis — try pasting the transcript manually.');
+      analysis = JSON.parse(jsonMatch[0]);
+    }
+
+    // Guard against error objects from Claude
+    if (analysis.error) throw new Error(analysis.error);
 
     _discCurrentResult = { analysis, url };
     showDiscoverResult(analysis, url);
@@ -10172,6 +10205,7 @@ async function analyzeDiscoverURL() {
     alert('Analysis failed: ' + e.message);
   } finally {
     clearInterval(stepTimer);
+    _discAnalyzing = false;
     if (btn)     { btn.disabled = false; btn.textContent = 'Analyze'; }
     if (loading) loading.style.display = 'none';
   }
@@ -10250,18 +10284,25 @@ function repurposeInSoniq() {
   goPg('write', writeNavBtn);
 
   setTimeout(() => {
-    const genreEl = document.getElementById('genre');
-    const topicEl = document.getElementById('topic');
-    const moodEl  = document.getElementById('mood');
-    const notesEl = document.getElementById('notes') || document.getElementById('style-note');
+    // Genre — uses onGenreChange() with button grid, not a select element
+    if (rp.genre && typeof onGenreChange === 'function') onGenreChange(rp.genre);
 
-    if (genreEl && rp.genre) { genreEl.value = rp.genre; genreEl.dispatchEvent(new Event('change')); }
-    if (topicEl && rp.topic) topicEl.value = rp.topic;
-    if (moodEl  && rp.mood)  moodEl.value  = rp.mood;
-    if (notesEl && rp.style_instruction) notesEl.value = rp.style_instruction;
+    // Topic — actual textarea ID is g-topic
+    const topicEl = document.getElementById('g-topic');
+    if (topicEl && rp.topic) {
+      topicEl.value = rp.topic;
+      topicEl.dispatchEvent(new Event('input'));
+    }
+
+    // Mood — uses toggleMood(); first clear existing moods, then set the first mood word
+    if (rp.mood && typeof toggleMood === 'function') {
+      const moodWord = rp.mood.split(/[,+\/]/)[0].trim().toLowerCase();
+      const moodDef  = (typeof MOODS_DEF !== 'undefined') ? MOODS_DEF.find(m => m.id === moodWord || m.label?.toLowerCase() === moodWord) : null;
+      if (moodDef) toggleMood(moodDef.id, null);
+    }
 
     // Pulse the generate button so user sees the next step
-    const genBtn = document.getElementById('gen-btn') || document.querySelector('.btn-amber');
+    const genBtn = document.getElementById('gen-btn');
     if (genBtn) {
       genBtn.style.transition = 'box-shadow .3s';
       genBtn.style.boxShadow  = '0 0 0 4px var(--amber)';
@@ -12026,8 +12067,9 @@ async function loadPromptIntelligence(prefix) {
   const mood  = song.mood  || (prefix === 'res' ? document.getElementById('mood')?.value  : '') || '';
 
   // Extract rough hook score from DOM (already computed by calcHookScore)
-  const numEl = document.getElementById(prefix + '-score-num');
-  const hookScore = numEl ? parseFloat(numEl.textContent) * 10 : 0; // convert 0-10 → 0-100
+  const numEl  = document.getElementById(prefix + '-score-num');
+  const rawNum = numEl ? parseFloat(numEl.textContent) : NaN;
+  const hookScore = (!isNaN(rawNum) && rawNum > 0) ? rawNum * 10 : 65; // default 65/100 when score not yet computed
 
   list.innerHTML = '<div style="font-size:12px;color:var(--tx3);padding:8px 0">Analyzing your song…</div>';
   card.classList.add('visible');
