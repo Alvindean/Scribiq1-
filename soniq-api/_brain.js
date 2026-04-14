@@ -3371,8 +3371,8 @@ Structure: ${structStr}
 Quality target: ${quality}
 
 RAP LAB DIMENSIONS — HARD CONSTRAINTS:
-• FLOW STYLE: ${dims.flow.join(' + ')} — ${dims.flow.map(f => FLOW_NOTES[f]).filter(Boolean).join(' / ')}
-• RHYME ARCHITECTURE: ${dims.rhymeArch.join(' + ')} — ${dims.rhymeArch.map(r => RHYME_NOTES[r]).filter(Boolean).join(' / ')}
+• FLOW STYLE: ${dims.flow.join(' + ')} — ${dims.flow.map(f => FLOW_NOTES[f]).filter(Boolean).join(' / ')}${dims.flow.length > 1 ? `\n  ↳ FLOW BLEND: Primary flow [${dims.flow[0]}] drives VERSE bars — this is the workhorse delivery. Secondary flow [${dims.flow.slice(1).join(' + ')}] enters in HOOK and/or BRIDGE. The contrast between them creates the dynamic arc: verse attacks differently than hook. Do NOT alternate flows randomly bar-by-bar — assign them structurally by section.` : ''}
+• RHYME ARCHITECTURE: ${dims.rhymeArch.join(' + ')} — ${dims.rhymeArch.map(r => RHYME_NOTES[r]).filter(Boolean).join(' / ')}${dims.rhymeArch.length > 1 ? `\n  ↳ RHYME BLEND: [${dims.rhymeArch[0]}] anchors the HOOK — accessible, memorable, easy to catch on repeat listens. [${dims.rhymeArch.slice(1).join(' + ')}] deepens the VERSE — where craft and complexity live. Don't mix schemes randomly within a section; assign them intentionally by function.` : ''}
 • SYLLABIC DENSITY: ${dims.density} — ${DENSITY_NOTES[dims.density]}
 • VOCABULARY REGISTER: ${dims.vocabRegister} — ${VOCAB_NOTES[dims.vocabRegister]}
 • PERSONA: ${dims.persona} — ${PERSONA_NOTES[dims.persona]}
