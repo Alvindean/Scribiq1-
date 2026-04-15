@@ -2797,6 +2797,9 @@ function buildSongPrompt(params) {
     else if (genre === 'parody')    craftDimNote = buildParodyDimBlock(craftDimensions);
     else if (genre === 'comedy')    craftDimNote = buildComedyDimBlock(craftDimensions);
     else if (genre === 'children')  craftDimNote = buildChildrenDimBlock(craftDimensions);
+    else if (genre === 'pop')       craftDimNote = buildPopDimBlock(craftDimensions);
+    else if (genre === 'rnb')       craftDimNote = buildRnbDimBlock(craftDimensions);
+    else if (genre === 'rock')      craftDimNote = buildRockDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -4658,6 +4661,149 @@ function buildChildrenDimBlock(dims) {
   if (lyrMap[dims.lyricApproach])   parts.push(`• LYRIC APPROACH: ${lyrMap[dims.lyricApproach]}`);
   const safetyClause = '\n• SAFETY CLAUSE: Lyrics must be age-appropriate — no profanity, no violence, no romantic/sexual content, no scary or distressing imagery, no substance references. Keep language gentle, inclusive, and kind.';
   return parts.length ? `\n\nCHILDREN CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}${safetyClause}` : '';
+}
+
+function buildPopDimBlock(dims) {
+  if (!dims) return '';
+  const eraMap = {
+    'y2k-bubblegum':'Y2K bubblegum pop — Britney/Xtina era; gated snares, layered vocal stacks, sugar-bright production.',
+    'early-00s-teen-pop':'Early 00s teen pop — crisp 4-on-floor, pop-punk adjacent, Disney Radio polish; Kelly Clarkson/early Pink.',
+    '2010s-edm-pop':'2010s EDM-pop — big drops, supersaw leads, chorus-as-beat; Calvin Harris crossover template.',
+    '2020s-bedroom-pop':'2020s bedroom pop — close-mic whisper vocals, lo-fi warmth, diaristic intimacy; Billie Eilish/Clairo.',
+    'timeless-classic':'Timeless classic pop — 60s-70s melodic sensibility, Beatles/Carole King DNA; songwriter-forward.'
+  };
+  const hkMap = {
+    'title-in-first-line':'Title-in-first-line — hook stated immediately, no slow burn; Max Martin melodic math.',
+    'pre-chorus-lift':'Pre-chorus lift — climbing melody and harmony pushing into chorus; the lift IS the hook.',
+    'post-chorus-earworm':'Post-chorus earworm — wordless or short-phrase repeat after chorus; the part you hum leaving the club.',
+    'melodic-ad-lib-tag':'Melodic ad-lib tag — signature vocal motif (Mariah whistle, Rihanna "ay"); artist identity as hook.',
+    'repetition-mantra':'Repetition mantra — same phrase repeated 8+ times with subtle variation; hypnotic hook.'
+  };
+  const vpMap = {
+    'stadium-belter':'Stadium belter — sustained high notes, chest voice power, arena-ready projection.',
+    'intimate-diary':'Intimate diary — conversational, whispered at times, close-mic presence; confession to one listener.',
+    'playful-flirt':'Playful flirt — smirking delivery, head voice bounce, charm over power.',
+    'cool-detached':'Cool detached — monotone-adjacent, emotional remove, stylized apathy; Lorde/Lana aesthetic.',
+    'theatrical-diva':'Theatrical diva — operatic phrasing, character-driven, showstopping peaks; Gaga/Adele range.'
+  };
+  const prMap = {
+    'maximalist-wall':'Maximalist wall of sound — dense layers, every frequency filled, Max Martin/Dr Luke density.',
+    'polished-radio':'Polished radio — cleanly mixed, everything in its place, optimized for broadcast compression.',
+    'minimal-vocal-forward':'Minimal vocal-forward — sparse arrangement, vocal dominant, space around every element.',
+    'lofi-bedroom':'Lo-fi bedroom — tape hiss, slight distortion, imperfection preserved; DIY aesthetic.',
+    'hyperpop-glitch':'Hyperpop glitch — pitch-shifted vocals, digital artifacts, PC Music/100 gecs aggressive maximalism.'
+  };
+  const ltMap = {
+    'heart-relational':'Heart/Relational — love, heartbreak, relationships; the core pop lyrical territory.',
+    'party-liberation':'Party/Liberation — weekend freedom, dance-floor catharsis, hedonic celebration.',
+    'empowerment-self':'Self-empowerment — reclaiming power, bouncing back, self-worth affirmation.',
+    'coming-of-age':'Coming-of-age — adolescent becoming, identity formation, first experiences.',
+    'melancholy-nostalgia':'Melancholy nostalgia — beautiful sadness, longing for past, bittersweet memory.'
+  };
+  const hkArr = Array.isArray(dims.hookStrategy)   ? dims.hookStrategy   : [dims.hookStrategy].filter(Boolean);
+  const ltArr = Array.isArray(dims.lyricTerritory) ? dims.lyricTerritory : [dims.lyricTerritory].filter(Boolean);
+  const parts = [];
+  if (eraMap[dims.eraAesthetic])    parts.push(`• ERA: ${eraMap[dims.eraAesthetic]}`);
+  if (hkArr.length)                 parts.push(`• HOOK: ${hkArr.map(v => hkMap[v]).filter(Boolean).join(' / ')}`);
+  if (vpMap[dims.vocalPersona])     parts.push(`• VOCAL: ${vpMap[dims.vocalPersona]}`);
+  if (prMap[dims.productionPolish]) parts.push(`• PRODUCTION: ${prMap[dims.productionPolish]}`);
+  if (ltArr.length)                 parts.push(`• TERRITORY: ${ltArr.map(v => ltMap[v]).filter(Boolean).join(' / ')}`);
+  return parts.length ? `\n\nPOP CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildRnbDimBlock(dims) {
+  if (!dims) return '';
+  const eMap = {
+    'classic-60s-soul':'Classic 60s soul — Motown/Stax era; horn sections, live band, gospel-adjacent vocal; Otis/Aretha DNA.',
+    '80s-quiet-storm':'80s Quiet Storm — lush synth pads, sax solos, slow-jam ballad territory; Luther/Anita Baker.',
+    '90s-new-jack-swing':'90s New Jack Swing — hip-hop swing beat + R&B melody; Teddy Riley production; Bobby Brown/Guy era.',
+    '2000s-neo-rnb':'2000s Neo-R&B — Timbaland/Neptunes production, Aaliyah/Usher/Beyoncé golden era.',
+    'modern-alt-rnb':'Modern alt-R&B — atmospheric, introspective; Frank Ocean/Solange/SZA; reverb-soaked, genre-blurred.'
+  };
+  const vdMap = {
+    'melismatic-runs':'Melismatic runs — virtuosic vocal ornamentation, multi-note syllables; gospel-derived R&B vocabulary.',
+    'falsetto-feature':'Falsetto feature — upper register as primary voice; Maxwell/Miguel/The-Dream territory.',
+    'spoken-word-bridge':'Spoken-word bridge — half-sung conversational address, intimate breaks; Erykah/D\'Angelo moments.',
+    'layered-harmonies':'Layered harmonies — stacked 3+ vocal parts; Destiny\'s Child/Boyz II Men choir density.',
+    'breathy-close-mic':'Breathy close-mic — whisper-adjacent proximity, ASMR intimacy; bedroom R&B vocal intimacy.'
+  };
+  const gfMap = {
+    'laid-back-pocket':'Laid-back pocket — drums slightly behind beat, relaxed swing; the groove creates space to sing.',
+    'on-top-bounce':'On-top bounce — drums slightly ahead, forward propulsion; new jack swing energy.',
+    'half-time-sway':'Half-time sway — drums feel half as fast as bpm; slow-jam hip-sway weight.',
+    'swing-16ths':'Swing 16ths — triplet feel on 16th notes; neo-soul pocket (D\'Angelo Voodoo era).',
+    'trap-soul-808':'Trap-soul 808 — trap drum programming under R&B vocal; Bryson Tiller/PartyNextDoor territory.'
+  };
+  const liMap = {
+    'explicit-body':'Explicit body — frank sexuality, physical desire foregrounded; adult R&B directness.',
+    'sensual-devotional':'Sensual devotional — romantic worship; sacred treatment of the beloved, adoration without objectification.',
+    'heartbreak-confession':'Heartbreak confession — vulnerable admission of hurt; begging, apologizing, mourning love lost.',
+    'slow-burn-tension':'Slow-burn tension — anticipation, restraint, will-we-won\'t-we charge; the heat of the hold.',
+    'grown-sophisticate':'Grown & sophisticate — adult experienced love; mature desire, complex feelings, quiet confidence.'
+  };
+  const adMap = {
+    'sparse-rhodes-voice':'Sparse Rhodes-voice — electric piano + voice + minimal drums; classic neo-soul intimate texture.',
+    'live-band-warm':'Live band warm — full rhythm section recorded together, ensemble chemistry; Philly soul warmth.',
+    'lush-layered':'Lush layered — strings, horns, multiple keys, stacked vocals; Babyface/LA Reid Motown-modern production.',
+    'programmed-synth-bed':'Programmed synth bed — pad-dominant, electronic warmth, minimal acoustic instrumentation.',
+    'horn-string-full':'Horns & strings — full orchestration, cinematic R&B; classic Quincy Jones production scope.'
+  };
+  const vdArr = Array.isArray(dims.vocalDelivery) ? dims.vocalDelivery : [dims.vocalDelivery].filter(Boolean);
+  const parts = [];
+  if (eMap[dims.eraSound])              parts.push(`• ERA: ${eMap[dims.eraSound]}`);
+  if (vdArr.length)                     parts.push(`• VOCAL: ${vdArr.map(v => vdMap[v]).filter(Boolean).join(' / ')}`);
+  if (gfMap[dims.grooveFeel])           parts.push(`• GROOVE: ${gfMap[dims.grooveFeel]}`);
+  if (liMap[dims.lyricIntimacy])        parts.push(`• LYRIC: ${liMap[dims.lyricIntimacy]}`);
+  if (adMap[dims.arrangementDensity])   parts.push(`• ARRANGEMENT: ${adMap[dims.arrangementDensity]}`);
+  return parts.length ? `\n\nR&B CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildRockDimBlock(dims) {
+  if (!dims) return '';
+  const sgMap = {
+    'classic-rock':'Classic rock — 60s-70s canon; Zeppelin/Stones/Who lineage; blues-derived riffs, analog warmth.',
+    'arena-rock':'Arena rock — 80s stadium-ready; Def Leppard/Journey/Bon Jovi; big choruses for crowd singalongs.',
+    'garage-rock':'Garage rock — raw DIY energy; White Stripes/Strokes lineage; simple chords, lo-fi aesthetic.',
+    'heartland-rock':'Heartland rock — Springsteen/Mellencamp/Petty; American working-class lyric, rootsy production.',
+    'punk-rock-adjacent':'Punk-rock-adjacent — Clash/Replacements; melodic sensibility with punk attitude, rougher edges.',
+    'hard-rock':'Hard rock — heavier than classic, lighter than metal; AC/DC/GnR; riff-centric, blues roots, swagger.'
+  };
+  const gaMap = {
+    'riff-driven':'Riff-driven guitar — memorable instrumental hook carries the song; the riff IS the song.',
+    'power-chord-wall':'Power-chord wall — open 5th chord texture, distorted density, fills harmonic space.',
+    'arpeggio-jangle':'Arpeggio jangle — picked patterns, cleaner tones, melodic individual notes over chords.',
+    'solo-showcase':'Solo showcase — dedicated instrumental break where guitar leads; virtuosity as song feature.',
+    'dual-guitar-harmony':'Dual-guitar harmony — two guitars playing harmonized lines (3rds/6ths); Allman/Thin Lizzy lineage.'
+  };
+  const rfMap = {
+    'straight-4-on-floor':'Straight 4-on-floor — kick on every beat, rock-steady momentum, pub-rock reliability.',
+    'shuffled-swing':'Shuffled swing — triplet feel under the rock beat; Stones-style blues shuffle groove.',
+    'half-time-heavy':'Half-time heavy — snare on 3 instead of 2&4; slower apparent tempo, crushing weight.',
+    'driving-8ths':'Driving 8ths — bass/rhythm guitar pumping 8th notes; punk/new wave urgency engine.',
+    'odd-meter-prog':'Odd-meter prog — 5/4, 7/8, or shifting time signatures; King Crimson/Rush territory.'
+  };
+  const lsMap = {
+    'anthem-unifying':'Anthem unifying — we/us lyric, collective identity, crowd singalong; arena-built meaning.',
+    'rebel-defiant':'Rebel defiant — against the system, the machine, authority; rock\'s foundational posture.',
+    'road-storytelling':'Road storytelling — narrative lyric, characters, place names; Springsteen specificity.',
+    'confessional-outsider':'Confessional outsider — alienation, personal pain, misfit identity; emotional honesty.',
+    'mythic-poetic':'Mythic poetic — elevated imagery, fantasy/classical references, Dylan-esque literary ambition.'
+  };
+  const peMap = {
+    '70s-analog-warm':'70s analog-warm — tape saturation, room mics, compressed drums; Zeppelin/Fleetwood Mac sound.',
+    '80s-big-reverb':'80s big reverb — gated snare, reverb on everything, exaggerated scale; Def Leppard production era.',
+    '90s-raw-dry':'90s raw-dry — reaction to 80s; close-mic\'d, dry, in-your-face; grunge-era flat mix.',
+    '00s-compressed-loud':'00s compressed-loud — loudness war production, brickwall mastering, dense but tiring mix.',
+    'modern-hybrid-digital':'Modern hybrid-digital — clean edits, amp sims, pristine mix; Greta Van Fleet retro-with-modern-tools.'
+  };
+  const gaArr = Array.isArray(dims.guitarApproach) ? dims.guitarApproach : [dims.guitarApproach].filter(Boolean);
+  const parts = [];
+  if (sgMap[dims.subgenre])      parts.push(`• SUBGENRE: ${sgMap[dims.subgenre]}`);
+  if (gaArr.length)              parts.push(`• GUITAR: ${gaArr.map(v => gaMap[v]).filter(Boolean).join(' / ')}`);
+  if (rfMap[dims.rhythmicFeel])  parts.push(`• RHYTHM: ${rfMap[dims.rhythmicFeel]}`);
+  if (lsMap[dims.lyricStance])   parts.push(`• LYRIC: ${lsMap[dims.lyricStance]}`);
+  if (peMap[dims.productionEra]) parts.push(`• PRODUCTION: ${peMap[dims.productionEra]}`);
+  return parts.length ? `\n\nROCK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
