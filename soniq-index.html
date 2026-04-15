@@ -4468,6 +4468,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
+        <button class="btn btn-sm" onclick="safeCopy(document.getElementById('res-title').textContent,'Title copied')">📋 Copy Title</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
@@ -4703,6 +4704,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
+        <button class="btn btn-sm" onclick="safeCopy(document.getElementById('lres-title').textContent,'Title copied')">📋 Copy Title</button>
         <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')">Copy Lyrics</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('lres')">Copy Prompt</button>
         <button class="like-btn" id="lres-like-btn" onclick="setLike('lres',true)" title="Like this song">👍</button>
