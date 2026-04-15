@@ -2809,6 +2809,9 @@ function buildSongPrompt(params) {
     else if (genre === 'bollywood') craftDimNote = buildBollywoodDimBlock(craftDimensions);
     else if (genre === 'cpop')      craftDimNote = buildCpopDimBlock(craftDimensions);
     else if (genre === 'amapiano')  craftDimNote = buildAmapianoDimBlock(craftDimensions);
+    else if (genre === 'tvmusical') craftDimNote = buildTvmusicalDimBlock(craftDimensions);
+    else if (genre === 'hiphop')    craftDimNote = buildHiphopDimBlock(craftDimensions);
+    else if (genre === 'drill')     craftDimNote = buildDrillDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -5247,6 +5250,150 @@ function buildAmapianoDimBlock(dims) {
   if (mrMap[dims.moodRegister])  parts.push(`• MOOD: ${mrMap[dims.moodRegister]}`);
   if (lgMap[dims.language])      parts.push(`• LANGUAGE: ${lgMap[dims.language]}`);
   return parts.length ? `\n\nAMAPIANO CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildTvmusicalDimBlock(dims) {
+  if (!dims) return '';
+  const ftMap = {
+    'tv-theme-song':'TV theme song — 30-60 second format establishing show premise; memorable hook, singalong quality.',
+    'musical-theatre-ballad':'Musical theatre ballad — emotional showstopper, rubato phrasing, character-reveals-inner-self function.',
+    'musical-theatre-uptempo':'Musical theatre uptempo — ensemble number or comedic patter; driving rhythm, wit-forward lyric.',
+    'cabaret-showtune':'Cabaret showtune — intimate club-performance register; direct audience address, piano/jazz-combo backing.',
+    'film-score-song':'Film score song — dramatic cinematic setting; thematic weight, orchestral arrangement, emotional climax.',
+    'animated-show-opening':'Animated show opening — children\'s or adult cartoon intro; catchy singalong, world-building lyric.'
+  };
+  const sfMap = {
+    'i-want-song':'I-Want song — protagonist states their yearning/goal; Act 1 numbers like "Part of Your World" / "Wouldn\'t It Be Loverly".',
+    '11-oclock-number':'11 o\'clock number — late-Act-2 showstopper; emotional climax before finale; "Defying Gravity" / "Rose\'s Turn".',
+    'opening-number':'Opening number — establishes world, tone, character ensemble; "Tradition" / "Belle" / "Another Day of Sun".',
+    'character-intro':'Character intro — specific character introduced through their song; Sondheim "The Witch\'s Rap" tradition.',
+    'reprise-emotional':'Reprise emotional — earlier song returns transformed; deepened meaning through narrative arc progress.'
+  };
+  const miMap = {
+    'broadway-classical':'Broadway classical — Rodgers & Hammerstein / Lerner & Loewe; formal harmonic structure, elevated melodic line.',
+    'contemporary-pop-theatre':'Contemporary pop theatre — post-2000 musical theatre with pop sensibility; Hamilton / Dear Evan Hansen / Waitress.',
+    'jazz-standard-influenced':'Jazz standard influenced — Kander & Ebb / Jason Robert Brown; jazz harmony, swing feel, sophisticated chromaticism.',
+    'folk-musical-influenced':'Folk musical influenced — Spring Awakening / Once / Hadestown; acoustic textures, folk/indie-rock palette.',
+    'rock-opera':'Rock opera — Hair / Jesus Christ Superstar / American Idiot; rock instrumentation as primary musical language.'
+  };
+  const lcMap = {
+    'rhyme-scheme-tight':'Rhyme-scheme tight — strict AABB/ABAB with internal rhymes; Sondheim craftsman discipline.',
+    'conversational-sondheim':'Conversational Sondheim — lyric mimics natural speech rhythm; narrative-forward, character-revealing.',
+    'list-song':'List song — enumeration structure; "I\'m the Very Model" / "Popular" / "Tonight Tonight"; catalog as craft.',
+    'patter-song':'Patter song — rapid-fire verbal cascade; G&S tradition; "Not Getting Married Today" / "Guns and Ships".',
+    'emotional-release':'Emotional release — build toward vocal/emotional climax; restraint gives way to full-voice declaration.'
+  };
+  const erMap = {
+    'golden-age-rh':'Golden Age (R&H) — 1940s-50s Rodgers & Hammerstein era; Oklahoma / South Pacific / Sound of Music aesthetic.',
+    'sondheim-era':'Sondheim era — 1970s-80s concept musicals; complex harmonies, ambivalent characters, adult themes.',
+    'contemporary-broadway':'Contemporary Broadway — 2000s+ commercial Broadway; Hamilton / Book of Mormon / Wicked ambition.',
+    'disney-animated-90s':'Disney Animated 90s — Menken/Ashman/Rice era; Little Mermaid / Beauty and the Beast / Aladdin template.',
+    'modern-pop-musical':'Modern pop musical — Dear Evan Hansen / Waitress / Mean Girls; radio-pop sensibility in theatre context.'
+  };
+  const miArr = Array.isArray(dims.melodicIdiom) ? dims.melodicIdiom : [dims.melodicIdiom].filter(Boolean);
+  const parts = [];
+  if (ftMap[dims.formatType])     parts.push(`• FORMAT: ${ftMap[dims.formatType]}`);
+  if (sfMap[dims.storyFunction])  parts.push(`• FUNCTION: ${sfMap[dims.storyFunction]}`);
+  if (miArr.length)               parts.push(`• IDIOM: ${miArr.map(v => miMap[v]).filter(Boolean).join(' / ')}`);
+  if (lcMap[dims.lyricCraft])     parts.push(`• LYRIC CRAFT: ${lcMap[dims.lyricCraft]}`);
+  if (erMap[dims.era])            parts.push(`• ERA: ${erMap[dims.era]}`);
+  return parts.length ? `\n\nTV / MUSICAL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildHiphopDimBlock(dims) {
+  if (!dims) return '';
+  const elMap = {
+    'golden-age-90s':'Golden Age 90s — 1988-1996 hip-hop canon; Tribe/De La/Wu-Tang/Nas; sample-based boom-bap with lyrical sophistication.',
+    'boom-bap':'Boom-bap — classic New York drum pattern (boom = kick, bap = snare); dusty jazz/soul samples, underground aesthetic.',
+    'southern-trap':'Southern trap — Atlanta-originated; 808 sub-bass, tripled hi-hats, half-time snares; Future / Young Thug / Migos.',
+    'west-coast-g-funk':'West-Coast G-Funk — Dr Dre / Snoop Dogg era; synth leads, P-Funk samples, slow-riding LA funk groove.',
+    'east-coast-modern':'East-Coast modern — contemporary NYC hip-hop; Jay-Z / Pusha T / Joey Bada$$; lyric-forward with modern production.',
+    'mumble-rap-2010s':'Mumble rap 2010s — melodic mumbled delivery, repetitive hooks, trap beats; Lil Uzi / Future / 21 Savage aesthetic.',
+    'conscious-rap':'Conscious rap — socially aware lyricism; Mos Def / Talib Kweli / Kendrick Lamar political-philosophical depth.',
+    'abstract-lyrical':'Abstract lyrical — experimental wordplay, nonlinear meaning; MF Doom / Earl Sweatshirt / Aesop Rock territory.'
+  };
+  const fsMap = {
+    'aggressive-punchline':'Aggressive punchline — hard-hitting bar-ending lines; each line lands with impact; Eminem / Joe Budden tradition.',
+    'laid-back-pocket':'Laid-back pocket — relaxed flow sitting behind beat; Snoop / Nas smooth conversational delivery.',
+    'melodic-sung-rap':'Melodic sung-rap — hybrid rap/sing delivery; Drake / Lil Wayne melodic rap innovation.',
+    'triplet-flow':'Triplet flow — 3-beats-per-word rapid cadence; Migos popularized but rooted in earlier Southern styles.',
+    'rapid-fire':'Rapid-fire — high syllable density; tongue-twister sections; Busta Rhymes / Twista / Eminem technical velocity.',
+    'narrative-storytelling':'Narrative storytelling — verse tells complete story with characters/arc; Slick Rick / Nas / Kendrick tradition.'
+  };
+  const bsMap = {
+    'classic-sample-based':'Classic sample-based — chopped soul/jazz/funk samples as primary texture; DJ Premier / Pete Rock lineage.',
+    'trap-808':'Trap 808 — sub-bass 808 kicks, programmed hats, minor-key synth leads; Atlanta-originated modern production norm.',
+    'live-instrumentation':'Live instrumentation — live-band hip-hop; Roots / Anderson .Paak approach; organic played-in elements.',
+    'cloud-ambient':'Cloud ambient — atmospheric reverb-heavy production; minimal drums, synth pads; Clams Casino / Burial-adjacent aesthetic.',
+    'jazz-rap-loops':'Jazz-rap loops — jazz samples as primary harmonic source; Tribe / Digable Planets / Robert Glasper era.'
+  };
+  const ltMap = {
+    'street-narrative':'Street narrative — urban life, hustle, neighborhood specifics; classic hip-hop territory rooted in authentic geography.',
+    'self-mythology':'Self-mythology — building artist persona/legend; flex energy, origin story, superhero-scale self-reference.',
+    'social-commentary':'Social commentary — systemic racism, inequality, political analysis; conscious rap ethical foundation.',
+    'love-romance':'Love/Romance — relationships, attraction, heartbreak; Method Man/Mary "All I Need" lineage of rap love songs.',
+    'abstract-cosmic':'Abstract cosmic — surreal wordplay, existential musing; MF Doom / Earl Sweatshirt non-literal territory.',
+    'party':'Party — club energy, celebration, weekend vibes; accessible universal hip-hop function.'
+  };
+  const vtMap = {
+    'dry-classic':'Dry classic — minimal vocal processing; natural voice, close-mic\'d; 90s production norm for vocal clarity.',
+    'heavily-processed':'Heavily processed — pitch-correction, effects, layering; modern trap / pop-rap vocal treatment.',
+    'autotune-melodic':'Autotune melodic — deliberate autotune as aesthetic; T-Pain / Lil Wayne / Travis Scott melodic rap signature.',
+    'double-tracked':'Double-tracked — vocals recorded twice layered; thickening technique, hip-hop radio-ready sound.',
+    'ad-lib-heavy':'Ad-lib heavy — frequent background vocals punctuating main verse; Atlanta trap tradition (Future / Gucci / Thug).'
+  };
+  const fsArr = Array.isArray(dims.flowStrategy) ? dims.flowStrategy : [dims.flowStrategy].filter(Boolean);
+  const parts = [];
+  if (elMap[dims.eraLineage])       parts.push(`• ERA: ${elMap[dims.eraLineage]}`);
+  if (fsArr.length)                 parts.push(`• FLOW: ${fsArr.map(v => fsMap[v]).filter(Boolean).join(' / ')}`);
+  if (bsMap[dims.beatStyle])        parts.push(`• BEAT: ${bsMap[dims.beatStyle]}`);
+  if (ltMap[dims.lyricTheme])       parts.push(`• THEME: ${ltMap[dims.lyricTheme]}`);
+  if (vtMap[dims.vocalTreatment])   parts.push(`• VOCAL: ${vtMap[dims.vocalTreatment]}`);
+  return parts.length ? `\n\nHIP-HOP CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildDrillDimBlock(dims) {
+  if (!dims) return '';
+  const rsMap = {
+    'chicago-original':'Chicago original drill — Chief Keef / Lil Durk / King Louie; 2012 South Side origin; dark menacing production, Young Chop sound.',
+    'uk-drill':'UK drill — London-originated; offbeat flow, sliding 808s, half-time snares; 67 / Headie One / Digga D sound.',
+    'brooklyn-drill':'Brooklyn drill — NY adaptation of UK drill; Pop Smoke / Fivio Foreign; faster tempo, menacing delivery, UK-producer crossover.',
+    'french-drill':'French drill — Paris scene; French-language drill; Gazo / Freeze Corleone / ZKR; European drill variant.',
+    'afro-drill':'Afro-drill — UK drill meets Afrobeats / amapiano; Black Sherif / Shallipopi hybrid territory.'
+  };
+  const lcMap = {
+    'street-life-gritty':'Street-life gritty — raw neighborhood narrative; specifics of block life, hustle, danger; authenticity-forward.',
+    'opps-diss':'Opps/Diss — naming rivals, confrontational lyric; drill\'s foundational oppositional energy.',
+    'drill-melodic-sung':'Drill melodic-sung — sung choruses over drill beats; Brooklyn-era crossover innovation.',
+    'conscious-drill':'Conscious drill — drill production + socially aware lyric; Nines / Headie One political-reflective mode.',
+    'party-drill':'Party drill — drill beat used for club/celebration lyric rather than menace; genre-as-vehicle approach.'
+  };
+  const fcMap = {
+    'uk-offbeat':'UK offbeat cadence — flow rides off the downbeat, syncopated with sliding 808s; signature UK drill rhythm.',
+    'chicago-original':'Chicago original cadence — on-beat, more aggressive direct flow; earlier drill standard.',
+    'slide-flow':'Slide flow — vocal glides matching 808 slides; modern drill rhythmic-melodic integration.',
+    'triplet-aggressive':'Triplet aggressive — triplet-based fast flow over drill beat; modern hybrid with trap-style triplet delivery.'
+  };
+  const bfMap = {
+    'sliding-808s':'Sliding 808s — bass notes glide between pitches; UK drill signature sonic element.',
+    'glide-bass':'Glide bass — similar to sliding 808s but smoother glissando; atmospheric drill variant.',
+    'melodic-dark-sample':'Melodic dark sample — minor-key sample (often classical/orchestral) as melodic hook; Pop Smoke era production.',
+    'minimal-menace':'Minimal menace — sparse beat, space around elements, ominous atmosphere; tension through restraint.'
+  };
+  const viMap = {
+    'menacing-low':'Menacing-low intensity — deep-chested threatening delivery; low register, measured pacing; Pop Smoke vocal DNA.',
+    'aggressive-loud':'Aggressive loud — high-energy shouting delivery; peak intensity, adrenaline-forward; Chief Keef early era.',
+    'monotone-detached':'Monotone detached — flat affect, emotionally distant delivery; UK drill cool-menace register.',
+    'melodic-autotuned':'Melodic autotuned — sung drill with heavy autotune processing; modern hybrid pop-drill crossover.'
+  };
+  const lcArr = Array.isArray(dims.lyricContent) ? dims.lyricContent : [dims.lyricContent].filter(Boolean);
+  const parts = [];
+  if (rsMap[dims.regionStyle])      parts.push(`• REGION: ${rsMap[dims.regionStyle]}`);
+  if (lcArr.length)                 parts.push(`• CONTENT: ${lcArr.map(v => lcMap[v]).filter(Boolean).join(' / ')}`);
+  if (fcMap[dims.flowCadence])      parts.push(`• FLOW: ${fcMap[dims.flowCadence]}`);
+  if (bfMap[dims.beatFeature])      parts.push(`• BEAT: ${bfMap[dims.beatFeature]}`);
+  if (viMap[dims.vocalIntensity])   parts.push(`• VOCAL: ${viMap[dims.vocalIntensity]}`);
+  return parts.length ? `\n\nDRILL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
