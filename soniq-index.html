@@ -1703,6 +1703,21 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 @keyframes ssDotPulse{0%,100%{box-shadow:0 0 0 4px rgba(245,192,0,0.18);}50%{box-shadow:0 0 0 8px rgba(245,192,0,0.06);}}
 .ss-status{font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.02em;text-align:center;}
 .ss-status span{color:var(--amber);}
+.ss-footer{display:flex;align-items:center;justify-content:center;gap:16px;width:100%;max-width:600px;}
+.ss-timer{font-size:11px;color:var(--tx4);font-variant-numeric:tabular-nums;font-weight:600;}
+/* ── Top generation progress bar ── */
+#gen-topbar{position:fixed;top:0;left:0;right:0;height:3px;z-index:99999;pointer-events:none;background:transparent;}
+#gen-topbar-fill{height:100%;width:0%;background:linear-gradient(to right,#f5c000,#ff9900);border-radius:0 2px 2px 0;box-shadow:0 0 10px rgba(245,192,0,0.7);transition:width 0.5s ease;}
+#gen-topbar.running #gen-topbar-fill{animation:topbarFill 18s cubic-bezier(0.1,0.6,0.3,1) forwards;}
+#gen-topbar.done #gen-topbar-fill{width:100% !important;animation:none;transition:width 0.25s ease;}
+@keyframes topbarFill{0%{width:0%}20%{width:40%}45%{width:62%}70%{width:78%}85%{width:86%}95%{width:91%}100%{width:93%}}
+/* ── Quick feature strip ── */
+.quick-features{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;}
+.qf-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 13px;border-radius:99px;border:1px solid var(--b2);background:var(--s2);color:var(--tx3);font-size:11px;font-weight:600;cursor:pointer;transition:all 0.18s ease;font-family:var(--font);line-height:1;}
+.qf-pill:hover{border-color:var(--amberline);color:var(--amber);background:var(--amberbg);}
+.qf-pill.on{border-color:var(--amber);color:var(--amber);background:var(--amberbg);}
+.qf-pill.on-fire{border-color:var(--red,#f05);color:#ff4466;background:rgba(255,44,88,0.08);}
+.qf-divider{width:1px;height:16px;background:var(--b2);margin:0 2px;align-self:center;}
 /* ── Producer XP Toast ── */
 #xp-toast{position:fixed;top:64px;right:20px;z-index:10000;background:linear-gradient(135deg,var(--violetbg),var(--s3));border:1px solid var(--violetline);border-radius:var(--r3);padding:10px 18px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(0,0,0,0.5);opacity:0;transform:translateY(-12px) scale(0.93);transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);pointer-events:none;}
 #xp-toast.show{opacity:1;transform:translateY(0) scale(1);}
@@ -1792,6 +1807,9 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
 </head>
 <body>
 
+<!-- GENERATION TOP BAR PROGRESS -->
+<div id="gen-topbar"><div id="gen-topbar-fill"></div></div>
+
 <!-- LEFT AD RAIL -->
 <aside class="ad-rail ad-rail-left" aria-label="Advertisement">
   <div class="ad-rail-label">Advertisement</div>
@@ -1848,7 +1866,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="ss-lbl">Done</div>
     </div>
   </div>
-  <div class="ss-status" id="ss-status"><span>Building your song…</span></div>
+  <div class="ss-footer">
+    <div class="ss-status" id="ss-status"><span>Building your song…</span></div>
+    <div class="ss-timer" id="ss-timer"></div>
+  </div>
 </div>
 
 <!-- PRODUCER XP TOAST -->
@@ -2059,6 +2080,14 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           <div class="gp-pips" id="gp-pips"><div class="gp-pip" id="gp-pip-1"></div></div>
           <span id="gp-label">1 free song today</span>
         </div>
+      </div>
+
+      <!-- QUICK FEATURE STRIP — always visible shortcuts -->
+      <div class="quick-features" id="quick-features">
+        <button class="qf-pill" id="qf-edge" onclick="quickCycleEdge(this)" title="Edge Mode — unlocks genre-authentic profanity and raw territory (18+)">🔥 Edge: Off</button>
+        <button class="qf-pill" id="qf-freestyle" onclick="quickToggleFreestyle(this)" title="Freestyle Mode — no hook, bars only. Great for cyphers, drill openers.">🎤 Freestyle</button>
+        <div class="qf-divider"></div>
+        <button class="qf-pill" id="qf-url" onclick="quickOpenDiscover()" title="Analyze any YouTube, SoundCloud, Spotify, or TikTok link">🔍 Analyze URL</button>
       </div>
 
       <!-- MORE OPTIONS TOGGLE -->
@@ -15837,10 +15866,48 @@ initCookieConsent();
 // ═══════════════════════════════════════════════════════
 const SS_LABELS = ['', 'Building Prompt…', 'Writing Lyrics…', 'Producing Brief…', 'Scoring Song…', 'Done! ✓'];
 
+// ── Top progress bar ──
+let _topbarAnim = null;
+function startTopbar() {
+  const bar = document.getElementById('gen-topbar');
+  const fill = document.getElementById('gen-topbar-fill');
+  if (!bar || !fill) return;
+  fill.style.width = '0%';
+  bar.classList.remove('done');
+  void fill.offsetWidth; // reflow to restart animation
+  bar.classList.add('running');
+}
+function finishTopbar() {
+  const bar = document.getElementById('gen-topbar');
+  if (!bar) return;
+  bar.classList.remove('running');
+  bar.classList.add('done');
+  setTimeout(() => { bar.classList.remove('done'); }, 700);
+}
+
+// ── Stage timer ──
+let _stageStart = 0, _timerInt = null;
+function startStageTimer() {
+  _stageStart = Date.now();
+  const el = document.getElementById('ss-timer');
+  if (_timerInt) clearInterval(_timerInt);
+  _timerInt = setInterval(() => {
+    if (!el) return;
+    const s = Math.floor((Date.now() - _stageStart) / 1000);
+    el.textContent = s + 's';
+  }, 1000);
+}
+function stopStageTimer() {
+  if (_timerInt) { clearInterval(_timerInt); _timerInt = null; }
+  const el = document.getElementById('ss-timer');
+  if (el) el.textContent = '';
+}
+
 function setGenStage(n) {
   const overlay = document.getElementById('studio-stages');
   const status = document.getElementById('ss-status');
   if (!overlay) return;
+  if (n === 1) { startTopbar(); startStageTimer(); }
   overlay.classList.add('show');
   for (let i = 1; i <= 5; i++) {
     const step = document.getElementById('ss-s' + i);
@@ -15853,6 +15920,8 @@ function setGenStage(n) {
 }
 
 function clearGenStage() {
+  finishTopbar();
+  stopStageTimer();
   const overlay = document.getElementById('studio-stages');
   if (!overlay) return;
   overlay.classList.remove('show');
@@ -15860,6 +15929,49 @@ function clearGenStage() {
     const step = document.getElementById('ss-s' + i);
     if (step) step.classList.remove('active', 'done');
   }
+}
+
+// ── Quick feature strip ──
+const EDGE_CYCLE = ['off', 'authentic', 'raw'];
+const EDGE_LABELS = { off: '🔥 Edge: Off', authentic: '🔥 Edge: Authentic', raw: '🔥 Edge: Raw' };
+
+function quickCycleEdge(btn) {
+  const adultAudiences = new Set(['', 'young-adult', 'adult']);
+  const cur = S.edgeMode || 'off';
+  const idx = EDGE_CYCLE.indexOf(cur);
+  const next = EDGE_CYCLE[(idx + 1) % EDGE_CYCLE.length];
+  if (next !== 'off' && !adultAudiences.has(S.selectedAgeGroup || '')) {
+    toast('Edge Mode requires 18+ or 25+ audience — set it in More Options first');
+    return;
+  }
+  // Sync with the full edge-mode pill UI
+  const fullPill = document.getElementById('edge-mode-' + (next === 'off' ? 'off' : next === 'authentic' ? 'auth' : 'raw'));
+  if (fullPill) setEdgeMode(fullPill, next);
+  else { S.edgeMode = next; }
+  // Update quick pill
+  btn.textContent = EDGE_LABELS[next];
+  btn.classList.toggle('on', next !== 'off');
+  btn.classList.toggle('on-fire', next === 'raw');
+}
+
+function quickToggleFreestyle(btn) {
+  // Sync with the existing freestyle toggle in Rap Lab
+  const rapLabEl = document.getElementById('freestyle-toggle');
+  toggleFreestyle(rapLabEl); // updates S.freestyleMode
+  btn.classList.toggle('on', !!S.freestyleMode);
+}
+
+function quickOpenDiscover() {
+  // Switch to Community page, then to Discover sub-tab
+  const commBtn = document.getElementById('nav-community-btn');
+  if (commBtn) commBtn.click();
+  setTimeout(() => {
+    const discBtn = document.getElementById('comm-tab-discover');
+    if (discBtn) discBtn.click();
+    // Scroll to URL input
+    const inp = document.getElementById('disc-url');
+    if (inp) { inp.scrollIntoView({ behavior: 'smooth', block: 'center' }); inp.focus(); }
+  }, 80);
 }
 
 // ── Producer XP ──
