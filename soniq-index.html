@@ -2095,6 +2095,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         <button class="qf-pill" id="qf-edge" onclick="quickCycleEdge(this)" title="Edge Mode — unlocks genre-authentic profanity and raw territory (18+)">🔥 Edge: Off</button>
         <button class="qf-pill" id="qf-freestyle" onclick="quickToggleFreestyle(this)" title="Freestyle Mode — no hook, bars only. Great for cyphers, drill openers.">🎤 Freestyle</button>
         <div class="qf-divider"></div>
+        <button class="qf-pill" id="qf-sample" onclick="quickSampleThis()" title="Sample a phrase from your last song and build a new one around it">⚡ Sample This</button>
         <button class="qf-pill" id="qf-url" onclick="quickOpenDiscover()" title="Analyze any YouTube, SoundCloud, Spotify, or TikTok link">🔍 Analyze URL</button>
       </div>
 
@@ -4475,10 +4476,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="gen-save-btn" onclick="saveLib()">💾 Save</button>
+        <button class="btn btn-amber btn-sm" id="res-sample-btn" onclick="openSamplePanel('res')" title="Pick a lyric phrase and build your next song around it">⚡ Sample This</button>
         <button class="btn btn-sm" onclick="openEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="safeCopy(document.getElementById('res-title').textContent,'Title copied')">📋 Copy Title</button>
         <button class="btn btn-sm" onclick="cpField('res-lyrics-text')">Copy Lyrics</button>
-        <button class="btn btn-sm" id="res-sample-btn" onclick="openSamplePanel('res')" title="Highlight any lyric line to build a new song around it" style="border-color:var(--amberline);color:var(--amber)">⚡ Sample This</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('res')">Copy Prompt</button>
         <button class="var-btn" id="res-var-btn" onclick="generateVariations('res')" disabled title="Generate variations after creating a song">✨ Variations</button>
         <button class="like-btn" id="res-like-btn" onclick="setLike('res',true)" title="Like this song">👍</button>
@@ -4712,10 +4713,10 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div class="result-acts">
         <button class="btn btn-cyan btn-sm" id="lucky-save-btn" onclick="saveLuckyToLib()">💾 Save</button>
+        <button class="btn btn-amber btn-sm" id="lres-sample-btn" onclick="openSamplePanel('lres')" title="Pick a lyric phrase and build your next song around it">⚡ Sample This</button>
         <button class="btn btn-sm" onclick="openLuckyEditor()">✏️ Edit</button>
         <button class="btn btn-sm" onclick="safeCopy(document.getElementById('lres-title').textContent,'Title copied')">📋 Copy Title</button>
         <button class="btn btn-sm" onclick="cpField('lres-lyrics-text')">Copy Lyrics</button>
-        <button class="btn btn-sm" id="lres-sample-btn" onclick="openSamplePanel('lres')" title="Highlight any lyric line to build a new song around it" style="border-color:var(--amberline);color:var(--amber)">⚡ Sample This</button>
         <button class="btn btn-sm" onclick="cpBriefPrompt('lres')">Copy Prompt</button>
         <button class="like-btn" id="lres-like-btn" onclick="setLike('lres',true)" title="Like this song">👍</button>
         <button class="dislike-btn" id="lres-dislike-btn" onclick="setLike('lres',false)" title="Dislike">👎</button>
@@ -15992,6 +15993,20 @@ function quickToggleFreestyle(btn) {
   const rapLabEl = document.getElementById('freestyle-toggle');
   toggleFreestyle(rapLabEl); // updates S.freestyleMode
   btn.classList.toggle('on', !!S.freestyleMode);
+}
+
+function quickSampleThis() {
+  // Try to use the last generated song (main output first, then lucky)
+  const prefixes = ['res', 'lres'];
+  for (const p of prefixes) {
+    const el = document.getElementById(p + '-lyrics-text');
+    if (el && (el.textContent || '').trim().length > 40) {
+      openSamplePanel(p);
+      return;
+    }
+  }
+  // No song generated yet — open panel with empty state (shows the free-text input)
+  openSamplePanel('res');
 }
 
 function quickOpenDiscover() {
