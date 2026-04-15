@@ -2806,6 +2806,9 @@ function buildSongPrompt(params) {
     else if (genre === 'metal')     craftDimNote = buildMetalDimBlock(craftDimensions);
     else if (genre === 'jazz')      craftDimNote = buildJazzDimBlock(craftDimensions);
     else if (genre === 'punk')      craftDimNote = buildPunkDimBlock(craftDimensions);
+    else if (genre === 'bollywood') craftDimNote = buildBollywoodDimBlock(craftDimensions);
+    else if (genre === 'cpop')      craftDimNote = buildCpopDimBlock(craftDimensions);
+    else if (genre === 'amapiano')  craftDimNote = buildAmapianoDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -5108,6 +5111,142 @@ function buildPunkDimBlock(dims) {
   if (pfMap[dims.productionFidelity])   parts.push(`• PRODUCTION: ${pfMap[dims.productionFidelity]}`);
   if (vdMap[dims.vocalDelivery])        parts.push(`• VOCAL: ${vdMap[dims.vocalDelivery]}`);
   return parts.length ? `\n\nPUNK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildBollywoodDimBlock(dims) {
+  if (!dims) return '';
+  const esMap = {
+    'classic-golden-50s60s':'Classic Golden 50s-60s — Lata/Rafi/Kishore era; orchestral arrangements, sitar/flute/tabla, Urdu-Hindi poetic lyric.',
+    'disco-bollywood-70s80s':'Disco Bollywood 70s-80s — Bappi Lahiri/RD Burman; dance-floor grooves with Indian flavor, synth-heavy arrangements.',
+    '90s-melodic':'90s Melodic — Nadeem-Shravan / Jatin-Lalit era; romantic melody-forward ballads, Shah Rukh Khan film-song prime.',
+    '2000s-item-song':'2000s Item Song — high-energy dance numbers; choreography-centered, fast bhangra/hip-hop fusion production.',
+    'modern-indie-pop-hindi':'Modern Indie-Pop Hindi — Prateek Kuhad/Ritviz; indie sensibility with Hindi lyric; non-film independent artist aesthetic.'
+  };
+  const laMap = {
+    'pure-hindi':'Pure Hindi — straightforward Hindi vernacular; colloquial accessibility.',
+    'hindi-urdu-poetic':'Hindi-Urdu poetic — literary Urdu-inflected Hindi; shayari tradition; ghazal-adjacent lyricism.',
+    'hinglish':'Hinglish — natural Hindi-English code-switching; urban Indian bilingual reality.',
+    'multi-regional':'Multi-regional — Hindi + Punjabi/Tamil/Gujarati phrases; pan-Indian linguistic texture.'
+  };
+  const inMap = {
+    'classical-sitar-tabla':'Classical sitar + tabla — Indian classical instruments foregrounded; raga-aware melodic choices.',
+    'orchestral-lush':'Orchestral lush — large string sections, brass, flutes; classic film score ensemble scale.',
+    'modern-electronic':'Modern electronic — programmed drums, synth leads, EDM drops adapted to Hindi vocal tradition.',
+    'fusion-western-indian':'Fusion Western-Indian — Western drum kit / bass / guitar + Indian classical instruments; hybrid contemporary sound.',
+    'qawwali-devotional':'Qawwali devotional — harmonium, tabla, handclaps; Sufi spiritual music tradition.'
+  };
+  const erMap = {
+    'romantic-classical':'Romantic classical — film-love-song tradition; tender, longing, devoted; classical Indian poetry of love.',
+    'patriotic':'Patriotic — national pride, freedom struggle themes; motherland devotion; Republic Day anthem register.',
+    'item-celebration':'Item celebration — dance-floor anthem; seductive energy, party celebration, wedding sangeet.',
+    'devotional-sacred':'Devotional sacred — bhajan/kirtan register; addressing deity; religious/spiritual intimacy.',
+    'heartbreak':'Heartbreak — separation-song tradition (viraha); longing for absent beloved, dignified sorrow.'
+  };
+  const vtMap = {
+    'classical-playback':'Classical playback — Lata-Rafi trained classical technique; pure vowels, ornamented phrasing.',
+    'modern-playback':'Modern playback — contemporary film singers (Arijit Singh/Shreya Ghoshal); clear polished delivery.',
+    'indie-singer-songwriter':'Indie singer-songwriter — non-film independent voice; less ornate, more conversational.',
+    'qawwali-trained':'Qawwali trained — Nusrat-influenced; melismatic virtuosity, spiritual ecstasy in delivery.',
+    'sufi-mystic':'Sufi mystic — transcendent spiritual voice; A.R. Rahman Sufi-fusion / Rabbi Shergill register.'
+  };
+  const inArr = Array.isArray(dims.instrumentation) ? dims.instrumentation : [dims.instrumentation].filter(Boolean);
+  const parts = [];
+  if (esMap[dims.eraStrain])           parts.push(`• ERA: ${esMap[dims.eraStrain]}`);
+  if (laMap[dims.languageApproach])    parts.push(`• LANGUAGE: ${laMap[dims.languageApproach]}`);
+  if (inArr.length)                    parts.push(`• INSTRUMENTATION: ${inArr.map(v => inMap[v]).filter(Boolean).join(' / ')}`);
+  if (erMap[dims.emotionalRegister])   parts.push(`• EMOTIONAL: ${erMap[dims.emotionalRegister]}`);
+  if (vtMap[dims.vocalTradition])      parts.push(`• VOCAL: ${vtMap[dims.vocalTradition]}`);
+  return parts.length ? `\n\nBOLLYWOOD CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildCpopDimBlock(dims) {
+  if (!dims) return '';
+  const erMap = {
+    '80s-hk-cantopop':'80s HK Cantopop — Anita Mui/Leslie Cheung/Alan Tam; Cantonese language; glamorous ballads, disco-inflected production.',
+    'mandopop-ballad-era':'Mandopop Ballad Era — 90s/00s Jay Chou/Jolin Tsai lineage; orchestral romantic ballads, Taiwan-centered.',
+    '2010s-edm-cpop':'2010s EDM-CPop — Western EDM templates with Mandarin vocals; festival drops, polished Western producers.',
+    'modern-mandopop':'Modern Mandopop — contemporary Chinese pop; clean production, emotional vocals, multi-genre openness.',
+    'rap-mandopop':'Rap Mandopop — hip-hop + Mandarin pop hybrid; Rap of China show era; trap influence on mainland production.'
+  };
+  const vdMap = {
+    'classical-trained-belt':'Classical-trained belt — operatic Chinese voice tradition; Peking opera-adjacent technique, powerful high register.',
+    'polished-pop':'Polished pop — contemporary mandopop clean delivery; precise intonation, studio-perfect tuning.',
+    'soft-intimate':'Soft intimate — whisper-adjacent close-mic; bedroom-pop Mandarin equivalent; Chenyu Hua territory.',
+    'edm-processed':'EDM processed — autotuned/vocoded treatment; global EDM aesthetic applied to Mandarin vowels.',
+    'rap-melodic-hybrid':'Rap-melodic hybrid — switching between rap verses and sung hooks; modern Chinese hip-hop vocal norm.'
+  };
+  const lrMap = {
+    'poetic-literary':'Poetic literary — classical Chinese poetry influence; literary Mandarin, elevated diction, metaphor-rich.',
+    'colloquial-direct':'Colloquial direct — everyday Mandarin speech patterns; accessibility, emotional plainness.',
+    'nostalgic-memory':'Nostalgic memory — remembering past / hometown / first love; Chinese culture\'s deep nostalgia vocabulary.',
+    'romantic-idealized':'Romantic idealized — pure devoted love; traditional Chinese romantic song register.',
+    'social-contemporary':'Social contemporary — urban life, work stress, modern identity; post-millennial Chinese youth experience.'
+  };
+  const psMap = {
+    'lush-orchestral':'Lush orchestral — full string sections, brass swells; cinematic mandopop ballad production.',
+    'clean-pop-ballad':'Clean pop ballad — piano + strings + drums; radio-mandopop production norm.',
+    'edm-festival':'EDM festival — Western EDM drop structure; big-room chorus, festival-ready.',
+    'trap-influence':'Trap influence — 808s, hi-hats, trap drum programming; Chinese hip-hop crossover sound.',
+    'indie-acoustic':'Indie acoustic — guitar + vocal + light production; independent Chinese singer-songwriter aesthetic.'
+  };
+  const ctMap = {
+    'romantic-longing':'Romantic longing — unrequited love, distance, waiting; core mandopop emotional territory.',
+    'youth-aspiration':'Youth aspiration — chasing dreams, college life, coming-of-age; youth-demographic messaging.',
+    'urban-modern':'Urban modern — Shanghai/Taipei/Hong Kong city life; fast-paced contemporary experience.',
+    'traditional-respect':'Traditional respect — family, heritage, filial devotion; Confucian values foregrounded.',
+    'cool-detached':'Cool detached — indie-aesthetic emotional remove; irony, ennui, millennial sophistication.'
+  };
+  const lrArr = Array.isArray(dims.lyricRegister) ? dims.lyricRegister : [dims.lyricRegister].filter(Boolean);
+  const parts = [];
+  if (erMap[dims.eraRegion])        parts.push(`• ERA: ${erMap[dims.eraRegion]}`);
+  if (vdMap[dims.vocalDelivery])    parts.push(`• VOCAL: ${vdMap[dims.vocalDelivery]}`);
+  if (lrArr.length)                 parts.push(`• LYRIC: ${lrArr.map(v => lrMap[v]).filter(Boolean).join(' / ')}`);
+  if (psMap[dims.productionStyle])  parts.push(`• PRODUCTION: ${psMap[dims.productionStyle]}`);
+  if (ctMap[dims.conceptTheme])     parts.push(`• CONCEPT: ${ctMap[dims.conceptTheme]}`);
+  return parts.length ? `\n\nC-POP CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildAmapianoDimBlock(dims) {
+  if (!dims) return '';
+  const rcMap = {
+    'log-drum-foundation':'Log-drum foundation — deep distinctive log-drum bass pattern defines the track; amapiano signature bass sound.',
+    'piano-loop-driven':'Piano loop driven — jazzy piano loop as melodic anchor; piano chord progression is the hook.',
+    'jazz-piano-fusion':'Jazz piano fusion — extended jazz chords, improvised-sounding runs; sophisticated harmonic palette.',
+    'vocal-forward':'Vocal forward — amapiano track built around singing lead; vocal melody as primary element over rhythm.'
+  };
+  const tpMap = {
+    'strict-113bpm':'Strict 113 BPM — canonical amapiano tempo; classic dancefloor pocket; Kabza De Small / DJ Maphorisa production norm.',
+    'relaxed-110':'Relaxed 110 — slightly slower than canonical; more relaxed groove; soulful amapiano mode.',
+    'uptempo-117':'Uptempo 117 — pushed tempo for dance-floor peak; higher-energy amapiano subvariant.',
+    'hybrid-tempo':'Hybrid tempo — tempo shifts within track; experimental amapiano composition.'
+  };
+  const vtMap = {
+    'lead-singer':'Lead singer — single vocalist carrying melodic hook; Sha Sha / Daliwonga lead-vocal tradition.',
+    'chant-groups':'Chant groups — group call-response chants; collective vocal energy; township communal spirit.',
+    'spoken-adlib':'Spoken adlib — DJ shouts, adlibs over groove; Kabza/Maphorisa producer-tag identity markers.',
+    'rapped-verse':'Rapped verse — amapiano with hip-hop verses; Cassper Nyovest / Focalistic rap-piano hybrid.',
+    'no-vocal-instrumental':'Instrumental only — pure instrumental amapiano; DJ-focused track, no vocal carrying hook.'
+  };
+  const mrMap = {
+    'private-school-posh':'Private school posh — upscale smooth amapiano; Johannesburg affluent aesthetic; lounge-jazz sophistication.',
+    'township-raw':'Township raw — Soweto/KwaZulu street energy; grittier, more aggressive production; authenticity-forward.',
+    'church-gospel-infusion':'Church/gospel infusion — gospel chord changes and choir elements; spiritual amapiano crossover.',
+    'dance-floor-peak':'Dance floor peak — maximum club energy; log drum hits harder; peak-hour amapiano.'
+  };
+  const lgMap = {
+    'zulu-dominant':'Zulu dominant — lyrics primarily in isiZulu; Johannesburg-area linguistic default.',
+    'xhosa-sotho-mix':'Xhosa/Sotho mix — isiXhosa or Sesotho as primary; regional SA linguistic variation.',
+    'english-heavy':'English heavy — English as main lyric language; crossover/international-targeted amapiano.',
+    'multilingual':'Multilingual — Zulu + English + other SA languages switching freely; pan-South African.'
+  };
+  const vtArr = Array.isArray(dims.vocalTreatment) ? dims.vocalTreatment : [dims.vocalTreatment].filter(Boolean);
+  const parts = [];
+  if (rcMap[dims.rhythmCore])    parts.push(`• RHYTHM CORE: ${rcMap[dims.rhythmCore]}`);
+  if (tpMap[dims.tempoPocket])   parts.push(`• TEMPO: ${tpMap[dims.tempoPocket]}`);
+  if (vtArr.length)              parts.push(`• VOCAL: ${vtArr.map(v => vtMap[v]).filter(Boolean).join(' / ')}`);
+  if (mrMap[dims.moodRegister])  parts.push(`• MOOD: ${mrMap[dims.moodRegister]}`);
+  if (lgMap[dims.language])      parts.push(`• LANGUAGE: ${lgMap[dims.language]}`);
+  return parts.length ? `\n\nAMAPIANO CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
