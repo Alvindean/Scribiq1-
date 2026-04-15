@@ -2800,6 +2800,9 @@ function buildSongPrompt(params) {
     else if (genre === 'pop')       craftDimNote = buildPopDimBlock(craftDimensions);
     else if (genre === 'rnb')       craftDimNote = buildRnbDimBlock(craftDimensions);
     else if (genre === 'rock')      craftDimNote = buildRockDimBlock(craftDimensions);
+    else if (genre === 'country')   craftDimNote = buildCountryDimBlock(craftDimensions);
+    else if (genre === 'edm')       craftDimNote = buildEdmDimBlock(craftDimensions);
+    else if (genre === 'folk')      craftDimNote = buildFolkDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -4804,6 +4807,152 @@ function buildRockDimBlock(dims) {
   if (lsMap[dims.lyricStance])   parts.push(`• LYRIC: ${lsMap[dims.lyricStance]}`);
   if (peMap[dims.productionEra]) parts.push(`• PRODUCTION: ${peMap[dims.productionEra]}`);
   return parts.length ? `\n\nROCK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildCountryDimBlock(dims) {
+  if (!dims) return '';
+  const elMap = {
+    'outlaw-70s':'Outlaw 70s — Waylon/Willie/Merle lineage; honky-tonk defiance, rough-edged production, rebellion against Nashville polish.',
+    'bakersfield':'Bakersfield — Buck Owens/Merle Haggard; Fender Telecaster twang, shuffled beat, California working-class roots.',
+    'nashville-polish':'Nashville polish — modern country radio sound; polished mix, pop-leaning choruses, stadium-ready anthems.',
+    'bro-country-2010s':'Bro-country 2010s — Florida Georgia Line/Luke Bryan; trucks/girls/beer party lyric, pop-country production density.',
+    'americana-folk-country':'Americana — folk-country hybrid; Jason Isbell/Gillian Welch; literary lyrics, acoustic-band textures, adult-album audience.',
+    'modern-alt-country':'Modern alt-country — Sturgill Simpson/Tyler Childers; psychedelic/rock-inflected, outlaw-revival attitude.'
+  };
+  const laMap = {
+    'truck-and-beer':'Truck & beer — Friday-night escape lyric; specific objects (Chevy/tailgate/cooler); bro-country territory.',
+    'heartbreak-ballad':'Heartbreak ballad — classic country longing; tears in beer, she-left-me, honky-tonk sorrow tradition.',
+    'story-song':'Story song — narrative from start to finish; characters/setting/ending; Johnny Cash "Fulsom Prison" lineage.',
+    'rural-roots':'Rural roots — farm/hometown specificity; dirt roads, red clay, small-town landmarks as lyric anchors.',
+    'small-town-memoir':'Small-town memoir — autobiographical look back; where I\'m from, who raised me, what I carry.'
+  };
+  const inMap = {
+    'acoustic-stripped':'Acoustic stripped — voice + guitar; no band, close-mic\'d, songwriter-round intimacy.',
+    'full-band-modern':'Full band modern — drums, bass, electric guitar, keys, pedal steel; contemporary country ensemble.',
+    'pedal-steel-fiddle':'Pedal steel + fiddle — traditional country textures dominant; crying steel, lonesome fiddle lead lines.',
+    'bluegrass-acoustic':'Bluegrass acoustic — banjo/mandolin/fiddle/upright bass; no drums; tight harmonies and fast picking.',
+    'country-pop-synths':'Country-pop synths — modern hybrid; pads, programmed claps, pedal steel dressing pop structure.'
+  };
+  const vcMap = {
+    'twang-earnest':'Twang earnest — pronounced country accent, sincere delivery; authenticity through vowel shape.',
+    'smooth-crooner':'Smooth crooner — less twang, more pop polish; George Strait / Keith Urban crossover voice.',
+    'gritty-outlaw':'Gritty outlaw — weathered texture, cigarette-scarred; Waylon/Johnny Cash authoritative depth.',
+    'bright-pop':'Bright pop — clean pop-country delivery; Kelsea Ballerini / Dan+Shay radio-ready.',
+    'weathered-storyteller':'Weathered storyteller — voice carries history; John Prine / Guy Clark conversational wisdom.'
+  };
+  const tfMap = {
+    'slow-ballad':'Slow ballad — rubato phrasing, tear-in-beer tempo; 60–70 BPM; every word has weight.',
+    'mid-tempo-two-step':'Mid-tempo two-step — danceable country groove; 90–110 BPM; classic honky-tonk pocket.',
+    'uptempo-honky-tonk':'Uptempo honky-tonk — 120+ BPM barn-burner; shuffle groove, lead-guitar breaks.',
+    'driving-anthem':'Driving anthem — mid-fast rock-country tempo; radio-ready chorus lift, stadium singalong.',
+    'waltz-3-4':'Waltz 3/4 — country waltz tradition; "Tennessee Waltz" feel; slow-dance lilt.'
+  };
+  const laArr = Array.isArray(dims.lyricArchetype) ? dims.lyricArchetype : [dims.lyricArchetype].filter(Boolean);
+  const parts = [];
+  if (elMap[dims.eraLineage])       parts.push(`• ERA: ${elMap[dims.eraLineage]}`);
+  if (laArr.length)                 parts.push(`• LYRIC: ${laArr.map(v => laMap[v]).filter(Boolean).join(' / ')}`);
+  if (inMap[dims.instrumentation])  parts.push(`• INSTRUMENTATION: ${inMap[dims.instrumentation]}`);
+  if (vcMap[dims.vocalCharacter])   parts.push(`• VOCAL: ${vcMap[dims.vocalCharacter]}`);
+  if (tfMap[dims.tempoFeel])        parts.push(`• TEMPO: ${tfMap[dims.tempoFeel]}`);
+  return parts.length ? `\n\nCOUNTRY CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildEdmDimBlock(dims) {
+  if (!dims) return '';
+  const sgMap = {
+    'house':'House — four-on-floor kick, hi-hats on offbeat, soulful vocal chops; Chicago/Deep/French house lineage.',
+    'trance':'Trance — 138 BPM, supersaw leads, extended builds, euphoric climaxes; Armin/Above&Beyond emotional uplift.',
+    'dubstep':'Dubstep — half-time wobble bass, syncopated drums, 140 BPM; Skrillex/Excision bass-forward aggression.',
+    'techno':'Techno — minimal/driving, 128–135 BPM, hypnotic repetition; Berlin/Detroit club-focused subculture.',
+    'drum-n-bass':'Drum & bass — 170+ BPM, Amen break-derived, heavy sub-bass; jungle/DnB UK rave tradition.',
+    'future-bass':'Future bass — 140-ish BPM, wobble/saw chord stabs, trap-influenced drums; Flume/Illenium emotional territory.',
+    'progressive':'Progressive — long builds, melodic layering, 128 BPM; Deadmau5/Eric Prydz extended-mix tradition.',
+    'big-room':'Big room — 130 BPM festival-stage; simple chord stabs, huge drops, Tomorrowland anthem factory.'
+  };
+  const dsMap = {
+    'melodic-release':'Melodic release drop — full synth lead plays the hook melody; the drop IS the song, euphoric and singable.',
+    'bass-heavy-growl':'Bass-heavy growl — drop dominated by bass timbre (wobble/Reese/growl); aggressive and movement-focused.',
+    'vocal-chop-lead':'Vocal chop lead drop — chopped pitched vocal sample carries melody; Chainsmokers/Marshmello template.',
+    'build-no-drop':'Build / No drop — climax happens in build, drop is minimal or absent; deconstructed anticipation.',
+    'hard-kick-jackin':'Hard kick jackin — distorted 4-on-floor kick dominates; bigroom/hardstyle aggression.'
+  };
+  const vtMap = {
+    'female-topline':'Female topline — female vocalist sings verse/chorus over EDM track; classic crossover collaboration format.',
+    'male-topline':'Male topline — male vocalist feature; indie-crossover / chainsmokers male-vocal era.',
+    'chopped-pitched':'Chopped + pitched vocals — vocal sample chopped, pitched, treated as melodic synth instrument.',
+    'spoken-hook':'Spoken hook — spoken phrase repeats as hook; no sung melody, rhythmic chant.',
+    'instrumental-only':'Instrumental only — no vocals; pure synth-driven composition.'
+  };
+  const eaMap = {
+    'peak-chorus-drop':'Peak chorus-drop arc — verse / build / drop = chorus; standard EDM architecture with verse-chorus song shape.',
+    'slow-build-single-peak':'Slow build single peak — 60+ second build, one climactic release; prog-trance extended form.',
+    'double-drop':'Double drop — two separate drops with different textures; more song-like multi-peak structure.',
+    'sustained-groove':'Sustained groove — song stays at one intensity; house/techno long-form energy maintenance.',
+    'switch-up-midway':'Switch-up midway — song shifts tempo/subgenre at bridge; two-part EDM hybrid.'
+  };
+  const fvMap = {
+    'festival-main':'Festival main-stage — 60,000-person energy; anthem-built, simple melodic hooks for crowd unity.',
+    'club-peak-hour':'Club peak-hour — 1–3am dancefloor; grittier mix, extended intro/outro for DJ transitions.',
+    'radio-crossover':'Radio crossover — pop-friendly 3:30 edit; verse/chorus structure, vocal-forward; Avicii/Chainsmokers territory.',
+    'headphones-album':'Headphones / album — listening experience, not dance; texture and composition over functional BPM.',
+    'underground-warehouse':'Underground warehouse — 4am Berghain aesthetic; minimal, hypnotic, unrelenting; no radio concessions.'
+  };
+  const vtArr = Array.isArray(dims.vocalTreatment) ? dims.vocalTreatment : [dims.vocalTreatment].filter(Boolean);
+  const parts = [];
+  if (sgMap[dims.subgenre])             parts.push(`• SUBGENRE: ${sgMap[dims.subgenre]}`);
+  if (dsMap[dims.dropStyle])            parts.push(`• DROP: ${dsMap[dims.dropStyle]}`);
+  if (vtArr.length)                     parts.push(`• VOCAL: ${vtArr.map(v => vtMap[v]).filter(Boolean).join(' / ')}`);
+  if (eaMap[dims.energyArc])            parts.push(`• ENERGY ARC: ${eaMap[dims.energyArc]}`);
+  if (fvMap[dims.festivalVsListening])  parts.push(`• FORMAT: ${fvMap[dims.festivalVsListening]}`);
+  return parts.length ? `\n\nEDM CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildFolkDimBlock(dims) {
+  if (!dims) return '';
+  const esMap = {
+    'old-timey-americana':'Old-timey Americana — pre-war rural string-band tradition; Carter Family / Harry Smith Anthology lineage.',
+    '60s-revival':'60s folk revival — Greenwich Village era; Dylan/Baez/Ochs; protest consciousness with acoustic guitar.',
+    'british-isles-traditional':'British Isles traditional — modal ballads, Child-ballad narratives; Fairport Convention / Pentangle DNA.',
+    'contemporary-indie-folk':'Contemporary indie folk — Bon Iver/Sufjan/Fleet Foxes; layered textures, reverb, modern production sensibility.',
+    'freak-folk':'Freak folk — Joanna Newsom/Devendra Banhart; eccentric instrumentation, surreal lyric, folk tradition subverted.',
+    'anti-folk':'Anti-folk — Jeffrey Lewis/Kimya Dawson; irony-inflected, lo-fi, intentionally amateur aesthetic.'
+  };
+  const inMap = {
+    'acoustic-guitar-voice':'Acoustic guitar + voice — the core folk texture; fingerpicked or strummed, vocal-forward mix.',
+    'banjo-mandolin':'Banjo / mandolin — Appalachian string instruments; bluegrass adjacent, fast-picking tradition.',
+    'fiddle-lead':'Fiddle lead — Celtic/Appalachian fiddle carries melodic weight; instrumental breaks between verses.',
+    'harmonium-drone':'Harmonium / drone — Indian or shruti-style sustained tone under voice; folk-meets-raga aesthetic.',
+    'full-band-chamber':'Full band chamber — acoustic band with strings/horns; Sufjan-style orchestrated folk.'
+  };
+  const ltMap = {
+    'ballad-narrative':'Ballad narrative — multi-verse story told in strict meter; Child-ballad tradition of story-song.',
+    'protest-political':'Protest political — Guthrie/Seeger lineage; direct address to injustice, movement-anthem potential.',
+    'confessional-modern':'Confessional modern — first-person interior life; Nick Drake / Elliott Smith diaristic lyric tradition.',
+    'mythic-archetypal':'Mythic archetypal — folklore figures, universal symbols; folk as collective unconscious access.',
+    'nature-landscape':'Nature landscape — specific places as lyric focus; mountains/rivers/seasons as emotional correlatives.'
+  };
+  const vdMap = {
+    'understated-earnest':'Understated earnest — natural speaking-voice delivery; no vibrato theatrics, truth-telling tone.',
+    'weathered-grit':'Weathered grit — lived-in vocal texture; Guy Clark / Townes Van Zandt seasoned roughness.',
+    'pure-choirboy':'Pure / choirboy — clear tone, minimal vibrato, Sufjan Stevens / Iron & Wine fragile clarity.',
+    'keening-high':'Keening high — high-pitched plaintive quality; Appalachian lament tradition, Sarah Jarosz register.',
+    'spoken-recitation':'Spoken recitation — half-sung, half-spoken delivery; Leonard Cohen late-career conversational intimacy.'
+  };
+  const ecMap = {
+    'solo-sparse':'Solo sparse — single instrument + voice; no ensemble, maximum intimacy.',
+    'duo-harmony':'Duo harmony — two voices in close-interval harmony; Simon & Garfunkel / Indigo Girls tradition.',
+    'string-band-quartet':'String-band quartet — 3–5 acoustic players; bluegrass or old-time ensemble scale.',
+    'full-orchestral-folk':'Full orchestral folk — chamber orchestra meets folk song; baroque-folk lineage (Nick Drake Bryter Layter).',
+    'communal-chorus':'Communal chorus — group/choir backing vocals on choruses; protest-song sing-along spirit.'
+  };
+  const inArr = Array.isArray(dims.instrumentation) ? dims.instrumentation : [dims.instrumentation].filter(Boolean);
+  const parts = [];
+  if (esMap[dims.eraStrain])        parts.push(`• STRAIN: ${esMap[dims.eraStrain]}`);
+  if (inArr.length)                 parts.push(`• INSTRUMENTATION: ${inArr.map(v => inMap[v]).filter(Boolean).join(' / ')}`);
+  if (ltMap[dims.lyricTradition])   parts.push(`• LYRIC: ${ltMap[dims.lyricTradition]}`);
+  if (vdMap[dims.vocalDelivery])    parts.push(`• VOCAL: ${vdMap[dims.vocalDelivery]}`);
+  if (ecMap[dims.ensembleScale])    parts.push(`• SCALE: ${ecMap[dims.ensembleScale]}`);
+  return parts.length ? `\n\nFOLK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
