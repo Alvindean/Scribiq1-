@@ -2794,6 +2794,9 @@ function buildSongPrompt(params) {
     else if (genre === 'latin')     craftDimNote = buildLatinDimBlock(craftDimensions);
     else if (genre === 'dancehall') craftDimNote = buildDancehallDimBlock(craftDimensions);
     else if (genre === 'gospel')    craftDimNote = buildGospelDimBlock(craftDimensions);
+    else if (genre === 'parody')    craftDimNote = buildParodyDimBlock(craftDimensions);
+    else if (genre === 'comedy')    craftDimNote = buildComedyDimBlock(craftDimensions);
+    else if (genre === 'children')  craftDimNote = buildChildrenDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -4516,6 +4519,145 @@ function buildGospelDimBlock(dims) {
   if (lfArr.length)                parts.push(`• LYRIC FOCUS: ${lfArr.map(v => lfMap[v]).filter(Boolean).join(' / ')}`);
   if (viMap[dims.vocalIntensity])  parts.push(`• INTENSITY: ${viMap[dims.vocalIntensity]}`);
   return parts.length ? `\n\nGOSPEL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildParodyDimBlock(dims) {
+  if (!dims) return '';
+  const targetMap = {
+    'specific-hit-song':    'Target a specific well-known hit — match its song structure, melodic contour, cadence, and signature hook shape closely enough that listeners recognize it instantly.',
+    'genre-parody':         'Parody an entire genre, not one song — lampoon the genre\'s clichés, production tropes, and lyrical conventions in aggregate.',
+    'artist-style-parody':  'Parody a specific artist\'s stylistic fingerprint — their vocal quirks, phrasing, pet topics, production signatures — without copying any single song verbatim.',
+    'cultural-trend':       'Parody a current cultural trend, fad, or moment — the song is an affectionate/mocking time capsule of a thing everyone is doing right now.',
+    'movie-tv-franchise':   'Parody a movie/TV franchise — lean on characters, catchphrases, and iconography; music cues the source but the lyric is the joke.'
+  };
+  const modeMap = {
+    'style-match-subvert-lyric': 'Weird Al mode: match the original\'s musical style faithfully while replacing the lyric with the comedic premise — sonic respect, lyrical mischief.',
+    'change-both':               'Change both music and lyric — use the reference only as comedic springboard; the final song stands alone musically from its target.',
+    'close-homage':              'Close homage — affectionate parody that celebrates the target; jokes land softly, the source gets a wink, not a kick.',
+    'outright-mockery':          'Outright mockery — the target is the butt of the joke; exaggerate and deflate the source\'s self-seriousness or pretension.'
+  };
+  const humorMap = {
+    'absurdist':         'Absurdist — non-sequitur logic, escalating nonsense, images that don\'t follow (Tim & Eric / Lonely Island weird mode).',
+    'deadpan':           'Deadpan — deliver comedic content in a flat, earnest register; the gap between tone and content is the joke (Flight of the Conchords mode).',
+    'crude':             'Crude — body humor, bathroom jokes, shock laughs; leaning into taboo for punchline force.',
+    'witty-wordplay':    'Witty wordplay — puns, double meanings, clever rhyme switchbacks, and setup/reversal craftsmanship (Weird Al / Stephen Lynch).',
+    'referential-nerdy': 'Referential/nerdy — jokes that reward pop-culture literacy; in-jokes, Easter eggs, fandom callouts.'
+  };
+  const topicMap = {
+    'current-events':        'Topic territory: current events / news cycle — the song is legible today and may not be next year.',
+    'food-consumer':         'Topic territory: food, brands, consumer products — snack-specific comedy with brand-name specificity.',
+    'tech-internet':         'Topic territory: tech, apps, internet habits, AI — the comedy of being very online.',
+    'relationships-dating':  'Topic territory: dating, relationships, apps, modern romance — awkward, rueful, specific to now.',
+    'work-adulting':         'Topic territory: jobs, bills, adulting, domestic failure — the comedy of mundane obligation.',
+    'pop-culture-meta':      'Topic territory: pop culture meta — songs about songs, celebrities, the music industry itself.'
+  };
+  const prodMap = {
+    'exact-sonic-clone':    'Production faithfulness: exact sonic clone — instrumentation, mix, arrangement match target so tightly the joke hits on pure lyric.',
+    'approximation':        'Production faithfulness: approximation — evoke the target style with clear fingerprints but don\'t imitate note-for-note.',
+    'loose-gesture':        'Production faithfulness: loose gesture — genre signals present but production stands on its own; comedy leads, mimicry follows.',
+    'cheap-parody-obvious': 'Production faithfulness: cheap/obvious — intentionally cheesy karaoke/MIDI vibe; the lo-fi is part of the joke.'
+  };
+  const humorArr = Array.isArray(dims.humorRegister) ? dims.humorRegister : [dims.humorRegister].filter(Boolean);
+  const parts = [];
+  if (targetMap[dims.targetType])              parts.push(`• TARGET TYPE: ${targetMap[dims.targetType]}`);
+  if (modeMap[dims.parodyMode])                parts.push(`• PARODY MODE: ${modeMap[dims.parodyMode]}`);
+  if (humorArr.length)                         parts.push(`• HUMOR REGISTER: ${humorArr.map(v => humorMap[v]).filter(Boolean).join(' / ')}`);
+  if (topicMap[dims.topicTerritory])           parts.push(`• TOPIC: ${topicMap[dims.topicTerritory]}`);
+  if (prodMap[dims.productionFaithfulness])    parts.push(`• PRODUCTION FAITHFULNESS: ${prodMap[dims.productionFaithfulness]}`);
+  return parts.length ? `\n\nPARODY CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildComedyDimBlock(dims) {
+  if (!dims) return '';
+  const styleMap = {
+    'stand-up-musical':        'Stand-up musical — one comedian at a piano/guitar; the song is an extended bit with musical punctuation (Bo Burnham / Tim Minchin).',
+    'character-bit':           'Character bit — narrator is a distinct comedic persona whose voice/worldview drives the song (Flight of the Conchords characters).',
+    'parody-adjacent-original':'Parody-adjacent but original — genre-savvy original song whose comedy comes from knowing the tropes it plays in.',
+    'musical-theatre-comedy':  'Musical theatre comedy — Broadway-leaning structure with comedic patter songs, list songs, and theatrical vocal delivery.',
+    'novelty-song':            'Novelty song — a one-concept song built around a catchy premise; radio-friendly earworm with a wink.',
+    'internet-meme-song':      'Internet/meme song — short, repeatable, loopable; designed for TikTok/YouTube spread; hook is the entire product.'
+  };
+  const densityMap = {
+    'setup-punchline-structure': 'Joke density: setup/punchline structure — most lines build to a turn; verses establish, choruses or line-ends land.',
+    'running-gag':               'Joke density: running gag — one recurring bit returns and escalates; each return earns bigger laugh through repetition.',
+    'one-big-absurd-premise':    'Joke density: one big absurd premise — commit hard to a single ridiculous world/scenario and explore it earnestly.',
+    'callback-heavy':            'Joke density: callback-heavy — setup early jokes whose payoff lands 2-3 sections later; reward attentive listening.',
+    'joke-per-line':             'Joke density: joke-per-line — every line is a punchline; rapid-fire density (Lonely Island / Bo Burnham verse mode).'
+  };
+  const regMap = {
+    'family-safe':    'Language register: family-safe — no profanity, no adult content; works across all ages.',
+    'adult-clever':   'Language register: adult-clever — grown-up references and innuendo, minimal profanity; clever-not-crude.',
+    'crude-raunchy':  'Language register: crude/raunchy — explicit language, sex/body jokes, shock welcome; adult audience only.',
+    'clean-cerebral': 'Language register: clean cerebral — intellectual humor; no profanity but references assume educated listener.'
+  };
+  const subjMap = {
+    'everyday-absurdity':         'Subject: everyday absurdity — finding the comedy in banal routines, objects, and interactions.',
+    'relationships-dating':       'Subject: relationships/dating — the comedy of romance, texts, apps, exes, misunderstandings.',
+    'workplace-modern-life':      'Subject: workplace / modern life — meetings, bosses, rent, commutes, bureaucratic absurdity.',
+    'food-obsessions':            'Subject: food obsessions — specific food items elevated to devotional / comedic object status.',
+    'tech-internet-culture':      'Subject: tech / internet culture — apps, algorithms, being online, AI, digital identity.',
+    'observational-human-nature': 'Subject: observational human nature — the universal small hypocrisies people do and deny.'
+  };
+  const musMap = {
+    'polished-musical':    'Musicality: polished — the arrangement is tight, melodic, radio-viable; comedy sits on legitimately good songcraft.',
+    'intentionally-bad':   'Musicality: intentionally bad — cheesy keyboard presets, flat mix, exaggerated amateurishness as the joke.',
+    'earnest-underneath':  'Musicality: earnest underneath — the music is genuinely moving; laughs come from the lyric gap against sincere sonics.',
+    'deadpan-melodic':     'Musicality: deadpan melodic — pretty, calm melody delivered with flat affect; tonal contrast powers the comedy.'
+  };
+  const subjArr = Array.isArray(dims.subjectMatter) ? dims.subjectMatter : [dims.subjectMatter].filter(Boolean);
+  const parts = [];
+  if (styleMap[dims.comedicStyle])       parts.push(`• COMEDIC STYLE: ${styleMap[dims.comedicStyle]}`);
+  if (densityMap[dims.jokeDensity])      parts.push(`• JOKE DENSITY: ${densityMap[dims.jokeDensity]}`);
+  if (regMap[dims.languageRegister])     parts.push(`• LANGUAGE REGISTER: ${regMap[dims.languageRegister]}`);
+  if (subjArr.length)                    parts.push(`• SUBJECT: ${subjArr.map(v => subjMap[v]).filter(Boolean).join(' / ')}`);
+  if (musMap[dims.musicality])           parts.push(`• MUSICALITY: ${musMap[dims.musicality]}`);
+  return parts.length ? `\n\nCOMEDY CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildChildrenDimBlock(dims) {
+  if (!dims) return '';
+  const ageMap = {
+    'toddler-2-4':      'Age target: toddlers 2-4 — simple one-syllable words, extreme repetition, short lines, concrete objects; no abstract concepts, no scary content.',
+    'pre-k-4-6':        'Age target: pre-K 4-6 — short sentences, simple rhymes, familiar everyday vocabulary; fun sounds, animals, counting, colors welcome.',
+    'elementary-6-10':  'Age target: elementary 6-10 — more vocabulary range, narrative arcs with beginning/middle/end, light humor and playful wordplay.',
+    'tween-10-13':      'Age target: tween 10-13 — real feelings, friendship complexity, mild self-awareness; never adult themes, profanity, or romantic content.'
+  };
+  const eduMap = {
+    'pure-fun':                   'Educational intent: pure fun — no curriculum; joy, silliness, and imagination are the entire goal.',
+    'counting-alphabet-basics':   'Educational intent: counting / alphabet / basics — teach numbers, letters, shapes, colors through catchy repetition.',
+    'social-emotional-learning':  'Educational intent: social-emotional learning — naming feelings, kindness, sharing, bravery, handling big emotions with gentle framing.',
+    'science-nature':             'Educational intent: science/nature — animals, weather, space, ecosystems explained accurately at the target age level.',
+    'life-skills':                'Educational intent: life skills — brushing teeth, tying shoes, bedtime routines, safety, manners presented as fun rituals.'
+  };
+  const melMap = {
+    'singsong-nursery':     'Melody style: singsong nursery — simple stepwise pentatonic/major melody; "Twinkle Twinkle" / "Wheels on the Bus" shape.',
+    'folk-simple':          'Melody style: folk simple — acoustic-guitar-friendly, 3-4 chord melody with story arc; Raffi / Pete Seeger lineage.',
+    'modern-pop-catchy':    'Melody style: modern pop-catchy — bright contemporary pop hook shape at kid-friendly tempo and range.',
+    'movement-song-action': 'Movement/action song — melody supports physical actions (clap, jump, spin); built for call-and-do participation.',
+    'lullaby-quiet':        'Melody style: lullaby — slow, soothing, low-dynamic; descending phrases designed to settle a child toward sleep.'
+  };
+  const prodMap = {
+    'acoustic-bright':       'Production: acoustic bright — acoustic guitar, light shaker, hand percussion, warm friendly mix; no harsh sounds.',
+    'synth-friendly':        'Production: synth-friendly — playful toy-keyboard/synth bleeps, bright major-key patches; bubbly modern kids-TV palette.',
+    'orchestral-full':       'Production: orchestral full — Disney/Pixar-style arrangement with strings, woodwinds, light brass; cinematic and warm.',
+    'stripped-voice-guitar': 'Production: stripped voice + guitar — single voice with acoustic guitar; intimate campfire/bedtime feel.'
+  };
+  const lyrMap = {
+    'storytelling':        'Lyric approach: storytelling — a narrative with characters, a problem, and a resolution; clear beginning/middle/end.',
+    'repetition-chant':    'Lyric approach: repetition/chant — core phrase repeats heavily so kids learn it fast and sing along immediately.',
+    'question-answer':     'Lyric approach: question/answer — lead asks, children answer back; structured for classroom/group participation.',
+    'list-song':           'Lyric approach: list song — cataloging items (animals, colors, foods); cumulative structure with each verse adding one.',
+    'direct-instruction':  'Lyric approach: direct instruction — lyrics explicitly teach the target concept step-by-step in friendly tone.'
+  };
+  const eduArr = Array.isArray(dims.educationalIntent) ? dims.educationalIntent : [dims.educationalIntent].filter(Boolean);
+  const parts = [];
+  if (ageMap[dims.ageTarget])       parts.push(`• AGE TARGET: ${ageMap[dims.ageTarget]}`);
+  if (eduArr.length)                parts.push(`• EDUCATIONAL INTENT: ${eduArr.map(v => eduMap[v]).filter(Boolean).join(' / ')}`);
+  if (melMap[dims.melodyStyle])     parts.push(`• MELODY STYLE: ${melMap[dims.melodyStyle]}`);
+  if (prodMap[dims.production])     parts.push(`• PRODUCTION: ${prodMap[dims.production]}`);
+  if (lyrMap[dims.lyricApproach])   parts.push(`• LYRIC APPROACH: ${lyrMap[dims.lyricApproach]}`);
+  const safetyClause = '\n• SAFETY CLAUSE: Lyrics must be age-appropriate — no profanity, no violence, no romantic/sexual content, no scary or distressing imagery, no substance references. Keep language gentle, inclusive, and kind.';
+  return parts.length ? `\n\nCHILDREN CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}${safetyClause}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────
