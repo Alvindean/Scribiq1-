@@ -2782,9 +2782,18 @@ function buildSongPrompt(params) {
   // Each builder returns '' if dims are null/missing, so this is safe for any genre.
   let craftDimNote = '';
   if (craftDimensions && typeof craftDimensions === 'object') {
-    if      (genre === 'blues')    craftDimNote = buildBluesDimBlock(craftDimensions);
-    else if (genre === 'bossa')    craftDimNote = buildBossaDimBlock(craftDimensions);
-    else if (genre === 'ss')       craftDimNote = buildSSDimBlock(craftDimensions);
+    if      (genre === 'blues')     craftDimNote = buildBluesDimBlock(craftDimensions);
+    else if (genre === 'bossa')     craftDimNote = buildBossaDimBlock(craftDimensions);
+    else if (genre === 'ss')        craftDimNote = buildSSDimBlock(craftDimensions);
+    else if (genre === 'kpop')      craftDimNote = buildKpopDimBlock(craftDimensions);
+    else if (genre === 'altrock')   craftDimNote = buildAltrockDimBlock(craftDimensions);
+    else if (genre === 'afrobeats') craftDimNote = buildAfrobeatsDimBlock(craftDimensions);
+    else if (genre === 'reggae')    craftDimNote = buildReggaeDimBlock(craftDimensions);
+    else if (genre === 'neosoul')   craftDimNote = buildNeosoulDimBlock(craftDimensions);
+    else if (genre === 'reggaeton') craftDimNote = buildReggaetonDimBlock(craftDimensions);
+    else if (genre === 'latin')     craftDimNote = buildLatinDimBlock(craftDimensions);
+    else if (genre === 'dancehall') craftDimNote = buildDancehallDimBlock(craftDimensions);
+    else if (genre === 'gospel')    craftDimNote = buildGospelDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -4056,6 +4065,457 @@ function buildSSDimBlock(dims) {
   if (texArr.length)                parts.push(`• EMOTIONAL TEXTURE: ${texArr.map(v => texMap[v]).filter(Boolean).join(' / ')}`);
 
   return parts.length ? `\n\nSINGER-SONGWRITER CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildKpopDimBlock(dims) {
+  if (!dims) return '';
+  const energyMap = {
+    'ballad':'Ballad energy — slow, sweeping, vocal-showcase; minimal percussion, lush strings or piano.',
+    'mid-tempo':'Mid-tempo — grooved clean production; room for synchronized moves and melodic breathing.',
+    'dance-ready':'Dance-ready — precise BPM-locked groove, choreography-anchored structure, punchy drops.',
+    'banger':'Banger — high-intensity, compressed dynamics, aggressive bass; peak crowd energy in every section.',
+    'neo-retro':'Neo-retro — Y2K/00s idol aesthetic re-filtered through current production; nostalgic + crisp.'
+  };
+  const rapMap = {
+    'none':'No rap — pure vocal performance; all sections sung.',
+    'light':'Light rap — short 4–8 bar rap bridge or pre-chorus break; primarily vocal song.',
+    'rap-break':'Rap break — full dedicated rap verse (usually V2 or bridge); switches flow then returns to melody.',
+    'rap-heavy':'Rap-heavy — more than 40% of bars rapped; hybrid idol-rapper framing.'
+  };
+  const conceptMap = {
+    'cute-youthful':'Cute/Youthful — bright colors, innocent longing, playful wordplay, bubblegum sonic palette.',
+    'dark-intense':'Dark/Intense — minor tonality, powerful choreography moments, heavier production drops.',
+    'powerful-confident':'Powerful/Confident — assertive delivery, strong rhythmic hooks, self-declaration lyrics.',
+    'romantic-tender':'Romantic/Tender — soft dynamics, sincere affection, emotional lyric directness.',
+    'quirky-playful':'Quirky/Playful — off-beat hooks, character-driven wordplay, unpredictable sonic moments.',
+    'cool-detached':'Cool/Detached — minimal expression, understated delivery, stylized distance from emotion.'
+  };
+  const groupMap = {
+    'solo':'Solo — single vocal identity; personal and direct address.',
+    'duo-harmony':'Duo harmony — two vocal textures in dialogue; harmonies are the emotional center.',
+    'unit-3-4':'Unit of 3–4 — call-and-response section splits; each member carries a distinct verse moment.',
+    'full-group':'Full group — 5+ member energy, staggered entries, unison choruses, member-spotlight verses.'
+  };
+  const eraMap = {
+    'classic-idol':'Classic idol (1st–2nd gen) — melodic, commercial, choreography-light; Seo Taiji / H.O.T. era DNA.',
+    'gen-3-peak':'Gen-3 peak (2012–2019) — polished performance, synchronized dance, dual-concept trend; BTS/TWICE sound.',
+    'gen-4-current':'Gen-4 current (2020–present) — darker aesthetics, global-first lyrics, multi-language mixing.',
+    'neo-retro':'Neo-retro — intentional Y2K callback with modern mastering; IVE/NMIXX throwback mode.',
+    'post-idol':'Post-idol — deconstructed group format, artist-led creative, genre hybridity beyond conventional K-Pop.'
+  };
+  const vocalMap = {
+    'aegyo-soft':'Aegyo-soft — wide vowels, slight breathy onset, cute tonal color (higher register preferred).',
+    'precision-clean':'Precision-clean — metronomically exact phrasing, controlled vibrato, studio-perfect intonation.',
+    'powerful-belt':'Powerful belt — belted high notes, emotional climax on chorus peak, full chest-mix voice.',
+    'english-forward':'English-forward — English lyrics prioritized; Korean phrases minimal and phonetically shaped for global ear.',
+    'konglish-mix':'Konglish mix — natural bilingual switching; English hooks, Korean verses; the blend is the identity.'
+  };
+  const conceptArr = Array.isArray(dims.conceptTheme) ? dims.conceptTheme : [dims.conceptTheme].filter(Boolean);
+  const parts = [];
+  if (energyMap[dims.energyTier])   parts.push(`• ENERGY: ${energyMap[dims.energyTier]}`);
+  if (rapMap[dims.rapPresence])     parts.push(`• RAP: ${rapMap[dims.rapPresence]}`);
+  if (conceptArr.length)            parts.push(`• CONCEPT: ${conceptArr.map(v => conceptMap[v]).filter(Boolean).join(' / ')}`);
+  if (groupMap[dims.groupDynamic])  parts.push(`• GROUP: ${groupMap[dims.groupDynamic]}`);
+  if (eraMap[dims.eraStyle])        parts.push(`• ERA: ${eraMap[dims.eraStyle]}`);
+  if (vocalMap[dims.vocalDelivery]) parts.push(`• VOCAL: ${vocalMap[dims.vocalDelivery]}`);
+  return parts.length ? `\n\nK-POP CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildAltrockDimBlock(dims) {
+  if (!dims) return '';
+  const dynMap = {
+    'quiet-loud':'Quiet-loud architecture — verse simmers at low volume, chorus erupts (Pixies / Nirvana model).',
+    'sustained-tension':'Sustained tension — song builds without releasing; compression stays high start to finish.',
+    'explosive-start':'Explosive start — opens at maximum intensity; nowhere to go but hold or descend.',
+    'slow-burn':'Slow burn — gradual accretion of instruments and volume; payoff lives in the final 90 seconds.',
+    'peaks-valleys':'Peaks & valleys — multiple dynamic swings; the song breathes in and out more than once.'
+  };
+  const gtMap = {
+    'clean-jangly':'Clean-jangly — Rickenbacker bright attack, chorus pedal shimmer; jangly 80s indie (Smiths/REM).',
+    'distorted-crunch':'Distorted crunch — amp saturation, dropped-D power chords, scooped mids; wall of sound.',
+    'shoegaze-wall':'Shoegaze wall — multiple layered guitar tracks, heavy reverb, pitch-shifting; MBV density.',
+    'angular-postpunk':'Angular post-punk — staccato rhythmic patterns, dissonant voicings, nervous energy.',
+    'arpeggiated-atm':'Arpeggiated atmosphere — delay-soaked picked arpeggios, wide stereo, hymnal quality.',
+    'math-rock-riff':'Math-rock riff — polyrhythmic count, odd-time signatures, interlocking parts (Slint).'
+  };
+  const lyMap = {
+    'opaque-imagery':'Opaque imagery — non-linear metaphor, private references, resistant to single interpretation.',
+    'direct-emotion':'Direct emotion — declarative vulnerability, no protective irony; feeling stated plainly.',
+    'narrative-scene':'Narrative scene — story in present tense from specific POV; cinematic, character-driven.',
+    'literary-abstract':'Literary/Abstract — allusions to literature or art, syntactically fragmented, elevated diction.',
+    'outsider-irony':'Outsider irony — detached self-aware narrator; sardonic distance from mainstream sincerity.'
+  };
+  const stMap = {
+    'vcpcvc-classic':'VCPCVC classic — verse / chorus / pre-chorus / verse / chorus / bridge / chorus; alt template.',
+    'no-intro-drop-in':'No-intro drop-in — song begins mid-groove or mid-vocal phrase; no establishment period.',
+    'extended-build':'Extended build — long intro (60–90s), gradual element addition, chorus withheld until 2/3 mark.',
+    'two-part-arc':'Two-part arc — first half is one mood/tempo, second half ruptures into different energy entirely.',
+    'no-chorus-tension':'No-chorus tension — no repeated hook section; verses accumulate, outro releases or refuses.'
+  };
+  const subMap = {
+    'indie-rock':'Indie rock voice — melodic hooks over mid-fi production, lo-fi warmth, emotionally open.',
+    'shoegaze':'Shoegaze — vocals buried in reverb, guitar as texture not riff, dreamlike lyric dissociation.',
+    'post-punk':'Post-punk — angular rhythms, bass-forward, agitated political or existential lyric tone.',
+    'grunge':'Grunge — flannel-era nihilism, down-tuned guitars, melodic verse / aggressive chorus contrast.',
+    'emo':'Emo — emotional directness, confessional lyric, clean-to-distorted dynamic, minor key earnestness.',
+    'dream-pop':'Dream-pop — lush reverb, soft vocal float, hazy melody lines, sensory imagery over narrative.'
+  };
+  const gtArr = Array.isArray(dims.guitarTexture) ? dims.guitarTexture : [dims.guitarTexture].filter(Boolean);
+  const lyArr = Array.isArray(dims.lyricMode)     ? dims.lyricMode     : [dims.lyricMode].filter(Boolean);
+  const parts = [];
+  if (dynMap[dims.dynamicArc])              parts.push(`• DYNAMIC ARC: ${dynMap[dims.dynamicArc]}`);
+  if (gtArr.length)                         parts.push(`• GUITAR: ${gtArr.map(v => gtMap[v]).filter(Boolean).join(' / ')}`);
+  if (lyArr.length)                         parts.push(`• LYRIC: ${lyArr.map(v => lyMap[v]).filter(Boolean).join(' / ')}`);
+  if (stMap[dims.songStructureApproach])    parts.push(`• STRUCTURE: ${stMap[dims.songStructureApproach]}`);
+  if (subMap[dims.subgenreVoice])           parts.push(`• SUBGENRE: ${subMap[dims.subgenreVoice]}`);
+  return parts.length ? `\n\nALT-ROCK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildAfrobeatsDimBlock(dims) {
+  if (!dims) return '';
+  const regMap = {
+    'nigerian-lagos':'Nigerian/Lagos — Afrobeats heartland; Burna Boy / Wizkid / Davido sound; percussive highlife DNA.',
+    'afrofusion':'Afrofusion — border-crossing blend of Afrobeats with R&B, dancehall, rap, or electronic influences.',
+    'sa-amapiano':'South African/Amapiano — log drum bass, piano house loops, cabasa rhythm, Johannesburg scene.',
+    'uk-afroswing':'UK Afroswing — grime-meets-afrobeats; Afrobeats cadence with UK urban production and patois bars.',
+    'ghanaian-highlife':'Ghanaian Highlife — older traditional foundations, guitar-prominent, community-celebratory energy.'
+  };
+  const grvMap = {
+    'chill-wave':'Chill wave — relaxed dembow-adjacent groove; late-night, introspective, midtempo smooth feel.',
+    'vibing-medium':'Vibing medium — steady two-step energy; dancefloor ready but not peaked; the main Afrobeats zone.',
+    'dancefloor':'Dancefloor — extended percussion breaks, call-out sections, built for sweaty club momentum.',
+    'club-banger':'Club banger — aggressive hi-hat work, sub-bass punch, fast BPM for the peak-hour set.'
+  };
+  const lgMap = {
+    'english-clean':'English clean — fully English lyrics with Afrobeats cadence and phrasing (global market targeting).',
+    'pidgin-english':'Pidgin English — Nigerian Creole mixed naturally; vibrant, culturally rooted, street-authentic.',
+    'yoruba-heavy':'Yoruba heavy — significant Yoruba phrases and cultural references; language as identity statement.',
+    'multilingual':'Multilingual — English + Pidgin + Yoruba (or other local) switching freely within one song.',
+    'zulu-sotho':'Zulu/Sotho — South African language integration; works with amapiano or township influences.'
+  };
+  const vcMap = {
+    'melodic-lead':'Melodic lead — primary vocal delivers hooky melodic lines; the groove serves the vocal.',
+    'call-response':'Call-response — lead vocal sets phrase, secondary voice or ad-libs complete it; African vocal tradition.',
+    'rap-feature':'Rap feature — half sung, half rapped; bilingual flow switching, bars braided into melodic sections.',
+    'groove-rider':'Groove rider — vocal rides the rhythm rather than fighting it; percussive delivery.',
+    'group-harmonies':'Group harmonies — stacked background parts, gospel-influenced choir energy under the lead.'
+  };
+  const erMap = {
+    'highlife-roots':'Highlife roots — 1960s–80s West African highlife DNA; acoustic guitar, brass, community spirit.',
+    'contemporary-afropop':'Contemporary Afropop — 2010s–present commercial afrobeats; crossed with trap/R&B production.',
+    'future-afro':'Future Afro — futuristic production, electronic elements, forward-looking sound with African rhythm core.',
+    'amapiano-piano':'Amapiano piano — log-drum bass, jazzy chord runs, 2020s SA sound.',
+    'afroswing-uk':'Afroswing UK — 2017–2022 era Afrobeats/dancehall/grime hybrid; J Hus / Not3s lineage.'
+  };
+  const lgArr = Array.isArray(dims.afroLang)  ? dims.afroLang  : [dims.afroLang].filter(Boolean);
+  const vcArr = Array.isArray(dims.afroVocal) ? dims.afroVocal : [dims.afroVocal].filter(Boolean);
+  const parts = [];
+  if (regMap[dims.afroRegion]) parts.push(`• REGION: ${regMap[dims.afroRegion]}`);
+  if (grvMap[dims.afroGroove]) parts.push(`• GROOVE: ${grvMap[dims.afroGroove]}`);
+  if (lgArr.length)            parts.push(`• LANGUAGE: ${lgArr.map(v => lgMap[v]).filter(Boolean).join(' / ')}`);
+  if (vcArr.length)            parts.push(`• VOCALS: ${vcArr.map(v => vcMap[v]).filter(Boolean).join(' / ')}`);
+  if (erMap[dims.afroEra])     parts.push(`• ERA: ${erMap[dims.afroEra]}`);
+  return parts.length ? `\n\nAFROBEATS CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildReggaeDimBlock(dims) {
+  if (!dims) return '';
+  const eraMap = {
+    'roots':'Roots reggae — 70s Kingston; Marley/Tosh/Burning Spear lineage; live horns, Hammond organ, conscious lyrics.',
+    'dancehall-80s':'Dancehall 80s — digital riddims start here; sing-jay vocals, proto-digital drum machines (Sleng Teng era).',
+    'digital-90s':'Digital 90s — fully electronic riddims, computerized bass, Buju/Beenie/Shabba era production.',
+    'contemporary':'Contemporary reggae — modern production values, cleaner mixing, global-ear mastering; keeps roots DNA.',
+    'rootscore':'Rootscore — modern roots revival; Chronixx/Protoje generation; analog warmth + modern clarity.'
+  };
+  const csMap = {
+    'spiritual-rastafari':'Rastafari consciousness — Jah, Zion, Babylon, H.I.M. Selassie; spiritual framework is explicit.',
+    'social-justice':'Social justice — system critique, poverty, inequality, police state; direct protest voice.',
+    'love-devotion':'Love/Devotion — lovers rock tradition; tender romantic address, devotional lyric intimacy.',
+    'nature-ital':'Nature/Ital — earth reverence, plant/herb references, natural living; anti-industrial framing.',
+    'pan-african':'Pan-African — Africa as home/root, diaspora longing, Marcus Garvey / Black liberation themes.',
+    'personal-reflection':'Personal reflection — interior life, doubts, growth, autobiographical honesty.'
+  };
+  const rhMap = {
+    'one-drop':'One-drop — emphasis on beat 3; kick+snare together on 3, bass leaves beat 1 silent. The canonical roots feel.',
+    'rockers':'Rockers — emphasis on all four beats; driving, forward-leaning; Sly Dunbar era innovation.',
+    'steppers':'Steppers — four-on-the-floor kick; militant, marching energy; dub poets and later roots.',
+    'nyahbinghi':'Nyahbinghi — Rastafari hand drums (bass/funde/repeater); ceremonial, sacred, pre-reggae rhythm source.',
+    'skanking-offbeat':'Skanking offbeat — guitar/organ chop emphasizing the upbeat (the "and" of each beat); the sonic skank itself.'
+  };
+  const vcMap = {
+    'melodic-lead':'Melodic lead — sung throughout, clear melody lines; Dennis Brown / Gregory Isaacs tradition.',
+    'toasting-deejay':'Toasting/DJ — rhythmic speech over riddim; U-Roy / Big Youth / dancehall DJ lineage.',
+    'harmonies':'Harmonies — stacked three-part harmonies; Wailers / Mighty Diamonds / Israel Vibration.',
+    'chanting':'Chanting — Rastafari chant delivery; repetitive spiritual phrases over nyahbinghi rhythm.',
+    'talking-blues':'Talking blues — spoken-word verse with sung chorus; dub poetry influence (Linton Kwesi Johnson).'
+  };
+  const otMap = {
+    'extended-vamp':'Extended vamp outro — song continues 30–60s past final chorus; solo instruments trade over riddim.',
+    'dub-breakdown':'Dub breakdown — elements strip away, reverb/delay on remaining parts; the mixing desk as instrument.',
+    'fade-traditional':'Fade traditional — standard gradual volume fade; the song trails off into silence.',
+    'reprise-acapella':'Reprise a cappella — final chorus stripped to voices only; congregational energy.'
+  };
+  const csArr = Array.isArray(dims.consciousness)  ? dims.consciousness  : [dims.consciousness].filter(Boolean);
+  const vcArr = Array.isArray(dims.vocalApproach)  ? dims.vocalApproach  : [dims.vocalApproach].filter(Boolean);
+  const parts = [];
+  if (eraMap[dims.eraStyle])           parts.push(`• ERA: ${eraMap[dims.eraStyle]}`);
+  if (csArr.length)                    parts.push(`• CONSCIOUSNESS: ${csArr.map(v => csMap[v]).filter(Boolean).join(' / ')}`);
+  if (rhMap[dims.rhythmPattern])       parts.push(`• RHYTHM: ${rhMap[dims.rhythmPattern]}`);
+  if (vcArr.length)                    parts.push(`• VOCAL: ${vcArr.map(v => vcMap[v]).filter(Boolean).join(' / ')}`);
+  if (otMap[dims.outroTreatment])      parts.push(`• OUTRO: ${otMap[dims.outroTreatment]}`);
+  return parts.length ? `\n\nREGGAE CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildNeosoulDimBlock(dims) {
+  if (!dims) return '';
+  const grMap = {
+    'deep-pocket':'Deep pocket — drums sit slightly behind the beat; the space creates the groove (D\'Angelo / Voodoo).',
+    'on-the-one':'On the one — funk accents on beat 1; crisp, disciplined pocket; Prince / Roots-era rhythm.',
+    'hip-hop-influenced':'Hip-hop influenced — sampled-loop feel, boom-bap drum programming under live instrumentation.',
+    'jazz-shuffled':'Jazz-shuffled — swung eighths, brushed snare, upright bass walking lines; Roy Ayers territory.',
+    'afrobeat-locked':'Afrobeat-locked — polyrhythmic percussion, interlocking guitar patterns; Fela-influenced.',
+    'organic-imperfect':'Organic/Imperfect — live room feel, tempo drift allowed, human timing over quantized precision.'
+  };
+  const vcMap = {
+    'understated':'Understated vocal — restrained, conversational; the power lives in what\'s withheld (Erykah / early D\'Angelo).',
+    'raw-gritty':'Raw/Gritty vocal — textured, imperfect, emotionally charged; Bilal / Jaguar Wright range.',
+    'smooth-controlled':'Smooth/Controlled — silk-textured delivery, precise pitch, studio polish; Maxwell territory.',
+    'falsetto-run':'Falsetto runs — upper register as primary voice; melisma as expressive vocabulary.',
+    'spoken-whisper':'Spoken/Whisper — half-sung intimacy; seductive proximity, ASMR-adjacent.'
+  };
+  const hrMap = {
+    'simple-soul':'Simple soul harmony — diatonic chords, classic I–IV–V–vi; the groove carries the sophistication.',
+    'jazz-extended':'Jazz-extended — min9, maj9, 11ths and 13ths; sophisticated color tones over R&B foundation.',
+    'gospel-borrowed':'Gospel-borrowed — passing dominants, plagal cadences, church harmony vocabulary.',
+    'neo-blues':'Neo-blues — minor pentatonic melodies over soul chords; blues scale tension baked into hooks.',
+    'chromatic-color':'Chromatic color — modulating chord qualities, passing tones, cinematic harmonic movement.'
+  };
+  const trMap = {
+    'romantic-sensual':'Romantic/Sensual — adult intimacy, grown-folks love; sophisticated desire, not teen infatuation.',
+    'self-empowerment':'Self-empowerment — interior affirmation, growth, reclaiming power; India.Arie territory.',
+    'spiritual-reflective':'Spiritual/Reflective — prayer-adjacent, meditation on meaning; sacred energy in secular form.',
+    'social-commentary':'Social commentary — race, justice, culture; Common/Erykah conscious strain.',
+    'nostalgic-longing':'Nostalgic longing — memory as subject; specific places, specific eras, warm retrospection.',
+    'vulnerable-confession':'Vulnerable confession — unguarded interior admission; letting listener see what\'s usually hidden.'
+  };
+  const arMap = {
+    'bare-bones':'Bare-bones — voice + one instrument (guitar or Rhodes); minimal arrangement, maximum intimacy.',
+    'full-band':'Full band — drums, bass, keys, guitar, horns; classic neo-soul ensemble texture.',
+    'sample-chopped':'Sample-chopped — dusty loop layered under live instrumentation; Dilla-adjacent feel.',
+    'strings-elevated':'Strings elevated — quartet or larger string arrangement over rhythm section; cinematic scope.',
+    'electronic-layered':'Electronic layered — analog synths, drum machine layers, electronic textures woven with organic instruments.'
+  };
+  const grArr = Array.isArray(dims.groove)    ? dims.groove    : [dims.groove].filter(Boolean);
+  const trArr = Array.isArray(dims.territory) ? dims.territory : [dims.territory].filter(Boolean);
+  const parts = [];
+  if (grArr.length)             parts.push(`• GROOVE: ${grArr.map(v => grMap[v]).filter(Boolean).join(' / ')}`);
+  if (vcMap[dims.vocal])        parts.push(`• VOCAL: ${vcMap[dims.vocal]}`);
+  if (hrMap[dims.harmony])      parts.push(`• HARMONY: ${hrMap[dims.harmony]}`);
+  if (trArr.length)             parts.push(`• TERRITORY: ${trArr.map(v => trMap[v]).filter(Boolean).join(' / ')}`);
+  if (arMap[dims.arrange])      parts.push(`• ARRANGEMENT: ${arMap[dims.arrange]}`);
+  return parts.length ? `\n\nNEO-SOUL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildReggaetonDimBlock(dims) {
+  if (!dims) return '';
+  const dwMap = {
+    'raw-underground':'Raw underground — El General / Panama roots; distorted low-fi dembow, street aggression.',
+    'polished-pop':'Polished pop — clean modern mix, crossover-ready; Daddy Yankee / Wisin era gloss.',
+    'trap-hybrid':'Trap hybrid — dembow bones under trap hi-hat patterns; Bad Bunny / Anuel axis.',
+    'electro-digital':'Electro-digital — EDM-leaning production, synth leads, festival energy; J Balvin pop-electronic mode.',
+    'perreo-intense':'Perreo intense — heavy dembow, club-dominant low-end, sexual intensity turned up.'
+  };
+  const tfMap = {
+    'classic-90':'Classic 90 BPM — original reggaeton tempo; Daddy Yankee / Don Omar golden-era pocket.',
+    'modern-96':'Modern 96 BPM — current commercial reggaeton tempo sweet spot; urbano mainstream.',
+    'slowed-88':'Slowed 88 BPM — relaxed perreo tempo, sensual emphasis over party momentum.',
+    'fast-100':'Fast 100 BPM — higher-energy reggaeton, pushing toward merengue/urban fusion speeds.',
+    'bounce-vibes':'Bounce vibes — buoyant, swinging pocket; the rhythm smiles rather than stomps.'
+  };
+  const vbMap = {
+    'party':'Party vibe — club celebration, weekend energy, collective euphoria focus.',
+    'sensual-perreo':'Sensual/Perreo — dance-floor intimacy, body-forward lyric, heat in the hook.',
+    'street-real':'Street/Real — barrio authenticity, hustle narrative, urban grit.',
+    'romantic':'Romantic — sincere love songs over reggaeton rhythm; tender address over dembow.',
+    'trap-aggressive':'Trap-aggressive — flex energy, menace, confidence as threat; Anuel AA territory.',
+    'summer-vibes':'Summer vibes — beach/tropical imagery, vacation euphoria, bright sunny production.'
+  };
+  const fsMap = {
+    'conversational':'Conversational flow — natural speech cadence in rhyme; lyric feels like talk not rap.',
+    'trap-staccato':'Trap-staccato — short punched syllables, triplet hi-hat flow, trap rhythmic DNA.',
+    'melodic-sung':'Melodic-sung — hook-led, sung refrains over rapped verses; modern pop-reggaeton.',
+    'rapid-fire':'Rapid-fire — high syllable density, tongue-twister sections, bar-heavy verses.',
+    'bounce-flow':'Bounce flow — flow rides the dembow bounce; rhythm and rhyme lock into the riddim elastically.'
+  };
+  const lgMap = {
+    'pure-spanish':'Pure Spanish — 100% Spanish lyrics; no English intrusions; authentic urbano identity.',
+    'spanglish':'Spanglish — natural code-switching between Spanish and English; diaspora identity.',
+    'english-forward':'English-forward — English primary, Spanish phrases for flavor; crossover targeting.',
+    'regional-slang':'Regional slang — heavy PR / DR / Colombian / Mexican slang; local identity markers embedded.'
+  };
+  const arMap = {
+    'solo':'Solo — single-artist performance throughout; no featured voices.',
+    'duo-feature':'Duo feature — main artist + one guest feature; classic reggaeton collab format.',
+    'female-lead':'Female lead — reggaetonera takes primary voice; Karol G / Ivy Queen energy.',
+    'collab-ensemble':'Collab ensemble — 3+ artists trading verses; posse cut format, radio-hit ensemble.'
+  };
+  const vbArr = Array.isArray(dims.vibe) ? dims.vibe : [dims.vibe].filter(Boolean);
+  const parts = [];
+  if (dwMap[dims.dembowWeight])   parts.push(`• DEMBOW: ${dwMap[dims.dembowWeight]}`);
+  if (tfMap[dims.tempoFeel])      parts.push(`• TEMPO: ${tfMap[dims.tempoFeel]}`);
+  if (vbArr.length)               parts.push(`• VIBE: ${vbArr.map(v => vbMap[v]).filter(Boolean).join(' / ')}`);
+  if (fsMap[dims.flowStyle])      parts.push(`• FLOW: ${fsMap[dims.flowStyle]}`);
+  if (lgMap[dims.language])       parts.push(`• LANGUAGE: ${lgMap[dims.language]}`);
+  if (arMap[dims.arrangement])    parts.push(`• ARRANGEMENT: ${arMap[dims.arrangement]}`);
+  return parts.length ? `\n\nREGGAETON CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildLatinDimBlock(dims) {
+  if (!dims) return '';
+  const rsMap = {
+    'salsa':'Salsa — Afro-Cuban clave foundation; piano montuno, horn stabs, congas/timbales; NY/PR/Cuban tradition.',
+    'merengue':'Merengue — Dominican 2/4 tambora rhythm; accordion/brass lead; fast, celebratory, dance-forward.',
+    'cumbia':'Cumbia — Colombian origin, accordion-led; slower gait, hip-sway tempo, universal across Latin America.',
+    'bachata':'Bachata — Dominican guitar-led; romantic, melancholic; Aventura/Romeo Santos modern crossover.',
+    'bossa-fusion':'Bossa fusion — Brazilian bossa nova DNA blended with Latin; nylon guitar, soft percussion, cool lyric.',
+    'mariachi':'Mariachi — Mexican traditional ensemble; vihuela, guitarrón, trumpets, violin; declarative romantic song.',
+    'bolero':'Bolero — slow romantic ballad tradition; Cuban/Mexican origins; lush orchestration, declarative love lyric.',
+    'ranchera':'Ranchera — Mexican rural tradition; 3/4 waltz or 4/4 polka feel; heartbreak, pride, tequila narratives.'
+  };
+  const riMap = {
+    'declarative-passionate':'Declarative passionate — grand romantic declarations, high-stakes emotional address.',
+    'tender-nostalgic':'Tender nostalgic — soft affection remembered; past-tense love with present-tense tenderness.',
+    'playful-teasing':'Playful teasing — flirtatious banter, chasing energy, light erotic humor.',
+    'bittersweet-longing':'Bittersweet longing — love lost or unattained; aching without bitterness, dignified sorrow.',
+    'hot-seductive':'Hot/Seductive — intimate heat, physical desire foregrounded; sensual directness.'
+  };
+  const laMap = {
+    'spanish-only':'Spanish only — 100% Spanish lyric; traditional Latin authenticity.',
+    'bilingual':'Bilingual — natural English/Spanish verse alternation; crossover balance.',
+    'english-spanish-mix':'English/Spanish mix — English primary with Spanish phrases for flavor; US crossover targeting.',
+    'formal-castilian':'Formal Castilian — literary Spanish register; sophisticated vocabulary, elevated diction.',
+    'regional-dialect':'Regional dialect — country-specific Spanish (Mexican / Cuban / Argentine / Colombian); identity-rooted.'
+  };
+  const iMap = {
+    'piano-montuno':'Piano montuno — syncopated two-handed piano pattern; salsa engine-room sound.',
+    'brass-section':'Brass section — trumpets/trombones with horn stabs and mambo breaks; Latin big-band texture.',
+    'guitar-riff':'Guitar — nylon or requinto lead; bachata-style arpeggios or mariachi strumming.',
+    'accordion':'Accordion lead — Tex-Mex / cumbia / merengue melodic signature.',
+    'violin-charanga':'Violin/Charanga — charanga ensemble texture; violins as melodic lead over rhythm section.',
+    'congas-rhythm':'Congas-rhythm forward — percussion as melodic voice; tumbao patterns drive the song.'
+  };
+  const deMap = {
+    'low-romantic':'Low romantic energy — slow bolero/bachata intimacy; close-couple dancing, ballad mode.',
+    'medium-sensual':'Medium sensual — mid-tempo groove; hip-movement dancing, subtle seduction.',
+    'high-salsa':'High salsa energy — fast breakdown sections, mambo bridges, dancer-focused intensity.',
+    'full-party':'Full party — peak-hour celebration, all-hands dancing, uninterrupted energy.',
+    'ballroom-formal':'Ballroom formal — structured dance-form (tango-adjacent discipline), formal pacing.'
+  };
+  const iArr = Array.isArray(dims.instrumentation_lead) ? dims.instrumentation_lead : [dims.instrumentation_lead].filter(Boolean);
+  const parts = [];
+  if (rsMap[dims.rhythm_style])         parts.push(`• RHYTHM: ${rsMap[dims.rhythm_style]}`);
+  if (riMap[dims.romantic_intensity])   parts.push(`• ROMANTIC INTENSITY: ${riMap[dims.romantic_intensity]}`);
+  if (laMap[dims.language_approach])    parts.push(`• LANGUAGE: ${laMap[dims.language_approach]}`);
+  if (iArr.length)                      parts.push(`• INSTRUMENT LEAD: ${iArr.map(v => iMap[v]).filter(Boolean).join(' / ')}`);
+  if (deMap[dims.dance_energy])         parts.push(`• DANCE ENERGY: ${deMap[dims.dance_energy]}`);
+  return parts.length ? `\n\nLATIN CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildDancehallDimBlock(dims) {
+  if (!dims) return '';
+  const vsMap = {
+    'singjay':'Singjay — half-sung half-rapped; melodic sections drop into toast patterns; Buju Banton / Cutty Ranks lineage.',
+    'deejay-toasting':'Deejay toasting — pure rhythmic chat over riddim; Shabba Ranks / Yellowman classic toasting.',
+    'singing-melodic':'Singing melodic — fully sung over dancehall riddim; Beres Hammond / Jah Cure modern lovers-rock.',
+    'chat-style':'Chat style — rapid-fire spoken delivery, syllable-forward; tongue-twister bar-heavy patois.',
+    'hyper-vocoder':'Hyper/Vocoder — auto-tuned modern delivery; Vybz Kartel post-2010 processed vocal aesthetic.'
+  };
+  const elMap = {
+    'bashment-intense':'Bashment intense — aggressive clash energy; Sting stage-show territory; dangerous-kinetic mood.',
+    'party-hype':'Party hype — dancehall session energy; lively crowd-response lyric, weekend celebration.',
+    'cool-and-deadly':'Cool and deadly — controlled menace; smooth flow with threat in the subtext; don-dada composure.',
+    'slack-sensual':'Slack/Sensual — explicit dancefloor lyric; body-forward, dance-move instruction, adult territory.',
+    'spiritual-conscious':'Spiritual conscious — Rasta-adjacent message over dancehall riddim; Sizzla / Capleton energy.'
+  };
+  const peMap = {
+    'roots-digital-80s':'Roots-digital 80s — Sleng Teng era; first digital riddims, Casio-style synth lines.',
+    'golden-90s':'Golden 90s — Steely & Clevie era; peak dancehall riddim craft; Bogle dance culture.',
+    'modern-2010s':'Modern 2010s — contemporary dancehall production; cleaner mix, pop-crossover polish.',
+    'trap-fusion-2020s':'Trap-fusion 2020s — trap drum programming under dancehall rhythmic DNA; global modern sound.',
+    'vintage-dancehall':'Vintage dancehall — 70s–early 80s pre-digital; King Tubby era live-riddim dub roots.'
+  };
+  const pdMap = {
+    'pure-patois':'Pure patois — 100% Jamaican Creole; authentic linguistic identity, no translation accommodation.',
+    'mixed-patois-english':'Mixed patois-English — natural code-switching; patois verses, English hooks; crossover balance.',
+    'light-patois':'Light patois — English primary with patois phrases and accent markers; accessibility forward.',
+    'english-heavy':'English heavy — mostly Standard Jamaican English; dancehall rhythm without heavy patois.',
+    'jamaican-accent':'Jamaican accent only — English lyric with pronunciation shaped by JA phonology; no patois grammar.'
+  };
+  const rtMap = {
+    'classic-riddim':'Classic riddim — song uses a named traditional riddim (Sleng Teng / Answer / Diwali) — same riddim as other songs.',
+    'original-riddim':'Original riddim — custom riddim built for this song; modern single-song production approach.',
+    'trap-riddim':'Trap riddim — 808-heavy trap beat structure under dancehall vocal style.',
+    'foreign-collab':'Foreign collab — riddim blending dancehall with Afrobeats / UK garage / Latin production.',
+    'one-drop-dancehall':'One-drop dancehall — reggae-derived one-drop rhythm programmed at dancehall tempo.'
+  };
+  const peArr = Array.isArray(dims.productionEra)   ? dims.productionEra   : [dims.productionEra].filter(Boolean);
+  const rtArr = Array.isArray(dims.riddimTreatment) ? dims.riddimTreatment : [dims.riddimTreatment].filter(Boolean);
+  const parts = [];
+  if (vsMap[dims.vocalStyle])     parts.push(`• VOCAL STYLE: ${vsMap[dims.vocalStyle]}`);
+  if (elMap[dims.energyLevel])    parts.push(`• ENERGY: ${elMap[dims.energyLevel]}`);
+  if (peArr.length)               parts.push(`• ERA: ${peArr.map(v => peMap[v]).filter(Boolean).join(' / ')}`);
+  if (pdMap[dims.patoisDensity])  parts.push(`• PATOIS: ${pdMap[dims.patoisDensity]}`);
+  if (rtArr.length)               parts.push(`• RIDDIM: ${rtArr.map(v => rtMap[v]).filter(Boolean).join(' / ')}`);
+  return parts.length ? `\n\nDANCEHALL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildGospelDimBlock(dims) {
+  if (!dims) return '';
+  const eaMap = {
+    'devotional':'Devotional arc — intimate personal worship; whispered/conversational address to God; Sunday-morning reverence.',
+    'celebratory':'Celebratory arc — victory energy; clapping, shouting, testimony-after-breakthrough mood.',
+    'altar-call':'Altar-call arc — final invitation mode; slow build asking for surrender/commitment; long sustained chords.',
+    'mid-service':'Mid-service arc — praise break energy; tempo up, full congregation engaged, dancing in the aisles.',
+    'praise-worship':'Praise & worship — contemporary P&W ballad structure; verse intimate → chorus anthemic lift.'
+  };
+  const chMap = {
+    'solo-lead':'Solo lead — single lead voice carries the song; minimal background support.',
+    'choir-response':'Choir response — lead voice + choir answering in call-and-response patterns; AME tradition.',
+    'full-mass-choir':'Full mass choir — 30+ voice choir as primary texture; Kirk Franklin / Hezekiah Walker scale.',
+    'contemporary-worship-band':'Contemporary worship band — lead vocalist + backing vocalists + full band; Hillsong / Bethel model.',
+    'a-cappella-group':'A cappella group — voices only, no instrumentation; Take 6 / gospel quartet tradition.'
+  };
+  const prMap = {
+    'traditional':'Traditional gospel — B3 organ, piano, live drums; James Cleveland / Walter Hawkins sonic DNA.',
+    'contemporary-praise':'Contemporary praise — modern P&W production; pad-forward mix, pop-polished worship.',
+    'hip-hop-gospel':'Hip-hop gospel — rap elements, trap drums, contemporary urban production; Lecrae / Kirk Franklin collabs.',
+    'neo-soul-gospel':'Neo-soul gospel — Rhodes/Wurlitzer warmth, jazz-extended harmony; Lalah Hathaway / gospel+neo-soul fusion.',
+    'acoustic-raw':'Acoustic raw — piano+voice or guitar+voice; stripped worship, unvarnished vulnerability.'
+  };
+  const lfMap = {
+    'testimony':'Testimony — personal story of what God has done; specific narrative, autobiographical detail.',
+    'praise-worship':'Praise/Worship — direct address to God; declaring attributes, honoring, adoring.',
+    'prophetic-declaration':'Prophetic declaration — speaking forward, claiming promises, faith-declaration lyric.',
+    'hope-breakthrough':'Hope/Breakthrough — encouragement for struggle; "keep going" theology, endurance lyric.',
+    'lamentation-prayer':'Lamentation/Prayer — honest grief before God; psalm-style honesty, not forced triumph.',
+    'social-gospel':'Social gospel — justice and community uplift; Civil Rights lineage of Mahalia / Sam Cooke prophetic voice.'
+  };
+  const viMap = {
+    'whisper-intimate':'Whisper/Intimate — soft private delivery; close-mic devotional hush.',
+    'full-voice':'Full voice — confident sustained delivery; congregational singability.',
+    'sanctified-runs':'Sanctified runs — melismatic virtuosity; gospel run vocabulary as expressive language.',
+    'choir-swell':'Choir swell — lead + choir building together toward climax shouts; traditional Sunday peak.',
+    'quiet-storm':'Quiet storm — contemporary gospel mellow mode; smooth, adult-contemporary sacred delivery.'
+  };
+  const chArr = Array.isArray(dims.choir)      ? dims.choir      : [dims.choir].filter(Boolean);
+  const lfArr = Array.isArray(dims.lyricFocus) ? dims.lyricFocus : [dims.lyricFocus].filter(Boolean);
+  const parts = [];
+  if (eaMap[dims.energyArc])       parts.push(`• ARC: ${eaMap[dims.energyArc]}`);
+  if (chArr.length)                parts.push(`• CHOIR: ${chArr.map(v => chMap[v]).filter(Boolean).join(' / ')}`);
+  if (prMap[dims.production])      parts.push(`• PRODUCTION: ${prMap[dims.production]}`);
+  if (lfArr.length)                parts.push(`• LYRIC FOCUS: ${lfArr.map(v => lfMap[v]).filter(Boolean).join(' / ')}`);
+  if (viMap[dims.vocalIntensity])  parts.push(`• INTENSITY: ${viMap[dims.vocalIntensity]}`);
+  return parts.length ? `\n\nGOSPEL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────

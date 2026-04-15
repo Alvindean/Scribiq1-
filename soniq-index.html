@@ -2426,6 +2426,527 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
         </div>
       </div>
+      <!-- C2 — KPOP -->
+      <div class="rl-dimensions" id="craft-dims-kpop" style="display:none">
+        <div class="rl-dim-header">K-Pop — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-kpop-energyTier">
+          <span class="rl-dim-label">Energy</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','energyTier','ballad')">Ballad</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','energyTier','mid-tempo')">Mid-Tempo</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'kpop','energyTier','dance-ready')">Dance-Ready</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','energyTier','banger')">Banger</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','energyTier','neo-retro')">Neo-Retro</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-kpop-rapPresence">
+          <span class="rl-dim-label">Rap</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','rapPresence','none')">None</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'kpop','rapPresence','light')">Light</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','rapPresence','rap-break')">Rap Break</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','rapPresence','rap-heavy')">Rap-Heavy</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-kpop-conceptTheme">
+          <span class="rl-dim-label">Concept <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'kpop','conceptTheme','cute-youthful')">Cute</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','conceptTheme','dark-intense')">Dark</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','conceptTheme','powerful-confident')">Powerful</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','conceptTheme','romantic-tender')">Romantic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','conceptTheme','quirky-playful')">Quirky</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','conceptTheme','cool-detached')">Cool</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-kpop-groupDynamic">
+          <span class="rl-dim-label">Group</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','groupDynamic','solo')">Solo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','groupDynamic','duo-harmony')">Duo</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'kpop','groupDynamic','unit-3-4')">Unit 3-4</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','groupDynamic','full-group')">Full Group</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-kpop-eraStyle">
+          <span class="rl-dim-label">Era</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','eraStyle','classic-idol')">Classic Idol</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','eraStyle','gen-3-peak')">Gen-3 Peak</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'kpop','eraStyle','gen-4-current')">Gen-4 Current</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','eraStyle','neo-retro')">Neo-Retro</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','eraStyle','post-idol')">Post-Idol</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-kpop-vocalDelivery">
+          <span class="rl-dim-label">Vocal</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','vocalDelivery','aegyo-soft')">Aegyo</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'kpop','vocalDelivery','precision-clean')">Precision</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','vocalDelivery','powerful-belt')">Belt</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','vocalDelivery','english-forward')">English-Fwd</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'kpop','vocalDelivery','konglish-mix')">Konglish</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C2 — ALT-ROCK -->
+      <div class="rl-dimensions" id="craft-dims-altrock" style="display:none">
+        <div class="rl-dim-header">Alt-Rock — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-altrock-dynamicArc">
+          <span class="rl-dim-label">Dynamic</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'altrock','dynamicArc','quiet-loud')">Quiet-Loud</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','dynamicArc','sustained-tension')">Sustained Tension</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','dynamicArc','explosive-start')">Explosive Start</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','dynamicArc','slow-burn')">Slow Burn</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','dynamicArc','peaks-valleys')">Peaks &amp; Valleys</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-altrock-guitarTexture">
+          <span class="rl-dim-label">Guitar <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','guitarTexture','clean-jangly')">Clean-Jangly</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'altrock','guitarTexture','distorted-crunch')">Distorted</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','guitarTexture','shoegaze-wall')">Shoegaze Wall</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','guitarTexture','angular-postpunk')">Angular Post-Punk</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','guitarTexture','arpeggiated-atm')">Arpeggiated</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','guitarTexture','math-rock-riff')">Math-Rock</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-altrock-lyricMode">
+          <span class="rl-dim-label">Lyric <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','lyricMode','opaque-imagery')">Opaque Imagery</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'altrock','lyricMode','direct-emotion')">Direct Emotion</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','lyricMode','narrative-scene')">Narrative Scene</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','lyricMode','literary-abstract')">Literary Abstract</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','lyricMode','outsider-irony')">Outsider Irony</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-altrock-songStructureApproach">
+          <span class="rl-dim-label">Structure</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'altrock','songStructureApproach','vcpcvc-classic')">VCPCVC Classic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','songStructureApproach','no-intro-drop-in')">Drop-In</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','songStructureApproach','extended-build')">Extended Build</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','songStructureApproach','two-part-arc')">Two-Part Arc</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','songStructureApproach','no-chorus-tension')">No-Chorus Tension</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-altrock-subgenreVoice">
+          <span class="rl-dim-label">Subgenre</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'altrock','subgenreVoice','indie-rock')">Indie Rock</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','subgenreVoice','shoegaze')">Shoegaze</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','subgenreVoice','post-punk')">Post-Punk</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','subgenreVoice','grunge')">Grunge</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','subgenreVoice','emo')">Emo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'altrock','subgenreVoice','dream-pop')">Dream-Pop</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C2 — AFROBEATS -->
+      <div class="rl-dimensions" id="craft-dims-afrobeats" style="display:none">
+        <div class="rl-dim-header">Afrobeats — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-afrobeats-afroRegion">
+          <span class="rl-dim-label">Region</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'afrobeats','afroRegion','nigerian-lagos')">Nigerian</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroRegion','afrofusion')">Afrofusion</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroRegion','sa-amapiano')">South African</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroRegion','uk-afroswing')">UK Afroswing</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroRegion','ghanaian-highlife')">Ghanaian</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-afrobeats-afroGroove">
+          <span class="rl-dim-label">Groove</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroGroove','chill-wave')">Chill Wave</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'afrobeats','afroGroove','vibing-medium')">Vibing</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroGroove','dancefloor')">Dancefloor</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroGroove','club-banger')">Club Banger</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-afrobeats-afroLang">
+          <span class="rl-dim-label">Lang <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'afrobeats','afroLang','english-clean')">English</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroLang','pidgin-english')">Pidgin</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroLang','yoruba-heavy')">Yoruba</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroLang','multilingual')">Multilingual</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroLang','zulu-sotho')">Zulu/Sotho</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-afrobeats-afroVocal">
+          <span class="rl-dim-label">Vocals <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'afrobeats','afroVocal','melodic-lead')">Melodic Lead</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroVocal','call-response')">Call/Response</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroVocal','rap-feature')">Rap Feature</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroVocal','groove-rider')">Groove Rider</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroVocal','group-harmonies')">Harmonies</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-afrobeats-afroEra">
+          <span class="rl-dim-label">Era</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroEra','highlife-roots')">Highlife</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'afrobeats','afroEra','contemporary-afropop')">Contemporary</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroEra','future-afro')">Future Afro</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroEra','amapiano-piano')">Amapiano</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'afrobeats','afroEra','afroswing-uk')">UK Afroswing</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C3 — REGGAE -->
+      <div class="rl-dimensions" id="craft-dims-reggae" style="display:none">
+        <div class="rl-dim-header">Reggae — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-reggae-eraStyle">
+          <span class="rl-dim-label">Era</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggae','eraStyle','roots')">Roots</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','eraStyle','dancehall-80s')">Dancehall 80s</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','eraStyle','digital-90s')">Digital 90s</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','eraStyle','contemporary')">Contemporary</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','eraStyle','rootscore')">Rootscore</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggae-consciousness">
+          <span class="rl-dim-label">Message <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggae','consciousness','spiritual-rastafari')">Rastafari</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','consciousness','social-justice')">Social Justice</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','consciousness','love-devotion')">Love</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','consciousness','nature-ital')">Ital/Nature</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','consciousness','pan-african')">Pan-African</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','consciousness','personal-reflection')">Personal</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggae-rhythmPattern">
+          <span class="rl-dim-label">Rhythm</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggae','rhythmPattern','one-drop')">One Drop</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','rhythmPattern','rockers')">Rockers</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','rhythmPattern','steppers')">Steppers</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','rhythmPattern','nyahbinghi')">Nyahbinghi</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','rhythmPattern','skanking-offbeat')">Skanking</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggae-vocalApproach">
+          <span class="rl-dim-label">Vocal <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggae','vocalApproach','melodic-lead')">Melodic Lead</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','vocalApproach','toasting-deejay')">Toasting/DJ</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','vocalApproach','harmonies')">Harmonies</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','vocalApproach','chanting')">Chanting</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','vocalApproach','talking-blues')">Talking Blues</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggae-outroTreatment">
+          <span class="rl-dim-label">Outro</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggae','outroTreatment','extended-vamp')">Extended Vamp</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','outroTreatment','dub-breakdown')">Dub Breakdown</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','outroTreatment','fade-traditional')">Fade</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggae','outroTreatment','reprise-acapella')">Reprise A Cappella</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C3 — NEO-SOUL -->
+      <div class="rl-dimensions" id="craft-dims-neosoul" style="display:none">
+        <div class="rl-dim-header">Neo-Soul — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-neosoul-groove">
+          <span class="rl-dim-label">Groove <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'neosoul','groove','deep-pocket')">Deep Pocket</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','groove','on-the-one')">On The One</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','groove','hip-hop-influenced')">Hip-Hop</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','groove','jazz-shuffled')">Jazz Shuffled</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','groove','afrobeat-locked')">Afrobeat-Locked</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','groove','organic-imperfect')">Organic / Loose</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-neosoul-vocal">
+          <span class="rl-dim-label">Vocal</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'neosoul','vocal','understated')">Understated</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','vocal','raw-gritty')">Raw/Gritty</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','vocal','smooth-controlled')">Smooth</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','vocal','falsetto-run')">Falsetto Runs</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','vocal','spoken-whisper')">Spoken/Whisper</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-neosoul-harmony">
+          <span class="rl-dim-label">Harmony</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'neosoul','harmony','simple-soul')">Simple Soul</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','harmony','jazz-extended')">Jazz Extended</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','harmony','gospel-borrowed')">Gospel</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','harmony','neo-blues')">Neo-Blues</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','harmony','chromatic-color')">Chromatic</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-neosoul-territory">
+          <span class="rl-dim-label">Territory <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'neosoul','territory','romantic-sensual')">Romantic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','territory','self-empowerment')">Self-Empowerment</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','territory','spiritual-reflective')">Spiritual</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','territory','social-commentary')">Social</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','territory','nostalgic-longing')">Nostalgic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','territory','vulnerable-confession')">Vulnerable</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-neosoul-arrange">
+          <span class="rl-dim-label">Arrange</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'neosoul','arrange','bare-bones')">Bare-Bones</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','arrange','full-band')">Full Band</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','arrange','sample-chopped')">Sample Chopped</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','arrange','strings-elevated')">Strings</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'neosoul','arrange','electronic-layered')">Electronic</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C3 — REGGAETON -->
+      <div class="rl-dimensions" id="craft-dims-reggaeton" style="display:none">
+        <div class="rl-dim-header">Reggaeton — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-reggaeton-dembowWeight">
+          <span class="rl-dim-label">Dembow</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','dembowWeight','raw-underground')">Raw Underground</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggaeton','dembowWeight','polished-pop')">Polished Pop</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','dembowWeight','trap-hybrid')">Trap Hybrid</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','dembowWeight','electro-digital')">Electro</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','dembowWeight','perreo-intense')">Perreo</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggaeton-tempoFeel">
+          <span class="rl-dim-label">Tempo</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggaeton','tempoFeel','classic-90')">Classic 90</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','tempoFeel','modern-96')">Modern 96</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','tempoFeel','slowed-88')">Slowed 88</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','tempoFeel','fast-100')">Fast 100</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','tempoFeel','bounce-vibes')">Bounce</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggaeton-vibe">
+          <span class="rl-dim-label">Vibe <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggaeton','vibe','party')">Party</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','vibe','sensual-perreo')">Sensual</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','vibe','street-real')">Street</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','vibe','romantic')">Romantic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','vibe','trap-aggressive')">Trap</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','vibe','summer-vibes')">Summer</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggaeton-flowStyle">
+          <span class="rl-dim-label">Flow</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggaeton','flowStyle','conversational')">Conversational</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','flowStyle','trap-staccato')">Trap Staccato</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','flowStyle','melodic-sung')">Melodic Sung</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','flowStyle','rapid-fire')">Rapid-Fire</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','flowStyle','bounce-flow')">Bounce Flow</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggaeton-language">
+          <span class="rl-dim-label">Language</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggaeton','language','pure-spanish')">Pure Spanish</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','language','spanglish')">Spanglish</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','language','english-forward')">English-Fwd</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','language','regional-slang')">Regional Slang</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-reggaeton-arrangement">
+          <span class="rl-dim-label">Arrange</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'reggaeton','arrangement','solo')">Solo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','arrangement','duo-feature')">Duo/Feature</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','arrangement','female-lead')">Female Lead</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'reggaeton','arrangement','collab-ensemble')">Collab</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C4 — LATIN -->
+      <div class="rl-dimensions" id="craft-dims-latin" style="display:none">
+        <div class="rl-dim-header">Latin — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-latin-rhythm_style">
+          <span class="rl-dim-label">Rhythm</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'latin','rhythm_style','salsa')">Salsa</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','merengue')">Merengue</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','cumbia')">Cumbia</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','bachata')">Bachata</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','bossa-fusion')">Bossa Fusion</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','mariachi')">Mariachi</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','bolero')">Bolero</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','rhythm_style','ranchera')">Ranchera</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-latin-romantic_intensity">
+          <span class="rl-dim-label">Romantic</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'latin','romantic_intensity','declarative-passionate')">Declarative</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','romantic_intensity','tender-nostalgic')">Tender</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','romantic_intensity','playful-teasing')">Playful</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','romantic_intensity','bittersweet-longing')">Bittersweet</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','romantic_intensity','hot-seductive')">Seductive</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-latin-language_approach">
+          <span class="rl-dim-label">Language</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'latin','language_approach','spanish-only')">Spanish Only</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','language_approach','bilingual')">Bilingual</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','language_approach','english-spanish-mix')">Eng/Esp Mix</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','language_approach','formal-castilian')">Formal Castilian</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','language_approach','regional-dialect')">Regional Dialect</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-latin-instrumentation_lead">
+          <span class="rl-dim-label">Instrument <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'latin','instrumentation_lead','piano-montuno')">Piano/Montuno</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','instrumentation_lead','brass-section')">Brass</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','instrumentation_lead','guitar-riff')">Guitar</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','instrumentation_lead','accordion')">Accordion</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','instrumentation_lead','violin-charanga')">Violin/Charanga</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','instrumentation_lead','congas-rhythm')">Congas</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-latin-dance_energy">
+          <span class="rl-dim-label">Dance</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','dance_energy','low-romantic')">Low/Romantic</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'latin','dance_energy','medium-sensual')">Medium/Sensual</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','dance_energy','high-salsa')">High/Salsa</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','dance_energy','full-party')">Full Party</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'latin','dance_energy','ballroom-formal')">Ballroom</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C4 — DANCEHALL -->
+      <div class="rl-dimensions" id="craft-dims-dancehall" style="display:none">
+        <div class="rl-dim-header">Dancehall — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-dancehall-vocalStyle">
+          <span class="rl-dim-label">Vocal Style</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'dancehall','vocalStyle','singjay')">Singjay</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','vocalStyle','deejay-toasting')">Deejay Toasting</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','vocalStyle','singing-melodic')">Melodic Singing</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','vocalStyle','chat-style')">Chat Style</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','vocalStyle','hyper-vocoder')">Vocoder</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-dancehall-energyLevel">
+          <span class="rl-dim-label">Energy</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','energyLevel','bashment-intense')">Bashment</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'dancehall','energyLevel','party-hype')">Party Hype</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','energyLevel','cool-and-deadly')">Cool &amp; Deadly</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','energyLevel','slack-sensual')">Slack/Sensual</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','energyLevel','spiritual-conscious')">Conscious</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-dancehall-productionEra">
+          <span class="rl-dim-label">Era <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','productionEra','roots-digital-80s')">Digital 80s</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','productionEra','golden-90s')">Golden 90s</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'dancehall','productionEra','modern-2010s')">Modern 2010s</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','productionEra','trap-fusion-2020s')">Trap Fusion</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','productionEra','vintage-dancehall')">Vintage</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-dancehall-patoisDensity">
+          <span class="rl-dim-label">Patois</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','patoisDensity','pure-patois')">Pure Patois</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'dancehall','patoisDensity','mixed-patois-english')">Mixed</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','patoisDensity','light-patois')">Light Patois</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','patoisDensity','english-heavy')">English Heavy</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','patoisDensity','jamaican-accent')">JA Accent</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-dancehall-riddimTreatment">
+          <span class="rl-dim-label">Riddim <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','riddimTreatment','classic-riddim')">Classic</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'dancehall','riddimTreatment','original-riddim')">Original</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','riddimTreatment','trap-riddim')">Trap Riddim</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','riddimTreatment','foreign-collab')">Foreign Collab</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'dancehall','riddimTreatment','one-drop-dancehall')">One Drop</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C4 — GOSPEL -->
+      <div class="rl-dimensions" id="craft-dims-gospel" style="display:none">
+        <div class="rl-dim-header">Gospel — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-gospel-energyArc">
+          <span class="rl-dim-label">Arc</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'gospel','energyArc','devotional')">Devotional</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','energyArc','celebratory')">Celebratory</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','energyArc','altar-call')">Altar Call</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','energyArc','mid-service')">Mid-Service</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','energyArc','praise-worship')">Praise &amp; Worship</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-gospel-choir">
+          <span class="rl-dim-label">Choir <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'gospel','choir','solo-lead')">Solo Lead</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','choir','choir-response')">Choir Response</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','choir','full-mass-choir')">Full Mass Choir</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','choir','contemporary-worship-band')">Contemp. Band</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','choir','a-cappella-group')">A Cappella</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-gospel-production">
+          <span class="rl-dim-label">Production</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'gospel','production','traditional')">Traditional</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','production','contemporary-praise')">Contemporary</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','production','hip-hop-gospel')">Hip-Hop Gospel</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','production','neo-soul-gospel')">Neo-Soul Gospel</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','production','acoustic-raw')">Acoustic Raw</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-gospel-lyricFocus">
+          <span class="rl-dim-label">Lyric <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'gospel','lyricFocus','testimony')">Testimony</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','lyricFocus','praise-worship')">Praise</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','lyricFocus','prophetic-declaration')">Prophetic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','lyricFocus','hope-breakthrough')">Hope</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','lyricFocus','lamentation-prayer')">Lamentation</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','lyricFocus','social-gospel')">Social Gospel</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-gospel-vocalIntensity">
+          <span class="rl-dim-label">Intensity</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','vocalIntensity','whisper-intimate')">Whisper</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'gospel','vocalIntensity','full-voice')">Full Voice</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','vocalIntensity','sanctified-runs')">Sanctified Runs</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','vocalIntensity','choir-swell')">Choir Swell</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'gospel','vocalIntensity','quiet-storm')">Quiet Storm</span>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══════ END GENRE CRAFT DIMENSION PANELS ═══════ -->
 
       <!-- ADVANCED SETTINGS ACCORDION -->
