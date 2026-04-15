@@ -2803,6 +2803,9 @@ function buildSongPrompt(params) {
     else if (genre === 'country')   craftDimNote = buildCountryDimBlock(craftDimensions);
     else if (genre === 'edm')       craftDimNote = buildEdmDimBlock(craftDimensions);
     else if (genre === 'folk')      craftDimNote = buildFolkDimBlock(craftDimensions);
+    else if (genre === 'metal')     craftDimNote = buildMetalDimBlock(craftDimensions);
+    else if (genre === 'jazz')      craftDimNote = buildJazzDimBlock(craftDimensions);
+    else if (genre === 'punk')      craftDimNote = buildPunkDimBlock(craftDimensions);
   }
 
   // EDGE MODE — lyrical permission system (gated by adult audience)
@@ -4953,6 +4956,158 @@ function buildFolkDimBlock(dims) {
   if (vdMap[dims.vocalDelivery])    parts.push(`• VOCAL: ${vdMap[dims.vocalDelivery]}`);
   if (ecMap[dims.ensembleScale])    parts.push(`• SCALE: ${ecMap[dims.ensembleScale]}`);
   return parts.length ? `\n\nFOLK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildMetalDimBlock(dims) {
+  if (!dims) return '';
+  const sgMap = {
+    'thrash':'Thrash — Bay Area speed/aggression; palm-muted tremolo, fast double-kick, political/nihilist lyric; Metallica/Slayer/Megadeth DNA.',
+    'death':'Death metal — growled vocals, drop-tuned, blast beats, horror/mortality lyric; Cannibal Corpse/Death/Morbid Angel.',
+    'black':'Black metal — tremolo-picked walls, shrieked vocals, raw lo-fi production, occult/nature lyric; Mayhem/Burzum/Emperor.',
+    'doom':'Doom — slow crushing tempo, down-tuned detuned guitars, funeral pace; Black Sabbath lineage; Electric Wizard / Sleep.',
+    'power':'Power metal — clean operatic vocals, fast tempos, fantasy/sword-and-sorcery lyrics; Helloween/Blind Guardian/Dragonforce.',
+    'metalcore':'Metalcore — hardcore-influenced breakdowns, harsh/clean vocal trade, melodic choruses; Killswitch Engage/Parkway Drive.',
+    'progressive':'Progressive metal — complex time signatures, extended songs, technical musicianship; Dream Theater/Tool/Opeth.',
+    'nu-metal':'Nu-metal — 7-string guitars, hip-hop influence, rap-metal hybrid, 90s–00s aesthetic; Korn/Slipknot/Linkin Park.'
+  };
+  const vaMap = {
+    'clean':'Clean vocals — sung melodic delivery; power metal / progressive / metalcore chorus tradition.',
+    'growl':'Growl vocals — guttural low-register death growl; Cookie Monster register, chest-cavity resonance.',
+    'scream':'Scream vocals — high-pitched shriek/banshee; black metal / hardcore emotional extremity.',
+    'harsh-clean-mix':'Harsh/clean mix — harsh verses + clean choruses or vice versa; metalcore dual-vocalist tradition.',
+    'operatic':'Operatic vocals — trained classical technique over metal; symphonic metal / Nightwish / power metal lineage.'
+  };
+  const gtMap = {
+    'palm-mute-tremolo':'Palm-mute tremolo — thrash-style rhythmic palm-muted chugging with tremolo-picked sections; speed and precision focus.',
+    'drop-tuned-chug':'Drop-tuned chug — heavy detuned (drop D, B, A) chugging riffs; nu-metal/djent low-end heaviness.',
+    'shred-solo':'Shred solo — virtuosic lead guitar breaks; sweep picking, tapping, modal runs; guitar-hero foreground moments.',
+    'sludgy-doom-riff':'Sludgy doom riff — slow heavy detuned riffs with distortion and feedback; doom/sludge weight.',
+    'djent-polyrhythm':'Djent polyrhythm — 7/8-string guitars playing polyrhythmic palm-muted patterns; Meshuggah/Periphery modern precision.',
+    'black-tremolo-wall':'Black tremolo wall — single-note tremolo picking creating a wall of texture; black metal atmospheric approach.'
+  };
+  const ltMap = {
+    'rage-aggression':'Rage/Aggression — direct anger, violence, confrontation; core metal emotional vocabulary.',
+    'mythology-fantasy':'Mythology/Fantasy — dragons, warriors, gods, fictional worlds; power/black metal epic narrative.',
+    'nihilism-void':'Nihilism/Void — meaninglessness, nothingness, existential horror; black metal / doom philosophical territory.',
+    'politics-war':'Politics/War — system critique, war horror, government corruption; thrash/crust tradition.',
+    'personal-pain':'Personal pain — depression, self-loathing, interior suffering; post-hardcore / emo-metal vulnerability.',
+    'occult-darkness':'Occult/Darkness — ritual, satanic imagery, gothic horror; black/death metal aesthetic language.'
+  };
+  const tfMap = {
+    'slow-crushing':'Slow crushing — 40–70 BPM; every beat weighted; doom/sludge crawling tempo.',
+    'mid-heavy-groove':'Mid heavy-groove — 90–110 BPM; headbanging pocket; Pantera/Lamb of God groove metal zone.',
+    'fast-aggressive':'Fast aggressive — 140–180 BPM; thrash/death standard; double-kick supported.',
+    'blast-beat-extreme':'Blast-beat extreme — 200+ BPM with blast-beat drum pattern; extreme metal velocity.',
+    'shifting-prog':'Shifting prog — multiple tempos in one song; progressive metal through-composed structure.'
+  };
+  const gtArr = Array.isArray(dims.guitarTechnique) ? dims.guitarTechnique : [dims.guitarTechnique].filter(Boolean);
+  const ltArr = Array.isArray(dims.lyricTerritory)  ? dims.lyricTerritory  : [dims.lyricTerritory].filter(Boolean);
+  const parts = [];
+  if (sgMap[dims.subgenre])        parts.push(`• SUBGENRE: ${sgMap[dims.subgenre]}`);
+  if (vaMap[dims.vocalApproach])   parts.push(`• VOCAL: ${vaMap[dims.vocalApproach]}`);
+  if (gtArr.length)                parts.push(`• GUITAR: ${gtArr.map(v => gtMap[v]).filter(Boolean).join(' / ')}`);
+  if (ltArr.length)                parts.push(`• LYRIC: ${ltArr.map(v => ltMap[v]).filter(Boolean).join(' / ')}`);
+  if (tfMap[dims.tempoFeel])       parts.push(`• TEMPO: ${tfMap[dims.tempoFeel]}`);
+  return parts.length ? `\n\nMETAL CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildJazzDimBlock(dims) {
+  if (!dims) return '';
+  const esMap = {
+    'swing-era':'Swing era — 1930s-40s big-band tradition; Ellington/Basie/Armstrong; 4-to-the-bar rhythm section, riff-based arrangements.',
+    'bebop':'Bebop — 1940s Parker/Gillespie revolution; fast tempo, complex chromatic melodies, head-solo-head form.',
+    'cool-jazz':'Cool jazz — 1950s Miles/Mulligan/MJQ; relaxed tempos, lyrical restraint, West Coast understatement.',
+    'hard-bop':'Hard bop — 1950s Art Blakey/Horace Silver; blues + gospel injected back into bebop; visceral and sophisticated.',
+    'modal':'Modal — post-Kind-of-Blue; static modal vamps instead of changes; Coltrane "My Favorite Things" territory.',
+    'free-jazz':'Free jazz — Ornette/late Coltrane/Ayler; no fixed meter/key/changes; improvisational liberation.',
+    'fusion':'Fusion — 1970s Miles Electric/Weather Report/Mahavishnu; jazz + rock + electric instruments.',
+    'contemporary':'Contemporary — modern jazz idiom; Snarky Puppy/Kamasi/Robert Glasper; genre-crossing, hip-hop aware.'
+  };
+  const emMap = {
+    'solo':'Solo jazz — single instrument; pianist or guitarist playing full harmonic and melodic statement alone.',
+    'duo':'Duo — two instruments; maximum intimacy, often voice+piano or piano+bass conversations.',
+    'trio':'Trio — piano/bass/drums standard; Oscar Peterson / Bill Evans / Keith Jarrett trio formats.',
+    'quartet':'Quartet — classic jazz unit; horn + rhythm section (piano/bass/drums); Coltrane Classic Quartet scale.',
+    'big-band':'Big band — 15+ piece ensemble; brass/reed sections with rhythm; arranged charts dominate improvisation.'
+  };
+  const iaMap = {
+    'standard-changes':'Standard changes — improvising over written chord progression; bebop tradition; melodic invention within constraint.',
+    'modal-vamp':'Modal vamp — extended improvisation over single mode/chord; Coltrane "Impressions" territory.',
+    'free-open':'Free open — no pre-determined harmonic/rhythmic structure; pure collective improvisation.',
+    'outside-chromatic':'Outside chromatic — deliberate dissonance against changes; playing outside the key as expressive choice.',
+    'head-only-minimal':'Head-only minimal — play the melody, minimal improvisation; composition-forward jazz.'
+  };
+  const soMap = {
+    'great-american-standard':'Great American Standard — pre-1960 pop song tradition (Gershwin/Porter/Kern); the canonical jazz repertoire.',
+    'original-composition':'Original composition — band-authored piece; modern jazz norm; not a cover of a standard.',
+    'blues-form':'Blues form — 12-bar blues structure; shared vocabulary across eras; Duke Ellington to Charlie Parker to Miles Davis.',
+    'rhythm-changes':'Rhythm changes — 32-bar AABA form from Gershwin\'s "I Got Rhythm"; second-most-used jazz structure after blues.',
+    'jazz-samba':'Jazz samba — bossa/samba Brazilian tradition integrated into jazz (Getz/Gilberto / Jobim collaborations).'
+  };
+  const vtMap = {
+    'instrumental-only':'Instrumental only — no vocal; pure jazz-instrumental tradition.',
+    'crooner-ballad':'Crooner ballad — Sinatra/Bennett/Fitzgerald ballad delivery; rubato phrasing, lyric as primary focus.',
+    'bebop-scat':'Bebop/scat — improvised vocal lines using syllables as instrumental substitute; Fitzgerald/Vaughan bebop phrasing.',
+    'vocalese-storytell':'Vocalese — lyrics written to instrumental solos; Lambert/Hendricks/Ross / Jon Hendricks lineage.',
+    'modern-hybrid':'Modern hybrid — contemporary jazz vocal; Cécile McLorin Salvant / Gregory Porter / Kurt Elling.'
+  };
+  const iaArr = Array.isArray(dims.improvisationApproach) ? dims.improvisationApproach : [dims.improvisationApproach].filter(Boolean);
+  const parts = [];
+  if (esMap[dims.eraSchool])            parts.push(`• SCHOOL: ${esMap[dims.eraSchool]}`);
+  if (emMap[dims.ensembleSize])         parts.push(`• ENSEMBLE: ${emMap[dims.ensembleSize]}`);
+  if (iaArr.length)                     parts.push(`• IMPROV: ${iaArr.map(v => iaMap[v]).filter(Boolean).join(' / ')}`);
+  if (soMap[dims.standardOrOriginal])   parts.push(`• REPERTOIRE: ${soMap[dims.standardOrOriginal]}`);
+  if (vtMap[dims.vocalTradition])       parts.push(`• VOCAL: ${vtMap[dims.vocalTradition]}`);
+  return parts.length ? `\n\nJAZZ CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
+}
+
+function buildPunkDimBlock(dims) {
+  if (!dims) return '';
+  const ewMap = {
+    '77-uk-punk':'77 UK Punk — Sex Pistols/Clash/Buzzcocks; political anger + catchy hooks; snotty British accent tradition.',
+    '77-us-punk':'77 US Punk — Ramones/Television/Richard Hell; CBGBs NY scene; shorter songs, art-punk intellectualism.',
+    '80s-hardcore':'80s hardcore — Black Flag/Minor Threat/Bad Brains; faster/angrier than 77 punk; DIY ethic, scene-built.',
+    'pop-punk-90s':'Pop-punk 90s — Green Day/Offspring/Blink; major-key melodic sensibility, teenage-angst lyric, skate-scene aesthetic.',
+    'riot-grrrl':'Riot Grrrl — Bikini Kill/Bratmobile/Sleater-Kinney; feminist hardcore; female fury; 90s Olympia WA scene.',
+    'post-hardcore':'Post-hardcore — Fugazi/At the Drive-In/Jawbox; melodic and dynamic hardcore evolution; art-punk ambition.',
+    'modern-dance-punk':'Modern dance-punk — LCD Soundsystem/!!!/Rapture; 00s NYC dance-rock; punk ethos + disco groove.'
+  };
+  const lsMap = {
+    'political-protest':'Political protest — direct confrontation with systems, government, capitalism; Clash / Dead Kennedys tradition.',
+    'personal-outsider':'Personal outsider — alienation, social awkwardness, misfit identity; pop-punk core lyrical register.',
+    'nihilist-refuse':'Nihilist refuse — "no future" / "nothing matters" / rejection of meaning; UK 77 nihilistic posture.',
+    'joyful-sarcasm':'Joyful sarcasm — ironic detachment, wit as armor; Dead Milkmen / Descendents humorous punk tradition.',
+    'fuck-authority':'Fuck authority — direct oppositional lyric; cops, teachers, parents, bosses as named enemies.'
+  };
+  const taMap = {
+    'fast-two-minute':'Fast two-minute — 180+ BPM; under 2:30 song length; Ramones template; get in, explode, get out.',
+    'hardcore-blistering':'Hardcore blistering — 220+ BPM; blast-tempo; under 2 minutes; Minor Threat / Black Flag velocity.',
+    'midtempo-anthem':'Midtempo anthem — 140–160 BPM; sing-along sustainable energy; pop-punk chorus tradition.',
+    'surf-punk-bounce':'Surf-punk bounce — shuffle-feel 150-ish BPM; Dead Kennedys / Reverend Horton Heat groove.',
+    'slow-sludge':'Slow sludge — against punk orthodoxy; slow doom-adjacent punk tempo; Flipper / early Melvins.'
+  };
+  const pfMap = {
+    'raw-lo-fi':'Raw lo-fi — single-mic recording, tape hiss, amplifier bleed; Guided By Voices / cassette-demo aesthetic.',
+    'garage-demo':'Garage demo — basement recording, amateur performance, no overdubs; Jay Reatard / garage-punk authenticity.',
+    'punchy-mid-fi':'Punchy mid-fi — clean but not polished; early-90s indie; recorded-in-a-week punk album norm.',
+    'radio-ready':'Radio ready — pop-punk crossover polish; Green Day Dookie / Blink-182 Enema-era commercial mix.',
+    'modern-clean':'Modern clean — contemporary pro production; drum replacement, pitch correction; 00s+ mainstream punk sound.'
+  };
+  const vdMap = {
+    'shouted-sneer':'Shouted sneer — Rotten-style snotty delivery; vowels distorted with attitude, lyric spat not sung.',
+    'melodic-pop-punk':'Melodic pop-punk — sung melodic lines with punk attitude; Blink/Sum 41 chorus-forward singing.',
+    'screamed-hardcore':'Screamed hardcore — throat-damaged shout; Minor Threat / black Flag Henry Rollins intensity.',
+    'conversational-deadpan':'Conversational deadpan — spoken-adjacent delivery, flat affect; Lou Reed / Modest Mouse lineage.',
+    'female-fierce':'Female fierce — Kathleen Hanna / Corin Tucker register; scream-adjacent feminine rage.'
+  };
+  const lsArr = Array.isArray(dims.lyricStance) ? dims.lyricStance : [dims.lyricStance].filter(Boolean);
+  const parts = [];
+  if (ewMap[dims.eraWave])              parts.push(`• WAVE: ${ewMap[dims.eraWave]}`);
+  if (lsArr.length)                     parts.push(`• STANCE: ${lsArr.map(v => lsMap[v]).filter(Boolean).join(' / ')}`);
+  if (taMap[dims.tempoAggression])      parts.push(`• TEMPO: ${taMap[dims.tempoAggression]}`);
+  if (pfMap[dims.productionFidelity])   parts.push(`• PRODUCTION: ${pfMap[dims.productionFidelity]}`);
+  if (vdMap[dims.vocalDelivery])        parts.push(`• VOCAL: ${vdMap[dims.vocalDelivery]}`);
+  return parts.length ? `\n\nPUNK CRAFT DIMENSIONS — HARD CONSTRAINTS:\n${parts.join('\n')}` : '';
 }
 
 // ── Editor Prompt Builder ─────────────────────────────────────────────────────

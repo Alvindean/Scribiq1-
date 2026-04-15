@@ -3445,6 +3445,181 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
         </div>
       </div>
 
+      <!-- C7 — METAL -->
+      <div class="rl-dimensions" id="craft-dims-metal" style="display:none">
+        <div class="rl-dim-header">Metal — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-metal-subgenre">
+          <span class="rl-dim-label">Subgenre</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'metal','subgenre','thrash')">Thrash</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','death')">Death</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','black')">Black</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','doom')">Doom</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','power')">Power</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','metalcore')">Metalcore</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','progressive')">Progressive</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','subgenre','nu-metal')">Nu-Metal</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-metal-vocalApproach">
+          <span class="rl-dim-label">Vocal</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'metal','vocalApproach','clean')">Clean</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','vocalApproach','growl')">Growl</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','vocalApproach','scream')">Scream</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','vocalApproach','harsh-clean-mix')">Harsh/Clean Mix</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','vocalApproach','operatic')">Operatic</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-metal-guitarTechnique">
+          <span class="rl-dim-label">Guitar <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'metal','guitarTechnique','palm-mute-tremolo')">Palm-Mute / Tremolo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','guitarTechnique','drop-tuned-chug')">Drop-Tuned Chug</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','guitarTechnique','shred-solo')">Shred Solo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','guitarTechnique','sludgy-doom-riff')">Sludgy Doom</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','guitarTechnique','djent-polyrhythm')">Djent Polyrhythm</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','guitarTechnique','black-tremolo-wall')">Black Tremolo Wall</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-metal-lyricTerritory">
+          <span class="rl-dim-label">Lyric <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'metal','lyricTerritory','rage-aggression')">Rage / Aggression</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','lyricTerritory','mythology-fantasy')">Mythology</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','lyricTerritory','nihilism-void')">Nihilism</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','lyricTerritory','politics-war')">Politics / War</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','lyricTerritory','personal-pain')">Personal Pain</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','lyricTerritory','occult-darkness')">Occult</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-metal-tempoFeel">
+          <span class="rl-dim-label">Tempo</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','tempoFeel','slow-crushing')">Slow Crushing</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','tempoFeel','mid-heavy-groove')">Mid Heavy Groove</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'metal','tempoFeel','fast-aggressive')">Fast Aggressive</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','tempoFeel','blast-beat-extreme')">Blast Beat Extreme</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'metal','tempoFeel','shifting-prog')">Shifting Prog</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C7 — JAZZ -->
+      <div class="rl-dimensions" id="craft-dims-jazz" style="display:none">
+        <div class="rl-dim-header">Jazz — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-jazz-eraSchool">
+          <span class="rl-dim-label">School</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','swing-era')">Swing Era</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','bebop')">Bebop</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','cool-jazz')">Cool Jazz</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'jazz','eraSchool','hard-bop')">Hard Bop</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','modal')">Modal</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','free-jazz')">Free Jazz</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','fusion')">Fusion</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','eraSchool','contemporary')">Contemporary</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-jazz-ensembleSize">
+          <span class="rl-dim-label">Ensemble</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','ensembleSize','solo')">Solo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','ensembleSize','duo')">Duo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','ensembleSize','trio')">Trio</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'jazz','ensembleSize','quartet')">Quartet</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','ensembleSize','big-band')">Big Band</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-jazz-improvisationApproach">
+          <span class="rl-dim-label">Improv <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'jazz','improvisationApproach','standard-changes')">Standard Changes</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','improvisationApproach','modal-vamp')">Modal Vamp</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','improvisationApproach','free-open')">Free / Open</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','improvisationApproach','outside-chromatic')">Outside Chromatic</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','improvisationApproach','head-only-minimal')">Head-Only</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-jazz-standardOrOriginal">
+          <span class="rl-dim-label">Repertoire</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','standardOrOriginal','great-american-standard')">Great American Standard</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'jazz','standardOrOriginal','original-composition')">Original Composition</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','standardOrOriginal','blues-form')">Blues Form</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','standardOrOriginal','rhythm-changes')">Rhythm Changes</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','standardOrOriginal','jazz-samba')">Jazz Samba</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-jazz-vocalTradition">
+          <span class="rl-dim-label">Vocal</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'jazz','vocalTradition','instrumental-only')">Instrumental Only</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','vocalTradition','crooner-ballad')">Crooner Ballad</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','vocalTradition','bebop-scat')">Bebop / Scat</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','vocalTradition','vocalese-storytell')">Vocalese</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'jazz','vocalTradition','modern-hybrid')">Modern Hybrid</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- C7 — PUNK -->
+      <div class="rl-dimensions" id="craft-dims-punk" style="display:none">
+        <div class="rl-dim-header">Punk — Craft Dimensions</div>
+        <div class="rl-dim-row" id="crd-punk-eraWave">
+          <span class="rl-dim-label">Wave</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','eraWave','77-uk-punk')">77 UK Punk</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'punk','eraWave','77-us-punk')">77 US Punk</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','eraWave','80s-hardcore')">80s Hardcore</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','eraWave','pop-punk-90s')">Pop-Punk 90s</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','eraWave','riot-grrrl')">Riot Grrrl</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','eraWave','post-hardcore')">Post-Hardcore</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','eraWave','modern-dance-punk')">Dance-Punk</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-punk-lyricStance">
+          <span class="rl-dim-label">Stance <span style="font-size:10px;font-weight:400;opacity:.55">(multi)</span></span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','lyricStance','political-protest')">Political Protest</span>
+            <span class="rl-dpill on" onclick="setCraftDim(this,'punk','lyricStance','personal-outsider')">Personal Outsider</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','lyricStance','nihilist-refuse')">Nihilist Refuse</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','lyricStance','joyful-sarcasm')">Joyful Sarcasm</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','lyricStance','fuck-authority')">Fuck Authority</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-punk-tempoAggression">
+          <span class="rl-dim-label">Tempo</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'punk','tempoAggression','fast-two-minute')">Fast / Two-Minute</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','tempoAggression','hardcore-blistering')">Hardcore Blistering</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','tempoAggression','midtempo-anthem')">Midtempo Anthem</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','tempoAggression','surf-punk-bounce')">Surf-Punk Bounce</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','tempoAggression','slow-sludge')">Slow Sludge</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-punk-productionFidelity">
+          <span class="rl-dim-label">Production</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'punk','productionFidelity','raw-lo-fi')">Raw Lo-Fi</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','productionFidelity','garage-demo')">Garage Demo</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','productionFidelity','punchy-mid-fi')">Punchy Mid-Fi</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','productionFidelity','radio-ready')">Radio Ready</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','productionFidelity','modern-clean')">Modern Clean</span>
+          </div>
+        </div>
+        <div class="rl-dim-row" id="crd-punk-vocalDelivery">
+          <span class="rl-dim-label">Vocal</span>
+          <div class="rl-dim-pills">
+            <span class="rl-dpill on" onclick="setCraftDim(this,'punk','vocalDelivery','shouted-sneer')">Shouted Sneer</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','vocalDelivery','melodic-pop-punk')">Melodic Pop-Punk</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','vocalDelivery','screamed-hardcore')">Screamed Hardcore</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','vocalDelivery','conversational-deadpan')">Conversational Deadpan</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'punk','vocalDelivery','female-fierce')">Female Fierce</span>
+          </div>
+        </div>
+      </div>
+
       <!-- ═══════ END GENRE CRAFT DIMENSION PANELS ═══════ -->
 
       <!-- ADVANCED SETTINGS ACCORDION -->
