@@ -84,16 +84,21 @@ src = patch(src,
   'insert breathwork block'
 );
 
-// Regex-based: works regardless of what the last export is
-const origSrc = src;
-src = src.replace(
-  /(module\.exports\s*=\s*\{[^\n]+?)\s*\};/,
-  '$1, BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };'
-);
-if (src === origSrc) {
-  console.error('\nFAIL - module.exports line not found');
+// Line-based: split, find, and patch the module.exports line
+const lines = src.split('\n');
+const modIdx = lines.findIndex(l => l.trim().startsWith('module.exports'));
+if (modIdx === -1) {
+  console.error('\nFAIL - no module.exports line found in file');
   process.exit(1);
 }
+const modLine = lines[modIdx];
+console.log('Exports line tail: ...' + modLine.slice(-70));
+if (!modLine.trimEnd().endsWith('};')) {
+  console.error('\nFAIL - module.exports line ends with: ' + JSON.stringify(modLine.slice(-15)));
+  process.exit(1);
+}
+lines[modIdx] = modLine.trimEnd().slice(0, -2) + ', BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };';
+src = lines.join('\n');
 console.log('OK: update module.exports');
 
 src = patch(src,
