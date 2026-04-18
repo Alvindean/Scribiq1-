@@ -84,11 +84,17 @@ src = patch(src,
   'insert breathwork block'
 );
 
-src = patch(src,
-  'buildVocalStackNote };',
-  'buildVocalStackNote, BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };',
-  'update module.exports'
+// Regex-based: works regardless of what the last export is
+const origSrc = src;
+src = src.replace(
+  /(module\.exports\s*=\s*\{[^\n]+?)\s*\};/,
+  '$1, BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };'
 );
+if (src === origSrc) {
+  console.error('\nFAIL - module.exports line not found');
+  process.exit(1);
+}
+console.log('OK: update module.exports');
 
 src = patch(src,
   '3. Bridge/Outro: [contrast scene or final visual statement]`;\n\n  return { system, prompt };\n}\n\nfunction buildLuckyPrompt',
