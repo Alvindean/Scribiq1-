@@ -85,8 +85,8 @@ src = patch(src,
 );
 
 src = patch(src,
-  ', buildEdgeNote };',
-  ', buildEdgeNote, BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };',
+  'buildVocalStackNote };',
+  'buildVocalStackNote, BREATH_TECHNIQUES_10, BREATH_PROFILES, buildSingerNotesInstruction };',
   'update module.exports'
 );
 
