@@ -119,5 +119,17 @@ src = patch(src,
   'buildRapLabPrompt inject'
 );
 
+src = patch(src,
+  'It should appear verbatim in the chorus and be the emotional thesis of the song.',
+  'It MUST appear verbatim, word-for-word, unedited, as the opening or closing line of the chorus. This is non-negotiable. Do not paraphrase, do not alter a single word.',
+  'seedLineNote harden'
+);
+
+src = patch(src,
+  'LYRICS:\n[Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE',
+  "LYRICS:\n${_cleanSeed ? '\\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\\n' : ''}[Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE",
+  'seedLineNote LYRICS echo'
+);
+
 fs.writeFileSync(FILE, src, 'utf8');
-console.log('\nDone. All 5 patches applied.');
+console.log('\nDone. All 7 patches applied.');
