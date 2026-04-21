@@ -16,6 +16,7 @@ import {
   Loader2,
   Check,
 } from "lucide-react";
+import { VOICES, DEFAULT_VOICE_ID } from "@/lib/elevenlabs/voices";
 
 export function PropertyPanel() {
   const {
@@ -37,6 +38,7 @@ export function PropertyPanel() {
   const [durationSaving, setDurationSaving] = useState(false);
   const [durationSaved, setDurationSaved] = useState(false);
   const [voiceoverError, setVoiceoverError] = useState<string | null>(null);
+  const [selectedVoiceId, setSelectedVoiceId] = useState<string>(DEFAULT_VOICE_ID);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
@@ -91,7 +93,7 @@ export function PropertyPanel() {
       const res = await fetch("/api/voiceover", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lessonId: selectedLesson.id, text }),
+        body: JSON.stringify({ lessonId: selectedLesson.id, text, voiceId: selectedVoiceId }),
       });
 
       const data = (await res.json()) as { url?: string; error?: string };
@@ -224,6 +226,47 @@ export function PropertyPanel() {
           value="voice"
           className="flex-1 flex flex-col px-3 pb-3 mt-3 gap-4"
         >
+          {/* Voice picker */}
+          <div className="flex flex-col gap-2">
+            <p className="text-xs font-medium text-zinc-400">Select Voice</p>
+            <div className="flex flex-col gap-1.5">
+              {VOICES.map((voice) => (
+                <button
+                  key={voice.id}
+                  type="button"
+                  onClick={() => setSelectedVoiceId(voice.id)}
+                  className={`flex items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition-colors ${
+                    selectedVoiceId === voice.id
+                      ? "border-violet-500 bg-violet-500/10"
+                      : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+                  }`}
+                >
+                  <div
+                    className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-xs font-bold ${
+                      voice.gender === "female"
+                        ? "bg-pink-500/20 text-pink-400"
+                        : "bg-blue-500/20 text-blue-400"
+                    }`}
+                  >
+                    {voice.label[0]}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-zinc-200 leading-tight">
+                      {voice.label}
+                      <span className="ml-1.5 text-[10px] font-normal text-zinc-500 uppercase tracking-wide">
+                        {voice.gender}
+                      </span>
+                    </p>
+                    <p className="text-xs text-zinc-500 truncate">{voice.description}</p>
+                  </div>
+                  {selectedVoiceId === voice.id && (
+                    <Check className="w-4 h-4 text-violet-400 shrink-0 ml-auto" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <Button
             onClick={handleGenerateVoiceover}
             disabled={isGenerating}
@@ -276,7 +319,7 @@ export function PropertyPanel() {
           )}
 
           {!selectedLesson.voiceoverUrl && !voiceoverError && (
-            <p className="text-xs text-zinc-600 text-center py-4">
+            <p className="text-xs text-zinc-600 text-center py-2">
               No voiceover generated yet.
             </p>
           )}
