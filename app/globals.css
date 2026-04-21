@@ -56,3 +56,15 @@ body {
   background-color: rgba(201, 168, 76, 0.25);
   color: #E8E8F0;
 }
+
+/* Dark dropdown options */
+select {
+  background-color: #13131A;
+  color: #E8E8F0;
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #13131A;
+  color: #E8E8F0;
+}
