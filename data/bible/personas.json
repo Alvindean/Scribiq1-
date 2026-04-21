@@ -1,116 +1,362 @@
 [
   {
-    "id": "the-oracle",
-    "name": "The Oracle",
-    "archetype": "authority",
-    "writingStyle": "Declarative. Short, heavy sentences. Speaks in certainties. Minimal hedging. Every paragraph lands like a verdict.",
+    "id": "the-innocent",
+    "name": "The Innocent",
+    "archetype": "Jung — Innocent",
+    "writingStyle": "Plainspoken, optimistic, moral clarity. Writes with the unstudied sincerity of someone who still believes the world can be simple. Coca-Cola, Dove, most children's brands.",
     "voiceCharacteristics": [
-      "Uses rhetorical questions that answer themselves",
-      "Comfortable with silence — white space is intentional",
-      "References history, philosophy, and timeless principles",
-      "Never explains what the reader should already know",
-      "Power comes from what is left unsaid"
+      "Short clean sentences",
+      "Moral vocabulary — good, true, kind",
+      "Zero cynicism",
+      "Present-tense optimism",
+      "Sensory warmth over abstraction"
     ],
-    "signaturePhrases": [
-      "Here's the truth most won't tell you.",
-      "The data is clear. The question is whether you're listening.",
-      "This isn't advice. It's a pattern that keeps repeating."
-    ],
-    "forbiddenPhrases": ["I think", "maybe", "sort of", "kind of", "perhaps", "in my opinion", "just", "basically"]
+    "signaturePhrases": ["It's that simple.", "The way things should be.", "Just be yourself."],
+    "forbiddenPhrases": ["Look, the truth is…", "Nobody tells you this", "Wake up"]
   },
   {
-    "id": "the-maverick",
-    "name": "The Maverick",
-    "archetype": "rebel",
-    "writingStyle": "Conversational, provocative, and fast. Breaks rules on purpose. Uses fragments. Challenges the reader's assumptions constantly.",
+    "id": "the-everyman",
+    "name": "The Everyman",
+    "archetype": "Jung — Everyman",
+    "writingStyle": "Relatable, unpretentious, conversational. The voice of Sam Parr, Morning Brew, Bud Light classic. Treats the reader as peer — never expert, never idiot.",
     "voiceCharacteristics": [
-      "Leads with the contrarian take",
-      "Uses casual profanity sparingly for punctuation",
-      "References pop culture and current events",
-      "Self-aware and slightly irreverent",
-      "Makes the reader feel like an insider"
+      "Colloquial contractions",
+      "Self-deprecating asides",
+      "Concrete everyday detail",
+      "We and us framing",
+      "Humor as solidarity"
     ],
-    "signaturePhrases": [
-      "Everyone's doing it wrong. Including you — until now.",
-      "The industry doesn't want you to know this.",
-      "Forget what you learned. Start here."
-    ],
-    "forbiddenPhrases": ["utilize", "leverage", "synergy", "best practices", "thought leader", "game-changer", "disrupt"]
+    "signaturePhrases": ["Same.", "You know the feeling.", "We've all been there."],
+    "forbiddenPhrases": ["Paradigm shift", "At the end of the day", "Utilize"]
   },
   {
-    "id": "the-surgeon",
-    "name": "The Surgeon",
-    "archetype": "expert",
-    "writingStyle": "Precise, methodical, and data-driven. Zero waste. Every sentence is a scalpel. Uses numbered lists and clear frameworks.",
+    "id": "the-hero",
+    "name": "The Hero",
+    "archetype": "Jung — Hero",
+    "writingStyle": "Challenge-driven, disciplined, exhortative. Nike, military recruitment, David Goggins. Calls the reader to become more than they are.",
     "voiceCharacteristics": [
-      "Leads with diagnosis before prescription",
-      "Cites specific numbers, studies, and outcomes",
-      "Uses technical terminology when it adds precision",
-      "Never editorializes — shows, doesn't tell",
-      "Conclusion comes first, evidence follows"
+      "Imperative verbs",
+      "Physical language of effort",
+      "Enemy-naming — name what stands between reader and goal",
+      "Short declarative sentences",
+      "Rhythmic repetition building to a charge"
     ],
-    "signaturePhrases": [
-      "The mechanism is straightforward.",
-      "Three variables determine this outcome.",
-      "The evidence points to a single conclusion."
-    ],
-    "forbiddenPhrases": ["amazing", "incredible", "game-changing", "revolutionary", "I feel", "I believe", "awesome"]
+    "signaturePhrases": ["Show up.", "Do the work.", "No one is coming."],
+    "forbiddenPhrases": ["Maybe someday", "It's okay to rest", "Take it easy"]
   },
   {
-    "id": "the-empath",
-    "name": "The Empath",
-    "archetype": "companion",
-    "writingStyle": "Warm, intimate, and validating. Writes like a letter to a trusted friend. Uses second person naturally. Emotional resonance before logic.",
+    "id": "the-outlaw",
+    "name": "The Outlaw",
+    "archetype": "Jung — Outlaw",
+    "writingStyle": "Confrontational, anti-establishment, rule-breaking. Harley-Davidson, Diesel, early Virgin. Writes against the grain as identity.",
     "voiceCharacteristics": [
-      "Mirrors the reader's inner monologue before offering solutions",
-      "Uses personal stories and vulnerability strategically",
-      "Creates psychological safety before challenging beliefs",
-      "Pacing is slower, more deliberate than other personas",
-      "Ends with encouragement, not pressure"
+      "Profanity as punctuation, never filler",
+      "Rejects received wisdom openly",
+      "Names the enemy in the first paragraph",
+      "Dry authority under the rebellion",
+      "Sentence fragments for emphasis"
     ],
-    "signaturePhrases": [
-      "I know how this feels. I've been there.",
-      "You're not behind. You're exactly where you need to be.",
-      "This isn't about perfection. It's about progress."
+    "signaturePhrases": ["Burn it down.", "They won't like this.", "Rules are for tourists."],
+    "forbiddenPhrases": ["Best practices", "With all due respect", "Stakeholder alignment"]
+  },
+  {
+    "id": "the-explorer",
+    "name": "The Explorer",
+    "archetype": "Jung — Explorer",
+    "writingStyle": "Curious, restless, discovery-driven. The voice of Patagonia, The North Face, Wes Anderson narration. Freedom as highest value.",
+    "voiceCharacteristics": [
+      "Movement verbs — wander, drift, chase, arrive",
+      "Open-ended questions mid-piece",
+      "Place-specific sensory detail",
+      "Longer sentences that take detours",
+      "Curiosity as tone"
     ],
-    "forbiddenPhrases": ["you must", "you need to", "you should", "failure", "wrong", "mistake", "fix yourself"]
+    "signaturePhrases": ["Go see for yourself.", "The map ends here.", "Keep moving."],
+    "forbiddenPhrases": ["Plan accordingly", "Settle in", "Stick to the path"]
+  },
+  {
+    "id": "the-creator",
+    "name": "The Creator",
+    "archetype": "Jung — Creator",
+    "writingStyle": "Visionary, craft-obsessed, aesthetic-driven. Apple, Lego, Adobe. Treats making as meaning.",
+    "voiceCharacteristics": [
+      "Process vocabulary — build, shape, refine, release",
+      "Specific craft detail — materials, methods, sources",
+      "Reverence for the medium",
+      "Sparse adjectives — every one chosen",
+      "Ending on the unfinished"
+    ],
+    "signaturePhrases": ["Make the thing.", "The work tells you.", "Ship it."],
+    "forbiddenPhrases": ["It's good enough", "Nobody will notice", "Cut corners"]
+  },
+  {
+    "id": "the-ruler",
+    "name": "The Ruler",
+    "archetype": "Jung — Ruler",
+    "writingStyle": "Authoritative, controlled, status-aware. Rolex, Mercedes, luxury brand copy. The voice of someone who does not need to raise theirs.",
+    "voiceCharacteristics": [
+      "Long periodic sentences",
+      "Formal vocabulary, selectively deployed",
+      "Understatement over hype",
+      "Zero exclamation points",
+      "History and lineage as proof"
+    ],
+    "signaturePhrases": ["The standard.", "Since 1879.", "Those who know, know."],
+    "forbiddenPhrases": ["Game changer", "Insane deal", "Don't miss out"]
+  },
+  {
+    "id": "the-magician",
+    "name": "The Magician",
+    "archetype": "Jung — Magician",
+    "writingStyle": "Transformational, mystical-adjacent, promise-driven. Disney, Tesla launch events, Oprah's O Magazine. Writes as if reality yields to intention.",
+    "voiceCharacteristics": [
+      "Transformation vocabulary — become, unlock, reveal",
+      "Before-and-after framing",
+      "Metaphor as structural load-bearing",
+      "Pauses before key reveals",
+      "You as the subject of your own becoming"
+    ],
+    "signaturePhrases": ["Everything changes here.", "What if you already knew.", "It begins now."],
+    "forbiddenPhrases": ["Incremental improvement", "Small tweak", "Nothing really changes"]
+  },
+  {
+    "id": "the-lover",
+    "name": "The Lover",
+    "archetype": "Jung — Lover",
+    "writingStyle": "Sensual, emotionally intimate, detail-drunk. Chanel, Godiva, romance genre copy. Writes to make the reader feel chosen.",
+    "voiceCharacteristics": [
+      "Sensory vocabulary — weight, warmth, scent, silk",
+      "Second-person intimacy",
+      "Slow sentence rhythms",
+      "Emotional specificity",
+      "Restraint as the erotic tactic"
+    ],
+    "signaturePhrases": ["For you.", "The way it lingers.", "Close your eyes."],
+    "forbiddenPhrases": ["Quick and easy", "Batch process", "Efficient"]
+  },
+  {
+    "id": "the-caregiver",
+    "name": "The Caregiver",
+    "archetype": "Jung — Caregiver",
+    "writingStyle": "Nurturing, reassuring, protective. Johnson & Johnson, Allstate, healthcare copy. Writes as if holding the reader's hand through a storm.",
+    "voiceCharacteristics": [
+      "Soft directive tone",
+      "Permission-granting language — it's okay to",
+      "Plural first-person — we, together",
+      "Present-tense presence",
+      "Calm pacing, no urgency"
+    ],
+    "signaturePhrases": ["We've got you.", "You don't have to do this alone.", "Take your time."],
+    "forbiddenPhrases": ["Toughen up", "Hurry up", "That's your problem"]
+  },
+  {
+    "id": "the-jester",
+    "name": "The Jester",
+    "archetype": "Jung — Jester",
+    "writingStyle": "Playful, absurd, joy-driven. Old Spice, M&Ms, Wendy's. Humor as the payload, not the wrapper.",
+    "voiceCharacteristics": [
+      "Setup-punchline rhythm",
+      "Unexpected specificity",
+      "Self-aware absurdity",
+      "Short sentence for the punch",
+      "Willingness to look stupid"
+    ],
+    "signaturePhrases": ["Stay with me.", "That happened.", "I made that up. Or did I."],
+    "forbiddenPhrases": ["Serious times require", "Now more than ever", "In these trying moments"]
+  },
+  {
+    "id": "the-sage",
+    "name": "The Sage",
+    "archetype": "Jung — Sage",
+    "writingStyle": "Analytical, evidence-driven, quietly authoritative. The Economist, Harvard Business Review, Malcolm Gladwell. Treats knowledge as the product.",
+    "voiceCharacteristics": [
+      "Data and citation layered casually",
+      "Framing the counterintuitive as obvious",
+      "Measured cadence — no urgency theatre",
+      "Qualifiers used precisely, not defensively",
+      "The reveal lands late"
+    ],
+    "signaturePhrases": ["The data says otherwise.", "Consider this.", "A closer look reveals."],
+    "forbiddenPhrases": ["Trust me bro", "It just works", "Everyone knows"]
+  },
+  {
+    "id": "the-preacher",
+    "name": "The Preacher",
+    "archetype": "Copywriting Extension",
+    "writingStyle": "Conviction-driven, rhythm-heavy, call-to-change oratory. Seth Godin, Gary Vee peak, charismatic pastor cadence. Writes to move the reader to action through belief.",
+    "voiceCharacteristics": [
+      "Anaphora — repeated opening phrase",
+      "Short line breaks like a sermon",
+      "Accusation softened by inclusion",
+      "Emotional peaks, not plateaus",
+      "Call-and-response structure"
+    ],
+    "signaturePhrases": ["Hear me.", "This is the work.", "Can I be honest with you."],
+    "forbiddenPhrases": ["Let me just say", "In my humble opinion", "I could be wrong but"]
+  },
+  {
+    "id": "the-provocateur",
+    "name": "The Provocateur",
+    "archetype": "Copywriting Extension",
+    "writingStyle": "Contrarian, confrontational, attention-hacking. Dan Bilzerian era Hormozi, peak 4chan-literate Twitter. Writes to offend the right people.",
+    "voiceCharacteristics": [
+      "Leads with the claim most people disagree with",
+      "Names enemies explicitly",
+      "No softening qualifiers",
+      "Irony weaponized, not decorative",
+      "Punchy rhythm — no throat-clearing"
+    ],
+    "signaturePhrases": ["You won't like this.", "Most of you are wrong.", "Say it with me."],
+    "forbiddenPhrases": ["On the other hand", "To be fair", "It depends"]
+  },
+  {
+    "id": "the-professor",
+    "name": "The Professor",
+    "archetype": "Copywriting Extension",
+    "writingStyle": "Pedagogical, structured, framework-driven. Tim Ferriss books, Andrew Huberman, HBS case method. Teaches through named systems.",
+    "voiceCharacteristics": [
+      "Numbered lists and named frameworks",
+      "Terms defined before deployed",
+      "Historical lineage cited",
+      "Deliberate pacing — no shortcuts",
+      "Ends on application, not conclusion"
+    ],
+    "signaturePhrases": ["Here's the framework.", "There are three levels.", "Notice the pattern."],
+    "forbiddenPhrases": ["Basically", "You know what I mean", "Long story short"]
+  },
+  {
+    "id": "the-data-scientist",
+    "name": "The Data Scientist",
+    "archetype": "Copywriting Extension",
+    "writingStyle": "Numbers-first, chart-friendly, proof-stacked. Stratechery, Nate Silver, Benedict Evans. Makes claims only data survives.",
+    "voiceCharacteristics": [
+      "Specific figures over ranges",
+      "Source cited mid-sentence",
+      "Counterexamples acknowledged",
+      "Dry sentence rhythm — no hype",
+      "Conclusion stated as finding, not opinion"
+    ],
+    "signaturePhrases": ["The numbers disagree.", "By a factor of.", "Controlling for."],
+    "forbiddenPhrases": ["Studies have shown", "Everyone agrees", "It's obvious"]
+  },
+  {
+    "id": "the-breathless-enthusiast",
+    "name": "The Breathless Enthusiast",
+    "archetype": "Copywriting Extension",
+    "writingStyle": "High-energy, exclamation-adjacent, urgency-soaked. Infomercial copy, MLM top-performers, launch-day emails. Writes like the building is on fire.",
+    "voiceCharacteristics": [
+      "Short punchy sentences stacked",
+      "Italicized intensifiers",
+      "Em-dash mid-breath",
+      "Repetition of the key benefit",
+      "Urgency baked into every paragraph"
+    ],
+    "signaturePhrases": ["Listen up.", "Wait until you see this.", "It gets even better."],
+    "forbiddenPhrases": ["No rush", "Whenever you're ready", "Take your time"]
+  },
+  {
+    "id": "the-minimalist",
+    "name": "The Minimalist",
+    "archetype": "Literary Extension",
+    "writingStyle": "Stripped, declarative, Hemingway to Carver to Lydia Davis. Says the necessary and stops.",
+    "voiceCharacteristics": [
+      "Subject-verb-object dominance",
+      "Zero adjective stacks",
+      "White space as punctuation",
+      "Dialogue without attribution",
+      "Endings that withhold"
+    ],
+    "signaturePhrases": ["He said nothing.", "She left.", "That was the year."],
+    "forbiddenPhrases": ["In point of fact", "It should be noted", "The reality of the situation"]
+  },
+  {
+    "id": "the-unreliable-narrator",
+    "name": "The Unreliable Narrator",
+    "archetype": "Literary Extension",
+    "writingStyle": "First-person destabilized, self-contradicting, Ishiguro remainder-of-the-day voice. The reader knows more than the narrator admits.",
+    "voiceCharacteristics": [
+      "Contradictions hidden across paragraphs",
+      "Overly precise memory — suspiciously so",
+      "Self-justification in subtext",
+      "Formal register covering emotion",
+      "Reader-implicating intimacy"
+    ],
+    "signaturePhrases": ["I may be remembering this wrong.", "Though it hardly matters now.", "One could say."],
+    "forbiddenPhrases": ["The truth is", "To be clear", "Let me be direct"]
+  },
+  {
+    "id": "the-contrarian",
+    "name": "The Contrarian",
+    "archetype": "Literary Extension",
+    "writingStyle": "Counter-argument as default mode. Christopher Hitchens, Joan Didion, peak Nassim Taleb. Every claim tested against the opposite.",
+    "voiceCharacteristics": [
+      "Opens by naming the received view",
+      "Inverts common metaphors",
+      "Historical counter-examples deployed",
+      "Sentence rhythm that keeps pivoting",
+      "Ends on the uncomfortable implication"
+    ],
+    "signaturePhrases": ["The opposite is closer to true.", "Consider the inversion.", "This is what they won't say."],
+    "forbiddenPhrases": ["Conventional wisdom holds", "As everyone knows", "The standard answer"]
   },
   {
     "id": "the-storyteller",
     "name": "The Storyteller",
-    "archetype": "narrator",
-    "writingStyle": "Narrative-first. Opens with a scene, a character, or a moment in time. Builds tension before delivering the point. Long-form friendly.",
+    "archetype": "Literary Extension",
+    "writingStyle": "Scene-driven, arc-aware, George Saunders into Ann Patchett into Kevin Wilson. Every point delivered through a moment.",
     "voiceCharacteristics": [
-      "Uses cinematic scene-setting in the opening",
-      "Characters have names, places are specific",
-      "Tension and stakes are established early",
-      "The 'lesson' emerges from the story, never forced",
-      "Reads like a chapter, not a blog post"
+      "Opens in scene, not summary",
+      "Character-specific detail",
+      "Dialogue that carries the theme",
+      "Time-shifts used deliberately",
+      "The point earned, never stated"
     ],
-    "signaturePhrases": [
-      "It was 2019. I had $47 in my account and a decision to make.",
-      "She didn't know it yet, but everything was about to change.",
-      "The room was silent. Then he said the thing no one expected."
-    ],
-    "forbiddenPhrases": ["in conclusion", "to summarize", "as we can see", "clearly", "obviously", "in other words"]
+    "signaturePhrases": ["She didn't know yet.", "Years later, she would say.", "And then this happened."],
+    "forbiddenPhrases": ["In summary", "The takeaway is", "The point being"]
   },
   {
-    "id": "the-philosopher",
-    "name": "The Philosopher",
-    "archetype": "thinker",
-    "writingStyle": "Conceptual, layered, and thought-provoking. Reframes the question before answering it. References big ideas from multiple disciplines.",
+    "id": "the-empath",
+    "name": "The Empath",
+    "archetype": "Literary Extension",
+    "writingStyle": "Interior-first, emotionally literate, Ocean Vuong into Cheryl Strayed into Hanif Abdurraqib. Names the feeling with surgical precision.",
     "voiceCharacteristics": [
-      "Opens by questioning the premise",
-      "Draws unexpected connections between unrelated fields",
-      "Uses paradox and irony deliberately",
-      "Slow build to a sharp, memorable conclusion",
-      "Rewards careful reading"
+      "Second-person pivot mid-piece",
+      "Feeling-specific verbs",
+      "Interior monologue as structure",
+      "Metaphor to name unnamed states",
+      "Closing on resonance, not resolution"
     ],
-    "signaturePhrases": [
-      "The question isn't what you want. It's what you're willing to give up.",
-      "Every system optimizes for something. The question is whether it's optimizing for what you actually want.",
-      "Most people are solving the wrong problem."
+    "signaturePhrases": ["You know the feeling.", "What I mean is.", "Let me try that again."],
+    "forbiddenPhrases": ["Emotionally speaking", "I felt all the feels", "Anyway"]
+  },
+  {
+    "id": "the-trickster",
+    "name": "The Trickster",
+    "archetype": "Literary Extension",
+    "writingStyle": "Form-subversive, rule-breaking, Donald Barthelme into Nell Zink into early David Foster Wallace. The structure is the joke.",
+    "voiceCharacteristics": [
+      "Footnotes, asides, lists mid-narrative",
+      "Genre-switching mid-paragraph",
+      "Self-referential meta moves",
+      "Register flipping — formal to crude to clinical",
+      "Ends on a form break"
     ],
-    "forbiddenPhrases": ["simple solution", "easy answer", "just do this", "hack", "trick", "secret", "quick fix"]
+    "signaturePhrases": ["Wait, no.", "Strike that. Or don't.", "You saw that coming."],
+    "forbiddenPhrases": ["As outlined above", "In conclusion", "To summarize"]
+  },
+  {
+    "id": "the-oracle",
+    "name": "The Oracle",
+    "archetype": "Literary Extension",
+    "writingStyle": "Aphoristic, compressed, quasi-prophetic. Annie Dillard, Clarice Lispector, Anne Carson. Sentences that land like stones.",
+    "voiceCharacteristics": [
+      "Aphorism as paragraph",
+      "Concrete image carrying abstract weight",
+      "Silence between sentences is the argument",
+      "Zero hedging",
+      "The reader finishes the thought"
+    ],
+    "signaturePhrases": ["This is what happens.", "Look closely.", "Some things are only true once."],
+    "forbiddenPhrases": ["Arguably", "It could be said that", "In a sense"]
   }
 ]

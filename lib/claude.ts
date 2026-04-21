@@ -30,57 +30,34 @@ export function buildSystemPrompt(options: GenerateOptions): string {
     personaData,
   } = options
 
-  // Build niche section
   let nicheSection = `## Niche: ${niche}`
   if (nicheData) {
     const lines: string[] = [`## Niche: ${niche}`]
-    if (nicheData.description) {
-      lines.push(`Description: ${nicheData.description}`)
-    }
+    if (nicheData.description) lines.push(`Description: ${nicheData.description}`)
     if (Array.isArray(nicheData.rules) && nicheData.rules.length > 0) {
       lines.push('Rules:')
       ;(nicheData.rules as string[]).forEach((r) => lines.push(`- ${r}`))
     }
-    if (nicheData.toneNotes) {
-      lines.push(`Tone notes: ${nicheData.toneNotes}`)
-    }
+    if (nicheData.toneNotes) lines.push(`Tone notes: ${nicheData.toneNotes}`)
     if (Array.isArray(nicheData.keywords) && nicheData.keywords.length > 0) {
       lines.push(`Keywords: ${(nicheData.keywords as string[]).join(', ')}`)
     }
     nicheSection = lines.join('\n')
   }
 
-  // Build persona section
   let personaSection = `## Persona: ${persona}`
   if (personaData) {
     const lines: string[] = [`## Persona: ${persona}`]
-    if (personaData.writingStyle) {
-      lines.push(`Writing style: ${personaData.writingStyle}`)
-    }
-    if (
-      Array.isArray(personaData.voiceCharacteristics) &&
-      personaData.voiceCharacteristics.length > 0
-    ) {
+    if (personaData.writingStyle) lines.push(`Writing style: ${personaData.writingStyle}`)
+    if (Array.isArray(personaData.voiceCharacteristics) && personaData.voiceCharacteristics.length > 0) {
       lines.push('Voice characteristics:')
-      ;(personaData.voiceCharacteristics as string[]).forEach((v) =>
-        lines.push(`- ${v}`)
-      )
+      ;(personaData.voiceCharacteristics as string[]).forEach((v) => lines.push(`- ${v}`))
     }
-    if (
-      Array.isArray(personaData.signaturePhrases) &&
-      personaData.signaturePhrases.length > 0
-    ) {
-      lines.push(
-        `Signature phrases: ${(personaData.signaturePhrases as string[]).join(' | ')}`
-      )
+    if (Array.isArray(personaData.signaturePhrases) && personaData.signaturePhrases.length > 0) {
+      lines.push(`Signature phrases: ${(personaData.signaturePhrases as string[]).join(' | ')}`)
     }
-    if (
-      Array.isArray(personaData.forbiddenPhrases) &&
-      personaData.forbiddenPhrases.length > 0
-    ) {
-      lines.push(
-        `Forbidden phrases (never use): ${(personaData.forbiddenPhrases as string[]).join(', ')}`
-      )
+    if (Array.isArray(personaData.forbiddenPhrases) && personaData.forbiddenPhrases.length > 0) {
+      lines.push(`Forbidden phrases (never use): ${(personaData.forbiddenPhrases as string[]).join(', ')}`)
     }
     personaSection = lines.join('\n')
   }
@@ -90,7 +67,6 @@ export function buildSystemPrompt(options: GenerateOptions): string {
     : ''
 
   const toneSection = toneNotes ? `## Tone Notes\n${toneNotes}` : ''
-
   const customSection = customRules ? `## Custom Rules\n${customRules}` : ''
 
   const parts = [
@@ -117,6 +93,11 @@ export function buildSystemPrompt(options: GenerateOptions): string {
 // ─── Streaming generation ─────────────────────────────────────────────────────
 
 export async function generateCopy(options: GenerateOptions): Promise<ReadableStream> {
+  const key = process.env.ANTHROPIC_API_KEY
+  if (!key || key === 'your_key_here' || key.length < 20) {
+    throw new Error('ANTHROPIC_API_KEY is not configured. Add your key to .env.local.')
+  }
+
   const systemPrompt = buildSystemPrompt(options)
 
   const eraLine = options.eraInfluence
@@ -157,7 +138,9 @@ export async function generateCopy(options: GenerateOptions): Promise<ReadableSt
         }
         controller.close()
       } catch (err) {
-        controller.error(err)
+        const msg = err instanceof Error ? err.message : 'Stream error'
+        controller.enqueue(new TextEncoder().encode(`\n\n[Error: ${msg}]`))
+        controller.close()
       }
     },
   })

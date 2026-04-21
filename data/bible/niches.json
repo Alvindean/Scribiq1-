@@ -1,92 +1,392 @@
 [
   {
-    "id": "finance",
-    "name": "Personal Finance",
-    "category": "money",
-    "description": "Copy for wealth building, investing, budgeting, and financial freedom audiences.",
+    "id": "direct-response-advertising",
+    "name": "Direct Response Advertising",
+    "category": "advertising",
+    "description": "Ad copy engineered to provoke immediate action — buy, call, click. Roots trace to 1820s patent medicine pamphlets, crystallized by Claude Hopkins and Ogilvy, weaponized online by Kennedy and Halbert.",
     "rules": [
-      "Never promise specific returns or guarantee outcomes",
-      "Lead with pain: debt, stress, missed opportunities",
-      "Use concrete numbers wherever possible ($47/month, 12% return)",
-      "Avoid jargon unless your audience is institutional",
-      "End with urgency tied to time or opportunity cost"
+      "Lead with the biggest benefit, not the brand",
+      "Every sentence must sell the next sentence",
+      "Use specific numbers and dated proof over vague claims",
+      "Close every piece with a single unambiguous call to action",
+      "Address the prospect directly — you, not we"
     ],
-    "toneNotes": "Authoritative but accessible. Never condescending. Treat readers as capable adults who just lack information.",
-    "keywords": ["wealth", "freedom", "compound interest", "passive income", "financial independence", "debt-free", "investing", "portfolio"]
+    "toneNotes": "Urgent, confident, benefit-dense. Short sentences. No hedging.",
+    "keywords": ["benefit", "urgency", "proof", "guarantee", "call to action", "FOMO", "scarcity"]
   },
   {
-    "id": "health-fitness",
-    "name": "Health & Fitness",
-    "category": "wellness",
-    "description": "Copy for fitness programs, nutrition, transformation, and performance audiences.",
+    "id": "email-marketing",
+    "name": "Email Marketing",
+    "category": "advertising",
+    "description": "The highest-ROI channel in writing. Subject-line science, preheader hooks, narrative nurture sequences, and broadcast blasts that feel like a friend writing.",
     "rules": [
-      "Lead with the transformation, not the method",
-      "Speak to the identity shift: 'become the person who...'",
-      "Use before/after framing sparingly but powerfully",
-      "Never shame. Motivate through possibility.",
-      "Cite science when it strengthens credibility"
+      "Subject line wins or loses everything — write 10 and pick one",
+      "Open with a pattern interrupt, not a greeting",
+      "One goal per email — click, reply, or read",
+      "P.S. often outpulls the body — use it",
+      "Write like a DM to one person, not a newsletter to thousands"
     ],
-    "toneNotes": "Energetic, aspirational, grounded in proof. The trainer who's been there and got back.",
-    "keywords": ["transformation", "strength", "energy", "performance", "habit", "consistency", "results", "body", "health"]
+    "toneNotes": "Intimate, conversational, curiosity-driven. Feels like a letter.",
+    "keywords": ["subject line", "open rate", "nurture", "sequence", "personal", "conversational"]
   },
   {
-    "id": "ecommerce",
-    "name": "E-commerce & Retail",
-    "category": "commerce",
-    "description": "Copy for product pages, email campaigns, and DTC brand storytelling.",
+    "id": "long-form-sales-pages",
+    "name": "Long-Form Sales Pages",
+    "category": "advertising",
+    "description": "VSLs, webinar replays, landing pages that run 8,000+ words. The architecture Gary Bencivenga, Gene Schwartz, and Dan Kennedy perfected — hook, agitate, reveal, close.",
     "rules": [
-      "Lead with the benefit, not the feature",
-      "Use sensory language — make readers feel the product",
-      "Address the objection before the reader raises it",
-      "Social proof must feel earned, not staged",
-      "Create urgency through scarcity or timing, never fake countdown timers"
+      "Match the prospect's awareness level — Schwartz five stages",
+      "Use story-driven proof, not bulleted feature lists",
+      "Stack offer value until the price feels absurdly low",
+      "Handle every objection before it forms",
+      "Close with stack, guarantee, scarcity, P.S."
     ],
-    "toneNotes": "Warm, confident, specific. Like a knowledgeable friend recommending something they love.",
-    "keywords": ["quality", "crafted", "exclusive", "limited", "essential", "everyday", "premium", "trusted"]
+    "toneNotes": "Authoritative storyteller. Reads like a 60 Minutes exposé crossed with a sermon.",
+    "keywords": ["VSL", "hook", "agitate", "mechanism", "stack", "guarantee", "close"]
   },
   {
-    "id": "saas",
-    "name": "SaaS & Tech",
-    "category": "technology",
-    "description": "Copy for software products, tech tools, and B2B/B2C digital services.",
+    "id": "radio-podcast-copy",
+    "name": "Radio & Podcast Copy",
+    "category": "advertising",
+    "description": "Audio-only copy from 1930s radio dramas to host-read podcast ads. Cadence, pause, and voice carry what text cannot.",
     "rules": [
-      "Lead with the problem destroyed, not the features offered",
-      "Quantify time saved or revenue gained whenever possible",
-      "Avoid buzzwords: 'seamless', 'robust', 'next-gen', 'revolutionary'",
-      "Use plain language — if a 12-year-old can't follow, rewrite",
-      "Proof beats promises: case studies, numbers, logos"
+      "Write for the ear — read every line aloud",
+      "Use contractions and spoken rhythm",
+      "Front-load the hook in the first 5 seconds",
+      "Let the host's voice breathe — leave white space",
+      "End with a memorable URL or offer code"
     ],
-    "toneNotes": "Clear, direct, intelligent. No fluff. Every word accountable.",
-    "keywords": ["automate", "scale", "integrate", "workflow", "efficiency", "ROI", "dashboard", "analytics", "pipeline"]
+    "toneNotes": "Spoken, warm, trustworthy. Host-as-friend.",
+    "keywords": ["host-read", "cadence", "audio", "ear", "spoken rhythm"]
   },
   {
-    "id": "coaching",
-    "name": "Coaching & Education",
-    "category": "education",
-    "description": "Copy for courses, coaching programs, masterminds, and knowledge products.",
+    "id": "brand-manifestos",
+    "name": "Brand Manifestos",
+    "category": "advertising",
+    "description": "Declaration-style copy that states what the brand stands for and against. Apple Think Different, Nike Crazy Ones, Dove Real Beauty — copy as worldview.",
     "rules": [
-      "Sell the outcome, not the curriculum",
-      "Use student success stories as anchors",
-      "Address the 'I've tried everything' objection directly",
-      "Specificity sells: 'In 8 weeks' beats 'quickly'",
-      "The coach's credibility must be earned, not asserted"
+      "Take a side — a manifesto without enemies is wallpaper",
+      "Write in declarations, not descriptions",
+      "Use anaphora — repeat the opening phrase",
+      "Name the status quo you reject",
+      "End with an invitation to join, not a purchase"
     ],
-    "toneNotes": "Mentoring, direct, real. Not a pitch — a serious conversation about what's possible.",
-    "keywords": ["transformation", "framework", "system", "results", "community", "accountability", "mastery", "breakthrough"]
+    "toneNotes": "Prophetic, declarative, rallying. Church-meets-rebellion.",
+    "keywords": ["manifesto", "worldview", "anaphora", "declaration", "rallying"]
   },
   {
-    "id": "crypto-web3",
-    "name": "Crypto & Web3",
-    "category": "finance",
-    "description": "Copy for blockchain projects, DeFi, NFTs, and decentralized technology.",
+    "id": "social-hooks",
+    "name": "Social Hooks (Aggressive)",
+    "category": "social",
+    "description": "The MrBeast / Alex Hormozi / Pickle school — scroll-stopping, pattern-interrupting, often confrontational opening lines built for the 1.7-second attention window.",
     "rules": [
-      "Never make financial promises or price predictions",
-      "Lead with the vision and mission, not the token",
-      "Speak to early adopter identity: 'builders not speculators'",
-      "Avoid hype language: 'mooning', 'aping in', 'to the moon'",
-      "Technical depth earns trust with this audience"
+      "First 3 words decide everything",
+      "Break a pattern — visual, verbal, or logical",
+      "Make a claim so bold it demands verification",
+      "Never start with a question the viewer can answer No to",
+      "Promise payoff in the hook — deliver it in the body"
     ],
-    "toneNotes": "Visionary but grounded. Builder energy. Treat readers as future architects of something new.",
-    "keywords": ["decentralized", "protocol", "community", "ownership", "transparency", "permissionless", "trustless", "innovation"]
+    "toneNotes": "Loud, confident, provocative. Feels like a slap.",
+    "keywords": ["pattern interrupt", "bold claim", "retention", "scroll stop", "contrarian"]
+  },
+  {
+    "id": "twitter-threads",
+    "name": "Twitter / X Threads",
+    "category": "social",
+    "description": "Serialized micro-essays where each tweet is a cliffhanger. Built on compression, whitespace, and the dopamine of the next reveal.",
+    "rules": [
+      "Tweet 1 is the entire thread's job — promise plus proof",
+      "Every tweet must earn the next click",
+      "Use whitespace like a poet — one line, one idea",
+      "Number the thread so readers feel progress",
+      "End with a bookmarkable summary or offer"
+    ],
+    "toneNotes": "Compressed, punchy, authoritative. Every word weighed.",
+    "keywords": ["thread", "compression", "cliffhanger", "numbered", "bookmarkable"]
+  },
+  {
+    "id": "newsletter-writing",
+    "name": "Newsletter Writing",
+    "category": "social",
+    "description": "Morning Brew wit, Substack depth, The Hustle personality. A voice in your inbox that readers look forward to, not delete.",
+    "rules": [
+      "Develop a consistent narrator — voice over brand",
+      "Open with a story, not a summary",
+      "One big idea per issue, beaten from three angles",
+      "Use callbacks to previous issues — build insider intimacy",
+      "End with a signature sign-off readers will quote"
+    ],
+    "toneNotes": "Warm expert-friend. Smart without showing off.",
+    "keywords": ["narrator voice", "callback", "signature", "insider", "big idea"]
+  },
+  {
+    "id": "seo-blog-writing",
+    "name": "SEO & Blog Content",
+    "category": "social",
+    "description": "Long-form content that ranks on Google and keeps humans reading. The intersection of search intent, structured data, and narrative craft.",
+    "rules": [
+      "Match search intent before word count",
+      "Answer the query in the first 100 words — then expand",
+      "Use H2s as standalone answers — featured-snippet-ready",
+      "Link internally with descriptive anchor text",
+      "Update and date — freshness beats first-mover"
+    ],
+    "toneNotes": "Clear, authoritative, scannable. Expert but approachable.",
+    "keywords": ["SEO", "search intent", "featured snippet", "H2", "scannable"]
+  },
+  {
+    "id": "movie-loglines-pitches",
+    "name": "Movie Loglines & Pitches",
+    "category": "screen",
+    "description": "The 25-word sell. Protagonist, goal, obstacle, twist — crammed into a sentence that makes a studio exec sit up.",
+    "rules": [
+      "Protagonist plus goal plus obstacle plus stakes — in one sentence",
+      "Lead with irony or reversal, not setup",
+      "Make the protagonist the worst possible person for the job",
+      "Never reveal the third-act twist in the logline",
+      "If it sounds familiar, rewrite it — specificity sells"
+    ],
+    "toneNotes": "Clinical, ironic, high-concept. Reads like movie-poster tag lines.",
+    "keywords": ["logline", "high concept", "irony", "stakes", "pitch"]
+  },
+  {
+    "id": "screenplay-structure",
+    "name": "Screenplay Structure",
+    "category": "screen",
+    "description": "Three-act, Save the Cat, Hero's Journey, Dan Harmon circle. The scaffolds that turn a blank page into 110 pages of movable screen time.",
+    "rules": [
+      "Enter scenes late, leave early",
+      "Every scene must change something — character, stakes, or information",
+      "Dialogue reveals want — action reveals need",
+      "Page count is a promise — act breaks at 25, 50, 75 percent",
+      "Subtext over text — what's said is never what's meant"
+    ],
+    "toneNotes": "Visual, lean, scene-driven. White space is a character.",
+    "keywords": ["three act", "Save the Cat", "subtext", "scene", "beat sheet"]
+  },
+  {
+    "id": "k-drama-short-drama",
+    "name": "K-Drama & Short Drama",
+    "category": "screen",
+    "description": "The 16-episode arc that weaponized yearning. Emotional beat precision, slow-burn tension, and the cliffhanger as religion. Now compressed into 60-second vertical drama.",
+    "rules": [
+      "Every episode ends on an emotional cliffhanger, not a plot one",
+      "The almost-kiss is more powerful than the kiss",
+      "Build a cultural context the audience must learn — then exploit it",
+      "Use repetition of a visual motif to anchor feeling",
+      "Let silence do 40 percent of the emotional work"
+    ],
+    "toneNotes": "Longing, restrained, visually symbolic. Feeling over plot.",
+    "keywords": ["yearning", "slow burn", "cliffhanger", "motif", "emotional beat"]
+  },
+  {
+    "id": "theatre-writing",
+    "name": "Theatre & Stage Writing",
+    "category": "screen",
+    "description": "Dialogue that must carry everything because the camera can't move. Monologues, act breaks, the unity of time and place. From Aeschylus to Sorkin.",
+    "rules": [
+      "Every character must sound different on the page",
+      "Monologue is earned — never first-act",
+      "Write the physical action between the lines",
+      "Use repetition and rhythm — theatre is oral tradition",
+      "The curtain is a promise of revelation"
+    ],
+    "toneNotes": "Elevated, rhythmic, literary. Language aware of itself.",
+    "keywords": ["monologue", "dialogue", "act break", "unity", "rhythm"]
+  },
+  {
+    "id": "literary-fiction",
+    "name": "Literary Fiction",
+    "category": "books",
+    "description": "Interiority, prose style, slow-burn tension. Where sentence-level craft is the plot. Marilynne Robinson, Cormac McCarthy, Toni Morrison.",
+    "rules": [
+      "Interiority is plot — what the character notices is the story",
+      "Sentence rhythm carries emotional weight",
+      "Show the specific — universals emerge from precision",
+      "Resist resolution — ambiguity respects the reader",
+      "Metaphor earns its place or dies"
+    ],
+    "toneNotes": "Measured, observant, layered. Language draws attention to itself when necessary.",
+    "keywords": ["interiority", "prose style", "ambiguity", "metaphor", "precision"]
+  },
+  {
+    "id": "thriller-mystery",
+    "name": "Thriller & Mystery",
+    "category": "books",
+    "description": "Page-turn mechanics. Red herrings, ticking clocks, information gaps. Gillian Flynn, Harlan Coben, Lee Child — mechanics that engineer the turn of the page.",
+    "rules": [
+      "End every chapter on a question or complication",
+      "Withhold information — but promise the reveal",
+      "Plant clues in plain sight, then let noise hide them",
+      "Short chapters accelerate pulse — use them at Act 3",
+      "The antagonist's logic must be airtight"
+    ],
+    "toneNotes": "Propulsive, economical, suspenseful. Sentences clipped for pace.",
+    "keywords": ["red herring", "page turn", "reveal", "ticking clock", "chapter end"]
+  },
+  {
+    "id": "romance-writing",
+    "name": "Romance (All Subgenres)",
+    "category": "books",
+    "description": "Regency, contemporary, dark romance, romantasy. The genre that mastered the almost — tension, yearning, the guaranteed emotional payoff of HEA.",
+    "rules": [
+      "Promise the HEA or HFN — readers signed a contract",
+      "The almost-touch outsells the touch",
+      "Build tension through denial and interruption",
+      "POV shifts reveal the unspoken want",
+      "Tropes are load-bearing — subvert carefully, never mock"
+    ],
+    "toneNotes": "Yearning, charged, emotional. Internal stakes over external.",
+    "keywords": ["HEA", "tropes", "yearning", "POV shift", "tension"]
+  },
+  {
+    "id": "horror-writing",
+    "name": "Horror Writing",
+    "category": "books",
+    "description": "The unseen scares more than the seen. Dread architecture from Shirley Jackson to Stephen King to Mariana Enriquez.",
+    "rules": [
+      "The dread is in the wait, not the reveal",
+      "Ground the impossible in the mundane first",
+      "Unreliable perception is the cheapest and deepest terror",
+      "Use concrete sensory detail — never vague fear",
+      "The ending must earn the dread — no bait-and-switch"
+    ],
+    "toneNotes": "Creeping, sensory, atmospheric. Dread accumulates, terror punctuates.",
+    "keywords": ["dread", "unseen", "sensory", "uncanny", "slow reveal"]
+  },
+  {
+    "id": "fantasy-scifi",
+    "name": "Fantasy & Science Fiction",
+    "category": "books",
+    "description": "World-building without exposition dumps. Magic systems, speculative tech, rules that matter. Sanderson, Le Guin, Ted Chiang.",
+    "rules": [
+      "Rules of the world must be consistent — break them with cost",
+      "Reveal world through character behavior, not narration",
+      "One unfamiliar concept per page — no more",
+      "Exposition hides inside conflict or humor",
+      "The speculative element must mean something thematically"
+    ],
+    "toneNotes": "Immersive, curious, precise. World is character.",
+    "keywords": ["world building", "magic system", "exposition", "speculative", "rules"]
+  },
+  {
+    "id": "childrens-ya",
+    "name": "Children's & YA",
+    "category": "books",
+    "description": "Voice-driven identity fiction. Sharp stakes, earned emotion, no condescension. From Roald Dahl to Judy Blume to Angie Thomas.",
+    "rules": [
+      "Never write down — kids smell condescension",
+      "Voice is the whole game — protagonists sound like themselves",
+      "Stakes feel life-or-death because to the protagonist they are",
+      "Adults are obstacles, allies, or absent — never solutions",
+      "Identity question drives plot — who am I becoming"
+    ],
+    "toneNotes": "Direct, immediate, emotionally literate. First-person dominant.",
+    "keywords": ["voice", "identity", "stakes", "coming of age", "first person"]
+  },
+  {
+    "id": "self-help-nonfiction",
+    "name": "Self-Help Nonfiction",
+    "category": "books",
+    "description": "Promise, problem, mechanism, solution, proof. The architecture of Dale Carnegie through Atomic Habits.",
+    "rules": [
+      "Promise transformation in the title and first page",
+      "Name the problem with more precision than the reader could themselves",
+      "Introduce a mechanism or frame — give it a name",
+      "Prove with story, not statistics",
+      "Close every chapter with a specific action the reader can take tonight"
+    ],
+    "toneNotes": "Confident teacher. Authoritative without condescension.",
+    "keywords": ["promise", "mechanism", "frame", "action", "transformation"]
+  },
+  {
+    "id": "business-narrative-nonfiction",
+    "name": "Business & Narrative Nonfiction",
+    "category": "books",
+    "description": "Gladwell, Lewis, Susan Cain. Ideas delivered as stories. Anecdote-first, principle second, evidence stack as structure.",
+    "rules": [
+      "Open every chapter with a specific scene, not a thesis",
+      "The principle arrives as revelation, not introduction",
+      "Stack three proofs minimum per major claim",
+      "Characters carry ideas — no disembodied concepts",
+      "The idea must reframe something familiar"
+    ],
+    "toneNotes": "Curious, narrative-driven, reframing. Reads like a magazine feature that earned 300 pages.",
+    "keywords": ["anecdote", "reframe", "counterintuitive", "proof stack", "narrative"]
+  },
+  {
+    "id": "true-crime-journalism",
+    "name": "True Crime & Longform Journalism",
+    "category": "books",
+    "description": "Capote's In Cold Blood to Serial to David Grann. Facts told with novelistic craft — scene, dialogue, interiority built from the record.",
+    "rules": [
+      "Every detail must be sourced — attribution is the spine",
+      "Scene-build from the record — never invent",
+      "Withhold strategically — mirror the investigator's timeline",
+      "Humanize the victim beyond their death",
+      "Ethical stakes are as real as narrative stakes"
+    ],
+    "toneNotes": "Restrained, meticulous, morally alert. Facts carry the weight.",
+    "keywords": ["attribution", "scene build", "investigation", "timeline", "ethics"]
+  },
+  {
+    "id": "speeches-rhetoric",
+    "name": "Speeches & Rhetoric",
+    "category": "oratory",
+    "description": "Cicero to Lincoln to Sorkin. Ethos, pathos, logos. Rhetorical devices — anaphora, tricolon, antithesis — engineered for voice and memory.",
+    "rules": [
+      "Write for the ear, not the page — read aloud until rhythm locks",
+      "Use tricolon — three-beat phrases land harder",
+      "Anaphora turns lines into chants",
+      "Antithesis creates memorability",
+      "End on a specific image, not an abstract call"
+    ],
+    "toneNotes": "Rhythmic, repetitive in structure, elevated. Language meant to be spoken.",
+    "keywords": ["anaphora", "tricolon", "antithesis", "ethos", "rhetoric"]
+  },
+  {
+    "id": "poetry",
+    "name": "Poetry",
+    "category": "oratory",
+    "description": "Compression, rhythm, image. The oldest form of NLP — anchoring emotion through sound and structure. From sonnets to Ocean Vuong.",
+    "rules": [
+      "Every word audited — no passengers",
+      "Sound is meaning — assonance, consonance, stress pattern",
+      "Concrete image beats abstraction every time",
+      "Line break is punctuation — use it deliberately",
+      "Resist explaining the poem inside the poem"
+    ],
+    "toneNotes": "Compressed, sonic, image-rich. Silence as much as speech.",
+    "keywords": ["compression", "line break", "image", "sound", "rhythm"]
+  },
+  {
+    "id": "hook-taxonomy",
+    "name": "Hook Taxonomy",
+    "category": "hooks",
+    "description": "The 25 plus repeatable hook types that open any piece of writing — curiosity gap, pattern interrupt, identity hook, contrarian hook, data shock, story open, embedded command, open loop, and more.",
+    "rules": [
+      "Name the hook type before you write it",
+      "Match the hook to the awareness level of the reader",
+      "Never combine more than two hook types in one opening",
+      "Every hook sets up a promise — keep it or lose the reader",
+      "Test three hooks before committing to one"
+    ],
+    "toneNotes": "Tactical, variable. Hook type dictates tone.",
+    "keywords": ["curiosity gap", "pattern interrupt", "open loop", "contrarian", "identity"]
+  },
+  {
+    "id": "branded-social-voice",
+    "name": "Branded Social Voice",
+    "category": "social",
+    "description": "Duolingo chaotic, Wendy's roast, Ryanair deadpan. A consistent brand persona that feels like a person, not a logo, across every platform.",
+    "rules": [
+      "Voice is a character with a backstory — write the bible first",
+      "Pick what the brand will never say — constraints define voice",
+      "Reply like a person, not a help desk",
+      "Humor must risk offense to land — sanitized is invisible",
+      "Consistency across posts matters more than cleverness of any one"
+    ],
+    "toneNotes": "Varies by brand — but always specific, consistent, human.",
+    "keywords": ["brand voice", "persona", "consistency", "reply", "character"]
   }
 ]

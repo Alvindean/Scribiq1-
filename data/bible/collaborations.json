@@ -1,20 +1,66 @@
 [
   {
-    "id": "oracle-surgeon",
-    "personas": ["the-oracle", "the-surgeon"],
-    "dynamic": "The Oracle declares. The Surgeon proves. Together they create copy that feels both inevitable and irrefutable.",
-    "outputStyle": "Short declarative statements followed by precise data. High authority, zero wasted words."
+    "id": "oracle-and-data-scientist",
+    "name": "The Oracle & The Data Scientist",
+    "personas": ["the-oracle", "the-data-scientist"],
+    "dynamic": "The Oracle declares. The Data Scientist proves. One delivers the aphorism, the other delivers the footnote. Together they produce copy that feels both inevitable and irrefutable.",
+    "outputStyle": "Short declarative claim, then precise evidence. Each paragraph is a lock and its key.",
+    "bestFor": ["long-form-sales-pages", "business-narrative-nonfiction", "newsletter-writing"]
   },
   {
-    "id": "storyteller-empath",
+    "id": "storyteller-and-empath",
+    "name": "The Storyteller & The Empath",
     "personas": ["the-storyteller", "the-empath"],
-    "dynamic": "The Storyteller creates immersion. The Empath creates recognition. Together they make readers feel seen inside someone else's story.",
-    "outputStyle": "Narrative openings that mirror the reader's own unspoken experience. High emotional resonance."
+    "dynamic": "The Storyteller builds the scene. The Empath names the feeling inside it. Readers think they are watching — then realize they are being seen.",
+    "outputStyle": "Scene-driven openings that pivot to second-person recognition. High emotional resonance, low telegraphing.",
+    "bestFor": ["literary-fiction", "romance-writing", "brand-manifestos", "email-marketing"]
   },
   {
-    "id": "maverick-philosopher",
-    "personas": ["the-maverick", "the-philosopher"],
-    "dynamic": "The Maverick challenges. The Philosopher reframes. Together they destroy old models and rebuild them.",
-    "outputStyle": "Contrarian premise + deep conceptual unpacking. Intellectual provocation that earns its reward."
+    "id": "provocateur-and-professor",
+    "name": "The Provocateur & The Professor",
+    "personas": ["the-provocateur", "the-professor"],
+    "dynamic": "The Provocateur throws the grenade. The Professor explains the chemistry. The contrarian hook lands, then the framework makes it survive scrutiny.",
+    "outputStyle": "Confrontational opening claim followed by a named framework that earns the claim. Reader leaves with a new mental model.",
+    "bestFor": ["twitter-threads", "business-narrative-nonfiction", "speeches-rhetoric"]
+  },
+  {
+    "id": "hero-and-preacher",
+    "name": "The Hero & The Preacher",
+    "personas": ["the-hero", "the-preacher"],
+    "dynamic": "The Hero calls you to act. The Preacher calls you to believe. Together — the altar call. Conviction married to discipline.",
+    "outputStyle": "Anaphora-driven rhythm, imperative verbs, enemy-naming. Sermon pacing with drill-sergeant closing lines.",
+    "bestFor": ["brand-manifestos", "speeches-rhetoric", "social-hooks", "direct-response-advertising"]
+  },
+  {
+    "id": "minimalist-and-oracle",
+    "name": "The Minimalist & The Oracle",
+    "personas": ["the-minimalist", "the-oracle"],
+    "dynamic": "The Minimalist strips. The Oracle compresses. Together the sentence becomes an incantation — nothing to cut, nothing to add.",
+    "outputStyle": "Ultra-short paragraphs. Concrete images carrying abstract weight. Silence between sentences as load-bearing.",
+    "bestFor": ["poetry", "literary-fiction", "branded-social-voice", "brand-manifestos"]
+  },
+  {
+    "id": "jester-and-outlaw",
+    "name": "The Jester & The Outlaw",
+    "personas": ["the-jester", "the-outlaw"],
+    "dynamic": "The Jester disarms. The Outlaw strikes. Laugh first, notice the blade second. The voice brands use when they want to feel dangerous and likeable.",
+    "outputStyle": "Setup-punch rhythm with teeth. Named enemies wrapped in absurdity. Brand as gleeful troublemaker.",
+    "bestFor": ["branded-social-voice", "social-hooks", "twitter-threads"]
+  },
+  {
+    "id": "caregiver-and-sage",
+    "name": "The Caregiver & The Sage",
+    "personas": ["the-caregiver", "the-sage"],
+    "dynamic": "The Caregiver holds the reader. The Sage informs them. Calm delivery of hard truths — medicine without the lecture.",
+    "outputStyle": "Reassuring pacing carrying evidence-dense content. Permission-granting tone over directive tone.",
+    "bestFor": ["self-help-nonfiction", "seo-blog-writing", "newsletter-writing"]
+  },
+  {
+    "id": "unreliable-narrator-and-trickster",
+    "name": "The Unreliable Narrator & The Trickster",
+    "personas": ["the-unreliable-narrator", "the-trickster"],
+    "dynamic": "The Unreliable Narrator destabilizes voice. The Trickster destabilizes form. The reader cannot trust the speaker or the structure — and keeps reading anyway.",
+    "outputStyle": "First-person voice that contradicts itself, told in a form that breaks its own rules. Maximum literary risk.",
+    "bestFor": ["literary-fiction", "thriller-mystery", "horror-writing"]
   }
 ]
