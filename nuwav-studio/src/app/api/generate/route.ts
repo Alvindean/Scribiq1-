@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 // Allow up to 300s on Vercel (Pro) or 60s (Hobby) for long AI generation runs
 export const maxDuration = 300;
 import { db } from "@/lib/db";
-import { projects, modules, lessons } from "@/lib/db/schema";
+import { profiles, projects, modules, lessons } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateOutline, generateScript } from "@/lib/ai/pipeline";
 
@@ -53,11 +53,30 @@ export async function POST(request: NextRequest): Promise<Response> {
     });
   }
 
+  const [profile] = await db
+    .select({ orgId: profiles.orgId })
+    .from(profiles)
+    .where(eq(profiles.id, session.user.id))
+    .limit(1);
+
+  if (!profile?.orgId || profile.orgId !== project.orgId) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const stream = new ReadableStream({
     async start(controller) {
       const send = (event: ProgressEvent) => {
         controller.enqueue(new TextEncoder().encode(encodeSSE(event)));
       };
+
+      const heartbeat = setInterval(() => {
+        try {
+          controller.enqueue(new TextEncoder().encode(": heartbeat\n\n"));
+        } catch {}
+      }, 15000);
 
       try {
         // Step 1 — Generate outline
@@ -72,6 +91,10 @@ export async function POST(request: NextRequest): Promise<Response> {
           type: project.type,
           template_structure: null,
         });
+
+        if (!outline || !Array.isArray(outline.modules) || outline.modules.length === 0) {
+          throw new Error("AI returned invalid outline structure. Please try again.");
+        }
 
         send({
           step: "outline_done",
@@ -108,6 +131,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         for (let mIdx = 0; mIdx < outline.modules.length; mIdx++) {
           const mod = outline.modules[mIdx];
           const dbModule = createdModules[mIdx];
+          if (!dbModule) throw new Error(`Module index mismatch at ${mIdx}`);
 
           for (let lIdx = 0; lIdx < mod.lessons.length; lIdx++) {
             const lesson = mod.lessons[lIdx];
@@ -170,6 +194,7 @@ export async function POST(request: NextRequest): Promise<Response> {
         const message = err instanceof Error ? err.message : "Unknown error";
         send({ step: "error", message, progress: -1 });
       } finally {
+        clearInterval(heartbeat);
         controller.close();
       }
     },

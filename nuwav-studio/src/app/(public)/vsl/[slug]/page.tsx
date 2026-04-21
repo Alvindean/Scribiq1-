@@ -81,10 +81,12 @@ export default async function VSLPage({ params }: Props) {
               <p className="text-violet-300 text-sm">Video loading...</p>
             </div>
           )}
-          <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-black font-bold">
-            {content.hero_cta ?? "Get Instant Access"}
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link href={`/checkout/${slug}`}>
+            <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-black font-bold">
+              {content.hero_cta ?? "Get Instant Access"}
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 

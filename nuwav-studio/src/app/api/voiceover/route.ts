@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { lessons } from "@/lib/db/schema";
+import { lessons, projects, profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 import { generateVoiceover } from "@/lib/elevenlabs/tts";
 import { uploadToR2, buildR2Key } from "@/lib/media/r2";
@@ -50,6 +50,12 @@ export async function POST(request: NextRequest): Promise<Response> {
         status: 404,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    const [project] = await db.select({ orgId: projects.orgId }).from(projects).where(eq(projects.id, lesson.projectId)).limit(1);
+    const [profile] = await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, session.user.id)).limit(1);
+    if (!project || !profile || project.orgId !== profile.orgId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
     }
 
     const { audioBuffer, contentType } = await generateVoiceover({

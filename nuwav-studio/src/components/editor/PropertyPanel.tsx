@@ -14,6 +14,7 @@ import {
   Clock,
   FileText,
   Loader2,
+  Check,
 } from "lucide-react";
 
 export function PropertyPanel() {
@@ -26,11 +27,15 @@ export function PropertyPanel() {
     isPlayingVoiceover,
     setIsPlayingVoiceover,
   } = useEditorStore();
-  const { updateLesson } = useProjectStore();
+  const { updateLesson, persistLesson } = useProjectStore();
 
   const [scriptDraft, setScriptDraft] = useState<string>("");
   const [durationInput, setDurationInput] = useState<string>("");
   const [scriptDirty, setScriptDirty] = useState(false);
+  const [scriptSaving, setScriptSaving] = useState(false);
+  const [scriptSaved, setScriptSaved] = useState(false);
+  const [durationSaving, setDurationSaving] = useState(false);
+  const [durationSaved, setDurationSaved] = useState(false);
   const [voiceoverError, setVoiceoverError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -43,6 +48,8 @@ export function PropertyPanel() {
           : ""
       );
       setScriptDirty(false);
+      setScriptSaved(false);
+      setDurationSaved(false);
       setVoiceoverError(null);
     }
   }, [selectedLesson]);
@@ -55,14 +62,19 @@ export function PropertyPanel() {
     );
   }
 
-  const handleSaveScript = () => {
-    updateLesson(selectedLesson.id, { script: scriptDraft });
+  const handleSaveScript = async () => {
+    setScriptSaving(true);
+    await persistLesson(selectedLesson.id, { script: scriptDraft });
+    setScriptSaving(false);
     setScriptDirty(false);
+    setScriptSaved(true);
+    setTimeout(() => setScriptSaved(false), 2000);
   };
 
   const handleDiscardScript = () => {
     setScriptDraft(selectedLesson.script ?? "");
     setScriptDirty(false);
+    setScriptSaved(false);
   };
 
   const handleGenerateVoiceover = async () => {
@@ -111,10 +123,14 @@ export function PropertyPanel() {
     setIsPlayingVoiceover(!isPlayingVoiceover);
   };
 
-  const handleSaveDuration = () => {
+  const handleSaveDuration = async () => {
     const parsed = parseInt(durationInput, 10);
     if (!Number.isNaN(parsed) && parsed >= 0) {
-      updateLesson(selectedLesson.id, { durationSeconds: parsed });
+      setDurationSaving(true);
+      await persistLesson(selectedLesson.id, { durationSeconds: parsed });
+      setDurationSaving(false);
+      setDurationSaved(true);
+      setTimeout(() => setDurationSaved(false), 2000);
     }
   };
 
@@ -164,18 +180,35 @@ export function PropertyPanel() {
             placeholder="Write the lesson script here…"
             className="flex-1 min-h-0 resize-none text-sm bg-zinc-800 border-zinc-700 text-zinc-100 placeholder:text-zinc-600 leading-relaxed"
           />
+          {scriptSaved && !scriptDirty && (
+            <div className="flex items-center gap-1.5 text-xs text-emerald-400 shrink-0 justify-end">
+              <Check className="w-3.5 h-3.5" />
+              Saved
+            </div>
+          )}
           {scriptDirty && (
             <div className="flex gap-2 shrink-0">
               <Button
                 onClick={handleSaveScript}
+                disabled={scriptSaving}
                 size="sm"
                 className="flex-1 bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
               >
-                <Save className="w-3.5 h-3.5" />
-                Save
+                {scriptSaving ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    Saving…
+                  </>
+                ) : (
+                  <>
+                    <Save className="w-3.5 h-3.5" />
+                    Save
+                  </>
+                )}
               </Button>
               <Button
                 onClick={handleDiscardScript}
+                disabled={scriptSaving}
                 size="sm"
                 variant="outline"
                 className="flex-1 border-zinc-700 text-zinc-300 hover:bg-zinc-800 gap-1.5"
@@ -294,10 +327,20 @@ export function PropertyPanel() {
               />
               <Button
                 onClick={handleSaveDuration}
+                disabled={durationSaving}
                 size="sm"
-                className="bg-violet-600 hover:bg-violet-700 text-white"
+                className="bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
               >
-                Save
+                {durationSaving ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : durationSaved ? (
+                  <>
+                    <Check className="w-3.5 h-3.5" />
+                    Saved
+                  </>
+                ) : (
+                  "Save"
+                )}
               </Button>
             </div>
           </div>

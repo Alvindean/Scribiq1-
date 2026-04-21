@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, exports } from "@/lib/db/schema";
+import { projects, exports, profiles } from "@/lib/db/schema";
 import { eq, desc } from "drizzle-orm";
 
 type ExportFormat = "mp4" | "pdf" | "pptx" | "scorm" | "zip";
@@ -23,6 +23,12 @@ export async function GET(request: NextRequest): Promise<Response> {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  const [projectForGet] = await db.select({ orgId: projects.orgId }).from(projects).where(eq(projects.id, projectId)).limit(1);
+  const [profileForGet] = await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, session.user.id)).limit(1);
+  if (!projectForGet || !profileForGet || projectForGet.orgId !== profileForGet.orgId) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
   }
 
   const exportList = await db
@@ -79,7 +85,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   try {
     const [project] = await db
-      .select({ id: projects.id })
+      .select({ id: projects.id, orgId: projects.orgId })
       .from(projects)
       .where(eq(projects.id, projectId))
       .limit(1);
@@ -89,6 +95,11 @@ export async function POST(request: NextRequest): Promise<Response> {
         status: 404,
         headers: { "Content-Type": "application/json" },
       });
+    }
+
+    const [profile] = await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, session.user.id)).limit(1);
+    if (!profile || project.orgId !== profile.orgId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
     }
 
     const [exportRecord] = await db

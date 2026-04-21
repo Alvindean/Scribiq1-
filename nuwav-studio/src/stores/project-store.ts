@@ -8,6 +8,7 @@ interface ProjectStore {
   setProject: (project: Project) => void;
   setModules: (modules: (Module & { lessons: Lesson[] })[]) => void;
   updateLesson: (lessonId: string, updates: Partial<Lesson>) => void;
+  persistLesson: (lessonId: string, updates: { script?: string; durationSeconds?: number }) => Promise<void>;
   updateProject: (updates: Partial<Project>) => void;
   reorderLessons: (moduleId: string, orderedIds: string[]) => void;
   reorderModules: (orderedIds: string[]) => void;
@@ -30,6 +31,22 @@ export const useProjectStore = create<ProjectStore>((set) => ({
         ),
       })),
     })),
+
+  persistLesson: async (lessonId, updates) => {
+    set((state) => ({
+      modules: state.modules.map((mod) => ({
+        ...mod,
+        lessons: mod.lessons.map((lesson) =>
+          lesson.id === lessonId ? { ...lesson, ...updates } : lesson
+        ),
+      })),
+    }));
+    await fetch(`/api/lessons/${lessonId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(updates),
+    });
+  },
 
   updateProject: (updates) =>
     set((state) => ({

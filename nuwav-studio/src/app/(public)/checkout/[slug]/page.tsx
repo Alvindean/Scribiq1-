@@ -2,9 +2,6 @@ import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { publishedPages, projects } from "@/lib/db/schema";
 import { eq, and } from "drizzle-orm";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -46,37 +43,18 @@ export default async function CheckoutPage({ params }: Props) {
             <p className="text-3xl font-bold text-violet-700 mt-2">{content.price ?? "Contact for pricing"}</p>
           </div>
 
-          <form className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email Address</Label>
-              <Input id="email" type="email" placeholder="you@example.com" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" type="text" placeholder="Jane Smith" required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="card">Card Number</Label>
-              <Input id="card" type="text" placeholder="4242 4242 4242 4242" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-2">
-                <Label htmlFor="expiry">Expiry</Label>
-                <Input id="expiry" type="text" placeholder="MM/YY" />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="cvc">CVC</Label>
-                <Input id="cvc" type="text" placeholder="123" />
-              </div>
-            </div>
-            <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" size="lg">
-              Complete Purchase
-            </Button>
-          </form>
-
-          <p className="text-xs text-center text-muted-foreground">
-            🔒 Secure checkout. 30-day money back guarantee.
-          </p>
+          <div className="rounded-lg bg-muted/50 border p-5 text-center space-y-3">
+            <p className="font-medium text-base">Ready to enroll?</p>
+            <p className="text-sm text-muted-foreground">
+              Contact your administrator to complete enrollment for this course.
+            </p>
+            <a
+              href="mailto:admin@nuwav.com"
+              className="inline-block mt-2 text-violet-700 hover:text-violet-900 font-semibold underline underline-offset-2 text-sm"
+            >
+              Contact administrator
+            </a>
+          </div>
         </div>
       </div>
     </div>

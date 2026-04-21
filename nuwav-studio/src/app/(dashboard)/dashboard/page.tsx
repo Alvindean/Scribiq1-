@@ -78,7 +78,7 @@ export default async function DashboardPage() {
               description="Create your first AI-powered course or VSL to get started."
               action={{
                 label: "Create Project",
-                onClick: () => { window.location.href = "/projects/new"; },
+                href: "/projects/new",
               }}
             />
           ) : (

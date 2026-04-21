@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { projects, publishedPages } from "@/lib/db/schema";
+import { projects, publishedPages, profiles } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(request: NextRequest): Promise<Response> {
@@ -21,6 +21,12 @@ export async function GET(request: NextRequest): Promise<Response> {
       status: 400,
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  const [projectForGet] = await db.select({ orgId: projects.orgId }).from(projects).where(eq(projects.id, projectId)).limit(1);
+  const [profileForGet] = await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, session.user.id)).limit(1);
+  if (!projectForGet || !profileForGet || projectForGet.orgId !== profileForGet.orgId) {
+    return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
   }
 
   const [page] = await db
@@ -80,7 +86,7 @@ export async function POST(request: NextRequest): Promise<Response> {
 
   try {
     const [project] = await db
-      .select({ id: projects.id })
+      .select({ id: projects.id, orgId: projects.orgId, type: projects.type })
       .from(projects)
       .where(eq(projects.id, projectId))
       .limit(1);
@@ -91,6 +97,13 @@ export async function POST(request: NextRequest): Promise<Response> {
         headers: { "Content-Type": "application/json" },
       });
     }
+
+    const [profile] = await db.select({ orgId: profiles.orgId }).from(profiles).where(eq(profiles.id, session.user.id)).limit(1);
+    if (!profile || project.orgId !== profile.orgId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { "Content-Type": "application/json" } });
+    }
+
+    const pageType = project.type === "vsl" ? "sales" : "course_portal";
 
     // Check if page already exists
     const [existing] = await db
@@ -112,7 +125,7 @@ export async function POST(request: NextRequest): Promise<Response> {
       await db.insert(publishedPages).values({
         projectId,
         slug,
-        pageType: "course_portal",
+        pageType,
         isLive: action === "toggle_live" ? isLive : false,
       });
     }

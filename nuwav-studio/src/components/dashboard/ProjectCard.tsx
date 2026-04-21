@@ -3,6 +3,13 @@ import { MoreHorizontal, Video, BookOpen, Layers } from "lucide-react";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { type Project } from "@/types/project";
 import { formatDuration } from "@/lib/utils/duration";
 
@@ -57,9 +64,26 @@ export function ProjectCard({ project }: ProjectCardProps) {
               </p>
             )}
           </div>
-          <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-1">
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 -mr-1">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">Project options</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/projects/${project.id}/editor`}>Open Editor</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Link href={`/projects/${project.id}/generate`}>Generate Content</Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive focus:text-destructive">
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         <div className="flex items-center gap-2 mt-3">
