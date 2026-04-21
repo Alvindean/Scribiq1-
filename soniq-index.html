@@ -2151,7 +2151,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       <div class="params" style="grid-template-columns:1fr 1fr">
         <div class="param">
           <div class="param-label">Vocal Style</div>
-          <select id="g-vocal">
+          <select id="g-vocal" onchange="toggleDuetConfig(this.value)">
             <optgroup label="── Core ──">
               <option>Male vocals</option>
               <option>Female vocals</option>
@@ -2187,6 +2187,28 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
               <option>ASMR / Barely-there</option>
             </optgroup>
           </select>
+          <!-- DUET CONFIG PANEL — shown only when Duet M/F is selected -->
+          <div id="duet-config-panel" style="display:none;margin-top:8px;padding:10px 12px;background:#1a1a24;border:1px solid #35354a;border-radius:8px">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#8080b0;margin-bottom:8px">Duet Configuration</div>
+            <div style="margin-bottom:8px">
+              <label style="font-size:11px;color:#a0a0c0;display:block;margin-bottom:4px">Lead Assignment</label>
+              <select id="duet-lead" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:6px 8px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer">
+                <option value="male-verse-female-chorus">Male leads verse / Female leads chorus</option>
+                <option value="female-verse-male-chorus">Female leads verse / Male leads chorus</option>
+                <option value="alternating">Alternating — trade each section</option>
+                <option value="equal">Equal — shared throughout</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:11px;color:#a0a0c0;display:block;margin-bottom:4px">Harmony Type</label>
+              <select id="duet-harmony" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:6px 8px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer">
+                <option value="unison-octave">Unison octave</option>
+                <option value="third-harmony">Third harmony</option>
+                <option value="call-and-response">Call-and-response</option>
+                <option value="parallel-sixths">Parallel sixths</option>
+              </select>
+            </div>
+          </div>
         </div>
         <div class="param">
           <div class="param-label">Structure</div>
@@ -4300,6 +4322,34 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
           </div>
         </div>
       </div>
+
+      <!-- TIME SIGNATURE -->
+      <label class="topic-label" style="margin-top:10px">Time Signature</label>
+      <select id="time-sig-select" style="width:100%;background:#1a1a24;border:1px solid #35354a;border-radius:6px;color:#e0e0f0;font-size:12px;padding:7px 10px;outline:none;-webkit-appearance:none;appearance:none;cursor:pointer;margin-bottom:12px">
+        <option value="4/4">4/4 — Standard</option>
+        <option value="3/4">3/4 — Waltz</option>
+        <option value="6/8">6/8 — Compound</option>
+        <option value="5/4">5/4 — Irregular</option>
+        <option value="7/8">7/8 — Asymmetric</option>
+      </select>
+
+      <!-- WEIRDNESS SLIDER -->
+      <label class="topic-label" style="margin-top:4px">Weirdness / Experimentalism — <span id="weirdness-lbl" style="color:#e0e0f0;font-family:var(--mono)">Standard</span></label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:10px;color:#6060a0">0</span>
+        <input type="range" min="0" max="100" value="20" id="weirdness-slider" style="flex:1;accent-color:#7c3aed" oninput="updateWeirdnessLbl(this.value)">
+        <span style="font-size:10px;color:#6060a0">100</span>
+      </div>
+      <div style="font-size:10px;color:#6060a0;font-style:italic;margin-bottom:12px">How far outside genre norms the song may venture — higher values invite experimental choices</div>
+
+      <!-- STYLE INFLUENCE SLIDER -->
+      <label class="topic-label" style="margin-top:4px">Style Influence — <span id="style-influence-lbl" style="color:#e0e0f0;font-family:var(--mono)">100%</span></label>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:10px;color:#6060a0">0%</span>
+        <input type="range" min="0" max="100" value="100" id="style-influence-slider" style="flex:1;accent-color:#0891b2" oninput="updateStyleInfluenceLbl(this.value)">
+        <span style="font-size:10px;color:#6060a0">100%</span>
+      </div>
+      <div style="font-size:10px;color:#6060a0;font-style:italic;margin-bottom:12px">How strictly selected style/substyle constraints apply — 100% = hard constraints, 50% = suggestions, 0% = style as inspiration only</div>
 
       <!-- SONG LENGTH -->
       <label class="topic-label">Song Length</label>
@@ -8621,6 +8671,13 @@ async function generateSong(){
     edgeTopics: Array.isArray(S.edgeTopics) ? [...S.edgeTopics] : [],
     aggression: S.selectedAggression || 'mid',
     freestyleMode: !!S.freestyleMode,
+    duetConfig: (document.getElementById('g-vocal')?.value === 'Duet M/F') ? {
+      lead: document.getElementById('duet-lead')?.value || 'male-verse-female-chorus',
+      harmony: document.getElementById('duet-harmony')?.value || 'unison-octave'
+    } : undefined,
+    timeSig: document.getElementById('time-sig-select')?.value || '4/4',
+    weirdness: parseInt(document.getElementById('weirdness-slider')?.value || 20),
+    styleInfluence: parseInt(document.getElementById('style-influence-slider')?.value || 100),
     // Per-genre craft dimensions (only the active genre's dims are sent)
     craftDimensions: (S.craftDimensions && S.craftDimensions[S.selectedGenre])
       ? JSON.parse(JSON.stringify(S.craftDimensions[S.selectedGenre]))
@@ -13677,6 +13734,26 @@ function setEmotionalArc(val) {
   S.emotionalArc = val;
   const d = document.getElementById('emotional-arc-desc');
   if (d) d.textContent = EMOTIONAL_ARC_DESCS[val] || '';
+}
+
+function toggleDuetConfig(val) {
+  const panel = document.getElementById('duet-config-panel');
+  if (panel) panel.style.display = (val === 'Duet M/F') ? 'block' : 'none';
+}
+
+function updateWeirdnessLbl(val) {
+  const v = parseInt(val);
+  let label = 'Standard';
+  if (v >= 100) label = 'Avant-garde';
+  else if (v >= 70) label = 'Experimental';
+  else if (v >= 40) label = 'Adventurous';
+  const el = document.getElementById('weirdness-lbl');
+  if (el) el.textContent = label;
+}
+
+function updateStyleInfluenceLbl(val) {
+  const el = document.getElementById('style-influence-lbl');
+  if (el) el.textContent = parseInt(val) + '%';
 }
 
 function toggleDualPerspective() {
