@@ -3740,7 +3740,7 @@ function buildRapLabPrompt(params) {
 
   const structStr = STRUCTURES[structure] || STRUCTURES.standard;
   const hookNote = HOOK_STYLE_NOTES[hookStyle] || '';
-  const brackets = GENRE_SUNO_BRACKETS.hiphop;
+  // GENRE_SUNO_BRACKETS.hiphop available here if needed for future bracket injection
 
   const system = `${style.agent}
 
@@ -3801,7 +3801,7 @@ FLOW BREAKDOWN:
 [3-5 lines: bar-by-bar flow pattern guide for the main verse. Where accents land, syllable density, rhythmic signature.]
 
 RAP LAB SETTINGS USED:
-Style: ${style.label} | Flow: ${dims.flow.join('+')} | Rhyme: ${dims.rhymeArch.join('+')} | Density: ${dims.density} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
+Style: ${style.label} | Flow: ${dims.flow.join('+')} | Rhyme: ${dims.rhymeArch.join('+')} | Density: ${dims.density.join('+')} | Vocab: ${dims.vocabRegister} | Persona: ${dims.persona}
 
 DIRECTOR NOTES:
 1. [Production decision specific to THIS song and style]
