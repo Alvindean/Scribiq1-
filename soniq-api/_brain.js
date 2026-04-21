@@ -3165,20 +3165,10 @@ HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
 SECTION MAP: [which sections and how it evolves]
 
 VISUAL PROMPT:
-COVER ART: [Single AI image prompt — dominant mood, color palette, visual metaphor for the song. Under 200 chars. No faces, no text in image.]
-STYLE: [art direction: photography / oil painting / digital illustration / cinematic still + key visual texture]
-PALETTE: [3-4 dominant colors and their emotional role]
-MOOD WORDS: [3 adjectives that describe the visual atmosphere]
+[Write a single ready-to-paste image prompt for Midjourney, DALL-E or Firefly. ONE sentence: visual mood, setting, 2-3 key colors, art style. Under 200 chars. No faces, no text in image.]
 
 VIDEO PROMPT:
-CONCEPT: [One-sentence visual concept for the music video — setting, character arc, or abstract visual theme]
-MOVEMENT: [How the camera moves: handheld · dolly push · aerial · static locked · whip pan]
-ANGLES: [Key shot sequence: wide establishing → medium waist → close-up details → specific money shot]
-COLOR GRADE: [Grade/LUT style: warm golden hour · cold blue steel · bleach bypass · neon-saturated · desaturated grit]
-SCENES:
-1. Verse: [location + action + camera behavior]
-2. Chorus: [what happens visually at the emotional peak — the defining image]
-3. Bridge/Outro: [contrast scene or final visual statement]`;
+[Write a single ready-to-paste video concept for Sora, Runway or Kling. ONE sentence: setting, visual action, camera movement, color grade, mood. Under 200 chars.]`;
 
   return { system, prompt };
 }
@@ -3307,20 +3297,10 @@ HOW TO PROMPT: [exact Suno/Udio phrase, under 60 chars]
 SECTION MAP: [which sections and how it evolves]
 
 VISUAL PROMPT:
-COVER ART: [Single AI image prompt — dominant mood, color palette, visual metaphor for the song. Under 200 chars. No faces, no text in image.]
-STYLE: [art direction: photography / oil painting / digital illustration / cinematic still + key visual texture]
-PALETTE: [3-4 dominant colors and their emotional role]
-MOOD WORDS: [3 adjectives that describe the visual atmosphere]
+[Write a single ready-to-paste image prompt for Midjourney, DALL-E or Firefly. ONE sentence: visual mood, setting, 2-3 key colors, art style. Under 200 chars. No faces, no text in image.]
 
 VIDEO PROMPT:
-CONCEPT: [One-sentence visual concept for the music video — setting, character arc, or abstract visual theme]
-MOVEMENT: [How the camera moves: handheld · dolly push · aerial · static locked · whip pan]
-ANGLES: [Key shot sequence: wide establishing → medium waist → close-up details → specific money shot]
-COLOR GRADE: [Grade/LUT style: warm golden hour · cold blue steel · bleach bypass · neon-saturated · desaturated grit]
-SCENES:
-1. Verse: [location + action + camera behavior]
-2. Chorus: [what happens visually at the emotional peak — the defining image]
-3. Bridge/Outro: [contrast scene or final visual statement]`;
+[Write a single ready-to-paste video concept for Sora, Runway or Kling. ONE sentence: setting, visual action, camera movement, color grade, mood. Under 200 chars.]`;
 
   return {
     system,
