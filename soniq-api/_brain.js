@@ -651,10 +651,12 @@ const SUBSTYLE_SUNO = {
   'Worship / CCM':      'worship music, piano, electric guitar, congregational singalong, soaring emotional, 75 BPM',
   'Southern Gospel':    'southern gospel, acoustic guitar, four-part close harmony, country gospel warmth, testimony',
   'Gospel Hip-Hop':     'gospel rap, trap beat, 808 bass, conscious faith lyrics, hip-hop gospel, street credibility',
-  // Bossa Nova substyles
+  // Bossa Nova substyles (latin substyle key matches UI exactly)
+  'Bossa Nova':         'bossa nova, nylon string guitar, upright bass, brushed drums, intimate vocal, jazz harmony, 100 BPM',
   'Classic Bossa':      'bossa nova, nylon string guitar, upright bass, brushed drums, intimate vocal, jazz harmony, 100 BPM',
-  'Jazz Bossa':         'bossa nova jazz, Stan Getz saxophone, vibraphone, cool jazz, nylon guitar, 105 BPM',
-  // Dancehall
+  'Jazz Bossa':         'bossa nova jazz, cool jazz saxophone, vibraphone, nylon guitar, 105 BPM',
+  // Dancehall (reggae substyle key matches UI exactly)
+  'Dancehall':          'dancehall, digital riddim, reggae, patois vocals, 90 BPM, Kingston Jamaica',
   'Classic Dancehall':  'dancehall, digital riddim, reggae, patois vocals, 90 BPM, Kingston Jamaica',
   'Modern Dancehall':   'modern dancehall, trap hi-hats, 808 bass, dancehall riddim, 95 BPM, Caribbean',
   // Bollywood
@@ -663,7 +665,8 @@ const SUBSTYLE_SUNO = {
   // C-Pop
   'Mandopop':           'mandopop, pentatonic melody, piano, soft production, 95 BPM, Mandarin pop, sweet',
   'Modern C-Pop':       'c-pop, pentatonic hook, modern production, 808 bass, 110 BPM, idol pop',
-  // Amapiano
+  // Amapiano (afrobeats substyle key matches UI exactly)
+  'Amapiano':           'amapiano, log drum bass, piano keys, South African house, 110 BPM, Johannesburg',
   'Classic Amapiano':   'amapiano, log drum bass, piano keys, South African house, 110 BPM, Johannesburg',
   'Vocal Amapiano':     'amapiano, log drum, vocal chant, piano riff, South African, 112 BPM, soulful',
 };
