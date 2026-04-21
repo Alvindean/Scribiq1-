@@ -8436,8 +8436,8 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   const dopamine=parseSection(raw,'DOPAMINE MAP','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
   const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
-  const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
-  const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
+  const _vb=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');const visualPrompt=_vb?(_vb.match(/COVER ART:\s*(.+)/)||['',_vb])[1].trim():'';
+  let _vpb=parseSection(raw,'VIDEO PROMPT',null);const _si=_vpb.indexOf('SINGER');if(_si>0)_vpb=_vpb.slice(0,_si).trim();const videoPrompt=_vpb?(_vpb.match(/CONCEPT:\s*(.+)/)||['',_vpb])[1].trim():'';
   // Production data from server constants (not AI-generated)
   const fxChain=prodData?.fxChain||'';
   const pluginToolkit=prodData?.pluginToolkit||'';
@@ -8950,8 +8950,8 @@ function parseSongResult(raw,genre,topic,prodData){
   const theoryAnalysis=parseSection(raw,'THEORY ANALYSIS','DIRECTOR NOTES');
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
   const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
-  const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');
-  const videoPrompt=parseSection(raw,'VIDEO PROMPT',null);
+  const _vb=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT');const visualPrompt=_vb?(_vb.match(/COVER ART:\s*(.+)/)||['',_vb])[1].trim():'';
+  let _vpb=parseSection(raw,'VIDEO PROMPT',null);const _si=_vpb.indexOf('SINGER');if(_si>0)_vpb=_vpb.slice(0,_si).trim();const videoPrompt=_vpb?(_vpb.match(/CONCEPT:\s*(.+)/)||['',_vpb])[1].trim():'';
   // Production data from server constants (not AI-generated — no hallucination, no extra tokens)
   const fxChain=prodData?.fxChain||'';
   const pluginToolkit=prodData?.pluginToolkit||'';
