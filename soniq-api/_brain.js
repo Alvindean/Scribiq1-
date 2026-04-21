@@ -677,133 +677,133 @@ const LYRIC_CRAFT_UNIVERSAL = {
   // ── FIGURATIVE LANGUAGE ────────────────────────────────────────────────────
   simile: {
     label: 'SIMILE',
-    instruction: `"X is LIKE Y" or "X is AS [adj] AS Y." The comparison must be EARNED — the two things share a surprising, non-obvious quality. Weak: "beautiful like a rose" (expected). Strong: "quiet like a house with no furniture in it" (specific, unexpected, resonant). Rule: the vehicle (what you compare TO) must reveal something NEW about the tenor (what you're describing). Works in every genre without exception.`,
+    short: `"X is LIKE Y" or "X is AS [adj] AS Y" — the comparison must be EARNED and non-obvious. Weak: "beautiful like a rose." Strong: "quiet like a house with no furniture in it." The vehicle must reveal something NEW about the subject.`,
     genres: 'all'
   },
 
   metaphor: {
     label: 'METAPHOR',
-    instruction: `Direct substitution — no "like" or "as." "You ARE the storm" not "you're like a storm." Stronger than simile because it collapses the distance between things. Each genre has a home metaphor vocabulary: blues (the devil, the crossroads, the river), country (the road, the fire, the harvest), gospel (the light, the valley, the shepherd), hip-hop (the game, the throne, the block). Use the genre's existing vocabulary OR introduce one fresh metaphor per song — never both at once.`,
+    short: `Direct substitution — no "like/as." "You ARE the storm." Must be earned — no generic imagery. Use the genre's home vocabulary (blues=crossroads/river, country=road/fire, gospel=light/shepherd, hip-hop=game/throne/block) OR introduce one fresh metaphor per song, never both.`,
     genres: 'all'
   },
 
   extendedMetaphor: {
     label: 'EXTENDED METAPHOR',
-    instruction: `One metaphor sustained for an entire verse or whole song. The opening line establishes it; every subsequent line deepens it without abandoning it. Rule: once you choose the metaphor, commit. A song comparing love to a storm must stay in weather language — thunder, lightning, the calm before, the wreckage after — not drift into random new imagery. Abandoning the metaphor mid-verse signals a weak writer. Ideal for: folk, Americana, gospel, blues, singer-songwriter, neo-soul, country ballads, art rock.`,
-    genres: ['folk','country','blues','gospel','neosoul','altrock','rb','pop','tvmusical','jazz']
+    short: `One metaphor sustained for the full verse or whole song. Commit completely — every line deepens the same image without drifting. A storm song stays in weather language start to finish. Abandoning the metaphor mid-verse signals a weak writer.`,
+    genres: ['folk','country','blues','gospel','neosoul','altrock','rnb','pop','tvmusical','jazz']
   },
 
   // ── DOUBLE / TRIPLE ENTENDRE ───────────────────────────────────────────────
   doubleEntendre: {
     label: 'DOUBLE ENTENDRE',
-    instruction: `A single line with two simultaneous valid meanings — one surface, one deeper (suggestive, political, or subversive). Both readings must work perfectly from the same words — neither forced, neither accidental. The listener who catches the second meaning is rewarded; the listener who doesn't still enjoys the surface. Blues invented this form. Country, R&B, reggae, hip-hop, and pop all use it. Rule: a double entendre is NOT a metaphor — it is the identical words carrying two complete, different meanings at the same moment.`,
-    genres: ['hiphop','blues','rb','reggae','country','pop','jazz','neosoul','rock','altrock']
+    short: `One line, two complete simultaneous meanings — surface and deeper (suggestive, political, or subversive). Both readings must work perfectly from the SAME words. The listener who catches the second is rewarded; the listener who doesn't still enjoys the surface. Blues invented this. Apply freely to: country, R&B, reggae, pop.`,
+    genres: ['hiphop','blues','rnb','reggae','country','pop','jazz','neosoul','rock','altrock']
   },
 
   tripleEntendre: {
     label: 'TRIPLE ENTENDRE',
-    instruction: `Three simultaneous valid readings of the same line. The third meaning is usually the deepest: a political statement, a cultural callback, or a self-referential meta-layer. Strategy: write the most obvious meaning first. Find the second. Then ask "what does this line say about the PERSON making it?" — that's often the third. Use sparingly: one per song maximum, placed at the most important bar or line. Do not announce it — let it exist for the listener to discover.`,
-    genres: ['hiphop','rb','pop','blues','country']
+    short: `Three simultaneous readings: (1) obvious surface, (2) deeper meaning, (3) self-referential or meta-political layer. Use once per song maximum at the most important line. Do not announce it — let the listener discover it.`,
+    genres: ['hiphop','rnb','pop','blues','country']
   },
 
   // ── SONIC DEVICES ──────────────────────────────────────────────────────────
   alliteration: {
     label: 'ALLITERATION',
-    instruction: `Two or more consecutive or nearby stressed syllables beginning with the same consonant SOUND (not just spelling — "phone" and "find" alliterate). Creates forward momentum and hook memorability. Placement: the hook's key phrase, the opening line of a verse, the punchline bar. Overuse kills it — no more than 2-3 alliterative pairs per verse. Works in every genre: pop hooks, gospel declarations, country storytelling, hip-hop punchlines, children's songs.`,
+    short: `Same consonant SOUND on consecutive stressed syllables ("phone" and "find" alliterate). Max 2-3 pairs per verse — overuse kills momentum. Best placement: hook key phrase, verse opening line, punchline bar.`,
     genres: 'all'
   },
 
   assonance: {
     label: 'ASSONANCE',
-    instruction: `Matching VOWEL sounds within or across lines — the "invisible rhyme" listeners feel without consciously identifying. Creates sonic cohesion in lines that don't technically end-rhyme. Use assonance in verses where end-rhyme would feel forced: the vowel matching holds the lines together subliminally. Essential for folk, Americana, indie, and alternative styles where natural speech rhythm matters. Every genre benefits — assonance is the glue between the obvious rhymes.`,
+    short: `Matching VOWEL sounds within or across lines — the invisible rhyme listeners feel but don't consciously identify. Holds lines together subliminally when end-rhyme would feel forced. Essential in folk, Americana, alternative, and any style prioritising natural speech.`,
     genres: 'all'
   },
 
   consonance: {
     label: 'CONSONANCE',
-    instruction: `Matching CONSONANT sounds at any position in the word — not just the start. Creates texture and weight. Hard consonants (K, T, D, G, P, B) create punch and aggression; soft consonants (S, F, SH, L, M, N) create smoothness and intimacy. Use consonant texture deliberately: a blues lyric about violence should land on hard consonants. A neo-soul ballad should flow on liquid consonants. Match the sonic texture of words to the emotional texture of meaning.`,
+    short: `Matching CONSONANT sounds at any word position. Hard consonants (K,T,D,G,P,B) create punch and aggression; soft consonants (S,F,SH,L,M,N) create smoothness and intimacy. Match the sonic texture of words to the emotional texture of the meaning.`,
     genres: 'all'
   },
 
   // ── STRUCTURAL CRAFT ───────────────────────────────────────────────────────
   setupPunchline: {
     label: 'SETUP / PUNCHLINE',
-    instruction: `The setup establishes an expectation; the punchline fulfills it unexpectedly. The landing must arrive in ONE line — punchlines never sprawl. Blues tradition: first two lines state the situation (often repeated), third line delivers the twist. Hip-hop: bar 15 sets the premise, bar 16 detonates it. Country: the full verse builds toward the final line, which recontextualizes everything before it. Folk storytelling: the last line of the song. Rule: the punchline must be INEVITABLE in retrospect, SURPRISING in the moment. If the listener saw it coming, the setup failed.`,
-    genres: ['hiphop','blues','country','folk','comedy','parody','rb','jazz','reggae','pop','rock','altrock']
+    short: `Setup establishes an expectation; punchline fulfills it unexpectedly in ONE line. Blues: 2-line situation + 1-line twist. Hip-hop: bars 1-15 build the premise, bar 16 detonates it. Country: full verse builds toward a final line that recontextualises everything before it. Rule: inevitable in retrospect, surprising in the moment.`,
+    genres: ['hiphop','blues','country','folk','comedy','parody','rnb','jazz','reggae','pop','rock','altrock']
   },
 
   misdirection: {
     label: 'MISDIRECTION / TWIST',
-    instruction: `Lead the listener confidently down one interpretation path, then the final word or line pivots completely. Key technique: use language in the setup that supports BOTH the expected and unexpected reading. The listener fills in the expected meaning — the final word proves them wrong. The unexpected reading must be supported by every prior word in retrospect. Most powerful in: country storytelling, folk narrative, pop bridges, blues punchlines, hip-hop punch-ins, and comedy. One strong misdirection per song is worth more than ten weak ones.`,
-    genres: ['country','folk','blues','comedy','parody','pop','hiphop','rb','altrock','rock','jazz']
+    short: `Lead the listener confidently down one interpretation; final word or line pivots completely. Setup language must support BOTH readings — the listener fills in the expected meaning, then the final word flips it. Unexpected reading must be supported by every prior word in retrospect.`,
+    genres: ['country','folk','blues','comedy','parody','pop','hiphop','rnb','altrock','rock','jazz']
   },
 
   callback: {
     label: 'CALLBACK / BOOKEND',
-    instruction: `Introduce a specific image, phrase, or line early in the song. Return to IDENTICAL words at the end — but the accumulated experience of the song has transformed what those words mean. The ending reframes the beginning. Technique: Verse 1 establishes the image neutrally or hopefully. Final chorus or outro returns the same words now carrying grief, irony, or resolution. The listener who paid attention is devastated. Works in every genre — one of the most emotionally powerful tools in songwriting period.`,
+    short: `Open with a specific image, phrase, or line. Return the IDENTICAL words at song's end — but accumulated experience transforms what they mean. The ending reframes the beginning. One of the most emotionally powerful tools in songwriting. Works in every genre.`,
     genres: 'all'
   },
 
   ruleOfThrees: {
     label: 'RULE OF THREES',
-    instruction: `Two expected things, then one unexpected. The human brain anticipates a third item completing a pattern — the subverted third delivers the surprise or emotional hit. Structure: "[expected 1], [expected 2], [subversion]." The first two items must genuinely establish the pattern — the third only lands if the expectation is real. Uses: comedy (the punchline IS the third item), gospel (testimony arc), country (list songs), pop (detail accumulation), hip-hop (bar escalation with the turn). Works in every genre.`,
+    short: `Two expected items, one unexpected. Brain anticipates the pattern completion — the subverted third delivers the surprise. "[Expected], [expected], [subversion]." First two must genuinely establish the pattern or the third won't land. Works in every genre.`,
     genres: 'all'
   },
 
   anaphora: {
     label: 'ANAPHORA',
-    instruction: `The same word or phrase begins multiple consecutive lines, building cumulative rhetorical power. Each repeated opening adds weight to the one before. The final anaphora line should be the most powerful — repetition makes the landing devastating. Limit: 3-5 repetitions maximum before the pattern becomes mechanical. The repeated word MUST be the right word — the most emotionally loaded option. Ideal for: gospel declarations, folk protest, hip-hop verse-building, pop bridge climaxes, country emotional peaks, R&B vamps.`,
-    genres: ['gospel','folk','hiphop','pop','country','rb','neosoul','blues','rock','altrock']
+    short: `Same word or phrase opens consecutive lines — cumulative rhetorical power. Each repeat adds weight; the final line must be the most powerful. Limit 3-5 repetitions. Use in gospel declarations, folk protest, hip-hop verse-builds, pop bridge climaxes, R&B vamps.`,
+    genres: ['gospel','folk','hiphop','pop','country','rnb','neosoul','blues','rock','altrock']
   },
 
   epistrophe: {
     label: 'EPISTROPHE',
-    instruction: `The same word or phrase ENDS multiple consecutive lines, creating an echo and driving one idea home through accumulation. The repeated word must carry the full weight of the section's meaning — it should be the most important word in the emotional argument. Works as the inverse of anaphora: where anaphora creates forward momentum, epistrophe creates accumulation and resolution. Powerful in gospel outros, hip-hop hooks, folk refrains, and any section where a single concept must land completely.`,
-    genres: ['gospel','hiphop','folk','rb','country','neosoul','pop','blues']
+    short: `Same word or phrase ENDS consecutive lines — echo and accumulation. The repeated word must be the most emotionally loaded word in the argument. Inverse of anaphora: creates resolution rather than momentum. Powerful in gospel outros, rap hooks, folk refrains.`,
+    genres: ['gospel','hiphop','folk','rnb','country','neosoul','pop','blues']
   },
 
   // ── HIP-HOP / RAP CRAFT ────────────────────────────────────────────────────
   multisyllabicScheme: {
     label: 'MULTISYLLABIC (MULTI) SCHEME',
-    instruction: `Chain 3-5 syllable rhyming CLUSTERS across bars instead of single end-words. Not "day/way" but "breaking away / taking the stage / making them pay." The more syllables that rhyme, the more technically impressive and sonically satisfying. HOW TO BUILD: pick a 3-syllable sound cluster, then write lines whose last 3 syllables match that sound pattern — not just the last word. Extend across 4-8 bars for a full scheme. Rule: the multi must be NATURAL — filler words inserted purely to complete the rhyme destroy all credibility. If you cannot fill a bar naturally, drop to a 2-syllable multi.`,
+    short: `Chain 3-5 syllable rhyming clusters across 4-8 bars — not "day/way" but "breaking away / taking the stage / making them pay." Pick a 3-syllable sound cluster; every line's LAST 3 syllables must match it. Must feel natural — filler words to complete the rhyme destroy credibility instantly.`,
     genres: ['hiphop','reggaeton','kpop','pop']
   },
 
   schemeExtension: {
     label: 'SCHEME EXTENSION',
-    instruction: `Take an established rhyme scheme and deliberately extend it 2-4 bars BEYOND where the listener expects it to end. The extended bars feel like bonus craft — unexpected technical generosity that rewards close listeners. The extension must maintain the quality of the original scheme; a weak extension is worse than ending on time. Use in hip-hop verse construction, reggaeton verses, and K-pop rap breaks.`,
+    short: `Extend an established rhyme scheme 2-4 bars past where the listener expects it to end. Feels like bonus craft — unexpected technical generosity. The extension must maintain scheme quality; a weak extension is worse than ending on time.`,
     genres: ['hiphop','reggaeton','kpop']
   },
 
   nameFlip: {
     label: 'NAME FLIP / WORD FLIP',
-    instruction: `Take a word — a name, a brand, a place, a common phrase — and use it in a context that activates a secondary meaning. The word means itself AND something else simultaneously. The flip works because the secondary meaning is earned by context, not announced. Rule: the double meaning must be genuinely present in the language — not invented for the rhyme. The listener's "oh — I see it" recognition is the payoff. Hip-hop primary, also effective in blues, country, comedy, and pop.`,
-    genres: ['hiphop','blues','country','comedy','parody','pop','rb']
+    short: `Use a word (name, brand, place, phrase) where its literal meaning AND a secondary meaning are simultaneously active. The secondary meaning must be genuinely in the language — not invented for the rhyme. The listener's silent "oh — I see it" is the payoff.`,
+    genres: ['hiphop','blues','country','comedy','parody','pop','rnb']
   },
 
   wordplayTaxonomy: {
     label: 'WORDPLAY FORMS',
-    instruction: `Choose the right wordplay form for the moment: (1) HOMOPHONE — words that sound identical with different meanings ("bare/bear", "reign/rain/rein") — use for hidden double readings in the same line. (2) HOMONYM — one word, multiple meanings ("bat" as animal and baseball bat) — use for within-line double meaning. (3) PORTMANTEAU — two words fused into one new compound — rare, powerful when it lands. (4) ACRONYM FLIP — a word that also reads as an acronym with a relevant second meaning. Rule: wordplay must reward the listener, not puzzle them. If it requires explanation after delivery, it failed.`,
-    genres: ['hiphop','pop','comedy','parody','country','blues','rb','altrock']
+    short: `Four types: (1) HOMOPHONE — same sound, different word ("reign/rain/rein"); (2) HOMONYM — same word, two meanings ("bat"); (3) PORTMANTEAU — two words fused into one; (4) ACRONYM FLIP — word also reads as meaningful acronym. Rule: must reward the listener without requiring explanation. If it needs a footnote, it failed.`,
+    genres: ['hiphop','pop','comedy','parody','country','blues','rnb','altrock']
   },
 
   battleRapCraft: {
     label: 'BATTLE RAP CRAFT',
-    instruction: `Battle rap operates by its own law: every bar must damage a target. Six rules: (1) PERSONAL — attack something specific and TRUE about the target, not generic insults. Generic = weak. Specific = devastation. (2) REBUTTAL — directly reference the opponent's own words or image, then flip it against them. (3) SCHEME CHAIN — commit to a multisyllabic scheme for 4-8 bars, never break it mid-round. Dropping the scheme signals weakness. (4) THE ANGLE — every round needs one clear conceptual angle. Pick a lane and stay in it. (5) THE CROWD MOMENT — engineer one bar per round designed to make the crowd react physically. No filler between crowd moments. (6) INTERNAL CONSISTENCY — every bar must support the angle. No random flexing in a poverty round; no poverty in a flex round.`,
+    short: `Every bar must damage a target. Six laws: (1) PERSONAL — specific and true, not generic insults; (2) REBUTTAL — flip the opponent's own words against them; (3) SCHEME CHAIN — commit to a multi for 4-8 bars, never break it mid-round; (4) THE ANGLE — one conceptual lane per round, stay in it; (5) CROWD MOMENT — one "oh shit" bar engineered per round; (6) CONSISTENCY — every bar supports the angle, no off-topic bars.`,
     genres: ['hiphop']
   }
 };
 
-// Returns a formatted lyric craft instruction block for a given genre.
-// Injects universal techniques + genre-specific techniques.
+// Returns a compact lyric craft instruction block for a given genre.
+// Uses short-form instructions to stay within prompt size budget (~2000 chars max).
 function buildLyricCraftNote(genre) {
   const applicable = Object.values(LYRIC_CRAFT_UNIVERSAL).filter(t =>
-    t.genres === 'all' || t.genres.includes(genre)
+    t.genres === 'all' || (Array.isArray(t.genres) && t.genres.includes(genre))
   );
   if (!applicable.length) return '';
 
-  const lines = applicable.map(t => `• ${t.label}: ${t.instruction}`).join('\n');
-  return `\n\nLYRIC CRAFT TOOLKIT — apply these techniques where they serve the song. Do not force them; use what fits:\n${lines}`;
+  const lines = applicable.map(t => `• ${t.label}: ${t.short}`).join('\n');
+  return `\n\nLYRIC CRAFT TOOLKIT — use these where they serve the song, never forced:\n${lines}`;
 }
 
 const STRUCTURES={
