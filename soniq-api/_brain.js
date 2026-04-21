@@ -5290,7 +5290,8 @@ function buildHiphopDimBlock(dims) {
     'east-coast-modern':'East-Coast modern — contemporary NYC hip-hop; Jay-Z / Pusha T / Joey Bada$$; lyric-forward with modern production.',
     'mumble-rap-2010s':'Mumble rap 2010s — melodic mumbled delivery, repetitive hooks, trap beats; Lil Uzi / Future / 21 Savage aesthetic.',
     'conscious-rap':'Conscious rap — socially aware lyricism; Mos Def / Talib Kweli / Kendrick Lamar political-philosophical depth.',
-    'abstract-lyrical':'Abstract lyrical — experimental wordplay, nonlinear meaning; MF Doom / Earl Sweatshirt / Aesop Rock territory.'
+    'abstract-lyrical':'Abstract lyrical — experimental wordplay, nonlinear meaning; MF Doom / Earl Sweatshirt / Aesop Rock territory.',
+    'phonk':'Phonk — 2020s dark Memphis rap revival; distorted 808 cowbell-kick, lo-fi menace, 85-100 BPM; Ghostemane / NLE Choppa / SXVXEN; aggressive-but-slow delivery over hypnotic minimal loops; TikTok / gaming / gym-culture dominance. Write lyrics that feel like a slow-motion threat — short punchy lines, heavy repetition, relentless energy without rush.'
   };
   const fsMap = {
     'aggressive-punchline':'Aggressive punchline — hard-hitting bar-ending lines; each line lands with impact; Eminem / Joe Budden tradition.',
