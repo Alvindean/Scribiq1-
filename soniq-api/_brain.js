@@ -5314,7 +5314,8 @@ function buildHiphopDimBlock(dims) {
     'social-commentary':'Social commentary — systemic racism, inequality, political analysis; conscious rap ethical foundation.',
     'love-romance':'Love/Romance — relationships, attraction, heartbreak; Method Man/Mary "All I Need" lineage of rap love songs.',
     'abstract-cosmic':'Abstract cosmic — surreal wordplay, existential musing; MF Doom / Earl Sweatshirt non-literal territory.',
-    'party':'Party — club energy, celebration, weekend vibes; accessible universal hip-hop function.'
+    'party':'Party — club energy, celebration, weekend vibes; accessible universal hip-hop function.',
+    'anthem-triumph':'Anthem/Triumph — motivational, overcoming-adversity, collective-victory energy; Eminem "Lose Yourself" / Kendrick "Alright" / Meek Mill "Dreams and Nightmares" / Kanye "Power" tradition. Cinematic build-ups, crowd-unifying hooks, first-person triumph that speaks for the collective. Every bar should feel like it belongs on a sports montage or a championship walk-out.'
   };
   const vtMap = {
     'dry-classic':'Dry classic — minimal vocal processing; natural voice, close-mic\'d; 90s production norm for vocal clarity.',
