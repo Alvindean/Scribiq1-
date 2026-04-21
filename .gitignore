@@ -31,3 +31,7 @@ next-env.d.ts
 
 # Claude Code agent artifacts
 .claude/
+
+# Cloudflare Tunnel credentials — never commit these
+.cloudflared/*.json
+.cloudflared/cert.pem
