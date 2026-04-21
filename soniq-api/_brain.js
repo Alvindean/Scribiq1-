@@ -3088,7 +3088,7 @@ SONGWRITING RULES:
 - Use the Zeigarnik effect: leave one phrase slightly open-ended per chorus
 - Dynamic contrast: verse energy should be noticeably lower than chorus
 - The last chorus must feel bigger than the first
-- GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform
+- GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform's production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.
 - LYRICS LENGTH RULE: Total lyrics (all sections combined) must stay under 5000 characters — this is the maximum the Suno lyrics field accepts. Count every character including section tags like [Verse 1]. Write a complete, high-quality song within this limit.
 - NO EM DASHES: Never use em dashes (—) anywhere in the lyrics. End lines with a word, not a dash. For pauses use a comma or ellipsis (...). For connective phrasing use a comma. Em dashes break Suno's text parsing.${syllableNote}${rhymeNote}${eraVocNote}${keyPsychNote}${dualPerspNote}${avoidNote}${specificityNote}${preChorusNote}${bridgeNote}${verse2Note}${postChorusNote}${outroNote}${platinumNote}${adlibNote}
 - ${bracketInstructionServer(genre, bracketMode, substyle)}
@@ -3106,7 +3106,21 @@ HOOK ISOLATION:
 [Copy the chorus lyrics here ONLY — nothing else. This is the hook in isolation for quick review.]
 
 LYRICS:
-${_cleanSeed ? '\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\n' : ''}[Write the complete song lyrics below. EACH SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE — e.g. [Verse 1] then the lines, [Chorus] then the lines, [Bridge] then the lines. No bracket tag = section does not exist. Every word must earn its place.]
+${_cleanSeed ? '\nSEED LINE REMINDER -- this exact line MUST appear verbatim as the opening or closing line of your chorus, word-for-word, do not change any word: ' + _cleanSeed + '\n' : ''}[Write the complete song lyrics using this exact bracket system — three types, each with a distinct job:
+
+TYPE 1 — STRUCTURE (own line, opens every section — required):
+[Intro] · [Verse 1] · [Pre-Chorus] · [Chorus] · [Bridge] · [Hook] · [Breakdown] · [Outro]
+
+TYPE 2 — DELIVERY (own line immediately BEFORE the specific lyric line it affects):
+[Whispered] · [Spoken] · [Falsetto] · [Screamed] · [Harmony] · [Ad-libs]
+
+TYPE 3 — PRODUCTION DNA (placed inline inside the section body, ≥1 required per Chorus):
+[808 Bass] · [Build] · [Drop] · [Trap Hi-Hat] · [Steel Guitar] · [Choir] · [Beat Switch] · [Breakdown]
+
+PARENTHESES () = ad-libs and background vocal layers ONLY — never use () for structural or delivery purposes.
+  Same line as a lyric = rhythmic pocket filler. Standalone line = spotlight ad-lib moment.
+
+Every word must earn its place. No bracket tag = that section does not exist.]
 
 SONG PROMPT:
 Genre: [core genre + sub-genre]
@@ -3115,7 +3129,7 @@ BPM: [range, e.g. 95-100]
 Vocal: [vocal descriptor]
 Texture: [production texture in 5-8 words]
 Counter-melody: [counter-melody device]
-Full prompt: [${substyleSunoTag ? `MUST lead with these locked production tags: "${substyleSunoTag}" — then add vocal and texture descriptors. ` : ''}Assemble into one ready-to-paste string under 440 characters — NO artist names]
+Full prompt: [${substyleSunoTag ? `MUST lead with these locked production tags: "${substyleSunoTag}" — then add vocal and texture descriptors. ` : ''}Assemble into one ready-to-paste Suno string under 440 characters — NO artist names. This string MUST reflect the same production vocabulary as the TYPE 3 production bracket tags used in the lyrics (e.g. if the chorus uses [808 Bass] the prompt must include 808 bass; if [Falsetto] appears in delivery tags note it in the vocal descriptor).]
 
 PRODUCTION BRIEF:
 CORE PROMPT:
@@ -3494,7 +3508,8 @@ function buildRapLabPrompt(params) {
     era = 'current',
     rapStyle = 'trap',
     rapDimensions = {},
-    hookStyle = 'auto'
+    hookStyle = 'auto',
+    bracketMode = 'suno'
   } = params || {};
 
   const topic = sanitizeInput(rawTopic);
@@ -3574,7 +3589,7 @@ RAP LAB DIMENSIONS — HARD CONSTRAINTS:
 ${hookNote ? '\n' + hookNote : ''}${rapSubSunoLock}
 
 BRACKET REQUIREMENTS:
-${bracketInstructionServer('hiphop', 'full', style.label)}
+${bracketInstructionServer('hiphop', bracketMode, style.label)}
 
 SONGWRITING RULES:
 - Every bar must earn its space — no filler lines
