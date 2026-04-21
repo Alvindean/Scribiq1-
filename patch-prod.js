@@ -2,7 +2,6 @@
 // Applies all pending changes to api/_brain.js and public/index.html
 
 const fs = require('fs');
-const path = require('path');
 
 let ok = 0, fail = 0;
 
@@ -137,6 +136,32 @@ patch(BRAIN, 'song prompt TYPE3 alignment',
 patch(BRAIN, 'genre purity TYPE3 reference',
   'GENRE PURITY: Every chorus MUST include at least one genre-specific production tag in brackets (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — this signals genre DNA to the AI platform',
   'GENRE PURITY: Every chorus MUST include at least one TYPE 3 production tag inline (e.g. [Build], [Drop], [Trap Hi-Hat], [Steel Guitar], [Choir], [808 Bass]) — these are NOT section headers, they are sonic DNA signals placed inside the lyric body to guide the AI platform\'s production. The SONG PROMPT Full prompt must use the same production vocabulary as these tags.'
+);
+
+// 12. Update buildLuckyPrompt LYRICS instruction (different text from buildSongPrompt)
+patch(BRAIN, 'lucky lyrics bracket hierarchy',
+  '[Write the complete song lyrics. EVERY SECTION MUST START WITH ITS BRACKET TAG ON ITS OWN LINE.]',
+  '[Write the complete song lyrics using this exact bracket system:\n\n' +
+  'TYPE 1 — STRUCTURE (own line, opens every section): [Verse 1] · [Chorus] · [Bridge] · [Outro]\n' +
+  'TYPE 2 — DELIVERY (own line before affected lyric): [Whispered] · [Spoken] · [Falsetto] · [Screamed]\n' +
+  'TYPE 3 — PRODUCTION DNA (inline inside sections, ≥1 per Chorus): [808 Bass] · [Build] · [Drop] · [Choir]\n' +
+  'PARENTHESES () = ad-libs only — never structural. Every word must earn its place.]'
+);
+
+// 13. Update buildRapLabPrompt LYRICS instruction
+patch(BRAIN, 'raplab lyrics bracket hierarchy',
+  '[Complete song lyrics only. EVERY SECTION starts with its bracket tag. Clean lyrics — no annotations, no notes, no commentary embedded in the lyrics.]',
+  '[Complete song lyrics. Bracket system:\n' +
+  'TYPE 1 STRUCTURE (own line): [16-bar Verse | Rap Verse] · [8-bar Hook] · [Bridge] · [Outro]\n' +
+  'TYPE 2 DELIVERY (own line before lyric): [Whispered] · [Spoken] · [Ad-libs]\n' +
+  'TYPE 3 PRODUCTION DNA (inline, ≥1 per Hook/Chorus): [808 Bass] · [Trap Hi-Hat] · [Beat Switch] · [Drop]\n' +
+  'PARENTHESES () = ad-libs and background vocals only. No annotations in lyrics.]'
+);
+
+// 14. Update buildLuckyPrompt SONG PROMPT to require TYPE 3 alignment
+patch(BRAIN, 'lucky song prompt TYPE3 alignment',
+  '[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names.]',
+  '[Under 440 chars. Core genre + sub-genre feel, key instruments (4-5), BPM range, tempo feel, vocal descriptor, production texture, counter-melody device. NO artist names. MUST use the same production vocabulary as the TYPE 3 bracket tags in the lyrics.]'
 );
 
 // ─── public/index.html ────────────────────────────────────────────────────────
