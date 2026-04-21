@@ -1,26 +1,19 @@
-import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
-let _client: OpenAI | null = null;
+let _client: Anthropic | null = null;
 
-function getClient(): OpenAI {
+function getClient(): Anthropic {
   if (!_client) {
-    if (!process.env.OPENROUTER_API_KEY) {
-      throw new Error("OPENROUTER_API_KEY is not set");
+    if (!process.env.ANTHROPIC_API_KEY) {
+      throw new Error("ANTHROPIC_API_KEY is not set");
     }
-    _client = new OpenAI({
-      apiKey: process.env.OPENROUTER_API_KEY,
-      baseURL: "https://openrouter.ai/api/v1",
-      defaultHeaders: {
-        "HTTP-Referer": process.env.NEXT_PUBLIC_APP_URL ?? "https://nuwav-studio.vercel.app",
-        "X-Title": "NuWav Studio",
-      },
-    });
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   }
   return _client;
 }
 
 const DEFAULT_MODEL =
-  process.env.OPENROUTER_MODEL ?? "anthropic/claude-sonnet-4-5";
+  process.env.ANTHROPIC_MODEL ?? "claude-sonnet-4-5";
 
 export interface GenerateOptions {
   prompt: string;
@@ -32,24 +25,19 @@ export interface GenerateOptions {
 export async function generateText(options: GenerateOptions): Promise<string> {
   const { prompt, systemPrompt, maxTokens = 4096, temperature = 0.7 } = options;
 
-  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [];
-  if (systemPrompt) {
-    messages.push({ role: "system", content: systemPrompt });
-  }
-  messages.push({ role: "user", content: prompt });
-
-  const response = await getClient().chat.completions.create({
+  const message = await getClient().messages.create({
     model: DEFAULT_MODEL,
     max_tokens: maxTokens,
     temperature,
-    messages,
+    ...(systemPrompt ? { system: systemPrompt } : {}),
+    messages: [{ role: "user", content: prompt }],
   });
 
-  const text = response.choices[0]?.message?.content;
-  if (!text) {
-    throw new Error("No text content in AI response");
+  const textBlock = message.content.find((b) => b.type === "text");
+  if (!textBlock || textBlock.type !== "text") {
+    throw new Error("No text content in response");
   }
-  return text;
+  return textBlock.text;
 }
 
 export async function generateJSON<T>(options: GenerateOptions): Promise<T> {
