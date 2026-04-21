@@ -3922,6 +3922,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="rl-dpill"    onclick="setCraftDim(this,'hiphop','lyricTheme','abstract-cosmic')">Abstract Cosmic</span>
             <span class="rl-dpill"    onclick="setCraftDim(this,'hiphop','lyricTheme','party')">Party</span>
             <span class="rl-dpill"    onclick="setCraftDim(this,'hiphop','lyricTheme','anthem-triumph')">Anthem / Triumph</span>
+            <span class="rl-dpill"    onclick="setCraftDim(this,'hiphop','lyricTheme','hustle-grind')">Hustle / Grind</span>
           </div>
         </div>
         <div class="rl-dim-row" id="crd-hiphop-vocalTreatment">
@@ -4020,6 +4021,16 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
             <span class="qpill" onclick="setEra(this,'current')" data-era="current">🔥 Current <span style="font-size:9px;opacity:.7">2023–Now</span></span>
           </div>
           <div id="era-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px"></div>
+
+          <!-- AGGRESSION -->
+          <label class="topic-label">Aggression</label>
+          <div class="quality-row" id="aggression-pills">
+            <span class="qpill" onclick="setAggression(this,'mellow')">🌊 Mellow</span>
+            <span class="qpill on" onclick="setAggression(this,'mid')">◼ Mid</span>
+            <span class="qpill" onclick="setAggression(this,'heat')">🔥 Heat</span>
+            <span class="qpill" onclick="setAggression(this,'rage')">💢 Rage</span>
+          </div>
+          <div id="aggression-desc" style="font-size:11px;color:var(--tx3);font-style:italic;margin-bottom:12px;min-height:16px"></div>
 
           <!-- BRACKET FORMATTING -->
           <label class="bracket-label">Suno Bracket Formatting</label>
@@ -7174,6 +7185,7 @@ const S={selectedGenre:'pop',
   syllableCap: 0,
   platform: 'suno',
   // Edge Mode — lyrical permission system (adult audiences only)
+  selectedAggression: 'mid',   // 'mellow' | 'mid' | 'heat' | 'rage'
   edgeMode: 'off',             // 'off' | 'authentic' | 'raw'
   edgeTopics: [],              // subset of: profanity, sex_explicit, violence_street, substance, political_rage, grief_raw, mental_health, body_raw, class_money
   freestyleMode: false,        // true = no hook, no chorus, bars/verses only
@@ -8606,6 +8618,7 @@ async function generateSong(){
     // Edge Mode (backend hard-gates these to adult audiences regardless)
     edgeMode: S.edgeMode || 'off',
     edgeTopics: Array.isArray(S.edgeTopics) ? [...S.edgeTopics] : [],
+    aggression: S.selectedAggression || 'mid',
     freestyleMode: !!S.freestyleMode,
     // Per-genre craft dimensions (only the active genre's dims are sent)
     craftDimensions: (S.craftDimensions && S.craftDimensions[S.selectedGenre])
@@ -10435,6 +10448,20 @@ function setEra(el, val) {
   S.selectedEra = val;
   const desc = document.getElementById('era-desc');
   if (desc) desc.textContent = ERA_DESCS[val] || '';
+}
+
+const AGGRESSION_DESCS = {
+  mellow: 'Laid-back, conversational, introspective — emotion through restraint.',
+  mid:    'Balanced energy — default feel for most genres.',
+  heat:   'Elevated intensity, confrontational urgency — every bar has a point to prove.',
+  rage:   'Maximum force — no softness, no hesitation, pure unfiltered aggression.',
+};
+function setAggression(el, val) {
+  document.querySelectorAll('#aggression-pills .qpill').forEach(p => p.classList.remove('on'));
+  el.classList.add('on');
+  S.selectedAggression = val;
+  const desc = document.getElementById('aggression-desc');
+  if (desc) desc.textContent = AGGRESSION_DESCS[val] || '';
 }
 
 const AGE_DESCS = {

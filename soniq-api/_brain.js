@@ -2775,7 +2775,7 @@ function buildSongPrompt(params) {
     emotionalArc = 'none', seedLine = '', syllableCap = 0,
     platform = 'suno', avoidPatterns = [], dualPerspective = false, platinum = false,
     edgeMode = 'off', edgeTopics = [], freestyleMode = false,
-    craftDimensions = null
+    craftDimensions = null, aggression = 'mid'
   } = params;
 
   // Per-genre Craft Dimensions note — routed to the right builder.
@@ -3061,6 +3061,13 @@ MASTERING: ${_mastering.lufs||'-14 LUFS'} · ${_mastering.dynamicRange||'DR 8–
   const adlibNote = buildAdlibNote(genre);
   const vocalStackNote = buildVocalStackNote(genre);
 
+  const _aggrMap = {
+    mellow: 'Mellow — laid-back, conversational, introspective energy throughout. No raised voices, no confrontation. Deliver emotion through restraint and precision. Think Chance the Rapper intimate mode, early Drake confessional, Kendrick reflective.',
+    heat:   'Heat — elevated intensity, confrontational urgency in every bar. The verse should feel like it is building toward something that could explode. Think Kendrick "HUMBLE." / Future menace / City Girls unapologetic. Every line has a point to prove.',
+    rage:   'Rage — maximum aggression throughout. Every line hits like a threat or a demand. No softness, no hesitation — pure unfiltered force. Think Eminem "Till I Collapse," DMX bark, early Chief Keef cold menace, NF uncontained fury.'
+  };
+  const aggressionNote = _aggrMap[aggression] ? `\n\nAGGRESSION LEVEL — ${_aggrMap[aggression]}` : '';
+
   const prompt = `Write a complete, production-ready ${genreLabel} song at the highest possible level of craft.
 
 Genre: ${genreLabel}
@@ -3070,7 +3077,7 @@ Vocal style: ${vocal}
 Structure: ${structStr}
 Quality target: ${quality}
 Era: ${eraMap[era] || eraMap.modern}
-Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${edgeNote}${freestyleNote}${genreSpecificNote}${craftDimNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
+Song length: ${lengthMap[length] || lengthMap.medium}${substyleNote}${substyleSunoLock}${bibleNote}${counterNote}${outlierSongsNote}${theoryNote}${blendNote}${albumNote}${ageNote}${edgeNote}${aggressionNote}${freestyleNote}${genreSpecificNote}${craftDimNote}${hookNote}${hookStructNote}${voiceNote}${emotionalArcNote}${seedLineNote}
 
 SONGWRITING RULES:
 - FIRST LINE RULE: The very first line of Verse 1 must drop immediately into a specific sensory image, action, or confession. No scene-setting, no "I remember when", no establishing shots. Earn attention in line 1.
@@ -5315,7 +5322,8 @@ function buildHiphopDimBlock(dims) {
     'love-romance':'Love/Romance — relationships, attraction, heartbreak; Method Man/Mary "All I Need" lineage of rap love songs.',
     'abstract-cosmic':'Abstract cosmic — surreal wordplay, existential musing; MF Doom / Earl Sweatshirt non-literal territory.',
     'party':'Party — club energy, celebration, weekend vibes; accessible universal hip-hop function.',
-    'anthem-triumph':'Anthem/Triumph — motivational, overcoming-adversity, collective-victory energy; Eminem "Lose Yourself" / Kendrick "Alright" / Meek Mill "Dreams and Nightmares" / Kanye "Power" tradition. Cinematic build-ups, crowd-unifying hooks, first-person triumph that speaks for the collective. Every bar should feel like it belongs on a sports montage or a championship walk-out.'
+    'anthem-triumph':'Anthem/Triumph — motivational, overcoming-adversity, collective-victory energy; Eminem "Lose Yourself" / Kendrick "Alright" / Meek Mill "Dreams and Nightmares" / Kanye "Power" tradition. Cinematic build-ups, crowd-unifying hooks, first-person triumph that speaks for the collective. Every bar should feel like it belongs on a sports montage or a championship walk-out.',
+    'hustle-grind':'Hustle/Grind — work-ethic, come-up-from-nothing, financial ambition; Nipsey Hussle / Rick Ross / Moneybagg Yo / Meek Mill grind mode. The journey IS the content — specifics of sacrifice, late nights, doubters proven wrong. Not bragging about having arrived; documenting the cost of getting there.'
   };
   const vtMap = {
     'dry-classic':'Dry classic — minimal vocal processing; natural voice, close-mic\'d; 90s production norm for vocal clarity.',
