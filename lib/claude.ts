@@ -119,8 +119,8 @@ export async function generateCopy(options: GenerateOptions): Promise<ReadableSt
   const userMessage = userMessageParts.filter((l) => l !== undefined).join('\n')
 
   const stream = await client.messages.stream({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 2048,
+    model: 'claude-opus-4-7',
+    max_tokens: 4096,
     system: systemPrompt,
     messages: [{ role: 'user', content: userMessage }],
   })
