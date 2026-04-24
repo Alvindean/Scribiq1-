@@ -8502,7 +8502,7 @@ function parseLuckyResult(raw,fusionName,meta,prodData){
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
   const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
   const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT')||'';
-  let _vpb=parseSection(raw,'VIDEO PROMPT',null);const _si=_vpb?_vpb.indexOf('SINGER'):-1;if(_si>0)_vpb=_vpb.slice(0,_si).trim();const videoPrompt=_vpb||'';
+  let _vpb=parseSection(raw,'VIDEO PROMPT',null);const _si=_vpb?_vpb.indexOf('\nSINGER'):-1;if(_si>=0)_vpb=_vpb.slice(0,_si).trim();const videoPrompt=_vpb||'';
   // Production data from server constants (not AI-generated)
   const fxChain=prodData?.fxChain||'';
   const pluginToolkit=prodData?.pluginToolkit||'';
@@ -9024,7 +9024,7 @@ function parseSongResult(raw,genre,topic,prodData){
   const notes=parseSection(raw,'DIRECTOR NOTES','COUNTERMELODY');
   const countermelody=parseSection(raw,'COUNTERMELODY','VISUAL PROMPT');
   const visualPrompt=parseSection(raw,'VISUAL PROMPT','VIDEO PROMPT')||'';
-  let _vpb=parseSection(raw,'VIDEO PROMPT',null);const _si=_vpb?_vpb.indexOf('SINGER'):-1;if(_si>0)_vpb=_vpb.slice(0,_si).trim();const videoPrompt=_vpb||'';
+  let _vpb=parseSection(raw,'VIDEO PROMPT',null);const _si=_vpb?_vpb.indexOf('\nSINGER'):-1;if(_si>=0)_vpb=_vpb.slice(0,_si).trim();const videoPrompt=_vpb||'';
   // Production data from server constants (not AI-generated — no hallucination, no extra tokens)
   const fxChain=prodData?.fxChain||'';
   const pluginToolkit=prodData?.pluginToolkit||'';
@@ -16236,7 +16236,7 @@ Return ONLY valid JSON with this exact structure (no markdown, no extra text):
 }`;
 
   try {
-    const raw = await callClaude(prompt, 'Return only valid JSON. No markdown fences.', 1200);
+    const raw = await callClaude(prompt, 'Return only valid JSON. No markdown fences.', 2048);
     const jsonStr = raw.match(/\{[\s\S]*\}/)?.[0];
     if (!jsonStr) throw new Error('no json');
     const data = JSON.parse(jsonStr);
