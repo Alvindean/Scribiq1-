@@ -3367,7 +3367,7 @@ VISUAL PROMPT:
 [Write a single ready-to-paste image prompt for Midjourney, DALL-E or Firefly. ONE sentence: visual mood, setting, 2-3 key colors, art style. Under 200 chars. No faces, no text in image.]
 
 VIDEO PROMPT:
-[Write a single ready-to-paste video concept for Sora, Runway or Kling. ONE sentence: setting, visual action, camera movement, color grade, mood. Under 200 chars.]`;
+[Write a ready-to-paste Higgsfield AI video prompt. 2-3 sentences. Include: (1) scene/environment with specific location detail, (2) subject action and movement, (3) camera movement (slow push in / tracking shot / handheld / crane pull-back), (4) color grade and lighting (warm golden hour / neon-drenched / desaturated cinematic / high-contrast noir), (5) emotional atmosphere. Optimized for Higgsfield, Runway Gen-3, Kling. Under 300 chars.]`;
 
   return { system, prompt };
 }
@@ -3499,7 +3499,7 @@ VISUAL PROMPT:
 [Write a single ready-to-paste image prompt for Midjourney, DALL-E or Firefly. ONE sentence: visual mood, setting, 2-3 key colors, art style. Under 200 chars. No faces, no text in image.]
 
 VIDEO PROMPT:
-[Write a single ready-to-paste video concept for Sora, Runway or Kling. ONE sentence: setting, visual action, camera movement, color grade, mood. Under 200 chars.]`;
+[Write a ready-to-paste Higgsfield AI video prompt. 2-3 sentences. Include: (1) scene/environment with specific location detail, (2) subject action and movement, (3) camera movement (slow push in / tracking shot / handheld / crane pull-back), (4) color grade and lighting (warm golden hour / neon-drenched / desaturated cinematic / high-contrast noir), (5) emotional atmosphere. Optimized for Higgsfield, Runway Gen-3, Kling. Under 300 chars.]`;
 
   return {
     system,

@@ -1929,7 +1929,7 @@ hr{border:none;border-top:1px solid var(--b1);margin:18px 0}
       </div>
       <div class="skit-section">
         <div class="skit-sec-label">
-          <span>#️⃣ Hashtags (30)</span>
+          <span>🔑 Keywords</span>
           <button class="skit-copy-btn" onclick="skitCopy('skit-hashtags')">Copy</button>
         </div>
         <div class="skit-content" id="skit-hashtags">—</div>
@@ -16228,10 +16228,10 @@ ${(song.lyrics || '').slice(0, 800)}
 Return ONLY valid JSON with this exact structure (no markdown, no extra text):
 {
   "cover_art": "A detailed Midjourney/DALL-E prompt for a 1:1 cover art image that captures the mood, genre, and theme of this song. Include style, lighting, color palette, and visual elements.",
-  "lyric_video": "A 9:16 vertical lyric video visual concept — describe the background, animation style, font aesthetic, color scheme, and text overlay placement for a TikTok/Reels lyric video.",
+  "lyric_video": "A ready-to-paste Higgsfield AI video prompt for this song. 2-3 sentences covering: scene/environment with specific location detail, subject movement and action, camera movement (slow push in / tracking / handheld / crane pull-back), color grade and lighting style, emotional atmosphere. Paste-ready for Higgsfield, Runway Gen-3, or Kling.",
   "caption": "A short, punchy Instagram/TikTok caption (under 150 chars) that hooks the viewer — include one emoji. NO hashtags here.",
   "description": "A 2-3 sentence YouTube/platform description that tells the story of the song and invites listeners in. Conversational tone.",
-  "hashtags": "#tag1 #tag2 #tag3 ... (exactly 30 hashtags — mix genre-specific, mood, trending, and broad reach tags)",
+  "keywords": "20-25 discovery keywords (no # symbol) — mix of genre, mood, theme, era, instrument, and emotion words that describe this song. Space-separated. Optimized for Spotify pitching, playlist editors, and music blogs.",
   "hook_quote": "The single most shareable lyric line or hook from this song — max 12 words, perfect for text overlay on a video or image thumbnail."
 }`;
 
@@ -16244,7 +16244,7 @@ Return ONLY valid JSON with this exact structure (no markdown, no extra text):
     document.getElementById('skit-lyric-video').textContent = data.lyric_video || '—';
     document.getElementById('skit-caption').textContent = data.caption || '—';
     document.getElementById('skit-description').textContent = data.description || '—';
-    document.getElementById('skit-hashtags').textContent = data.hashtags || '—';
+    document.getElementById('skit-hashtags').textContent = data.keywords || data.hashtags || '—';
     document.getElementById('skit-hook-quote').textContent = data.hook_quote || '—';
     document.getElementById('skit-content').style.display = 'block';
     if (genBtn) { genBtn.disabled = false; genBtn.textContent = '🔄 Regenerate'; }
